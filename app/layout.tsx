@@ -31,6 +31,10 @@ export const metadata: Metadata = {
     template: '%s | johnenderson.com',
   },
   description: 'Site pessoal — artigos, notas e experimentos.',
+  icons: {
+    icon: [{ url: '/icon.svg', type: 'image/svg+xml' }],
+    shortcut: ['/icon.svg'],
+  },
   openGraph: {
     type: 'website',
     locale: 'pt_BR',
