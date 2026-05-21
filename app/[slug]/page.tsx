@@ -1,11 +1,12 @@
 import type { Metadata } from 'next';
+import { notFound } from 'next/navigation';
 import { getPlaiceholder } from 'plaiceholder';
 
 import { Layout } from 'Base/Article/Layout';
 import { MDXServer } from 'Base/components/MDX/MDXServer';
 import { getPaths } from 'src/lib';
-import { getPostContent } from 'src/lib/getPostContent';
-import { getPostMetadata } from 'src/lib/getPostMetadata';
+import { getPostContent, hasPostContent } from 'src/lib/getPostContent';
+import { getPostMetadata, hasPostMetadata } from 'src/lib/getPostMetadata';
 
 type Props = {
   params: Promise<{ slug: string }>;
@@ -17,6 +18,11 @@ export async function generateStaticParams() {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
+
+  if (!hasPostMetadata(slug)) {
+    return {};
+  }
+
   const postMetadata = getPostMetadata(slug);
 
   return {
@@ -30,6 +36,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function Page({ params }: Props) {
   const { slug } = await params;
+
+  if (!hasPostContent(slug) || !hasPostMetadata(slug)) {
+    notFound();
+  }
+
   const { postContent, minutes } = getPostContent(slug);
   const postMetadata = getPostMetadata(slug);
   const { base64, img } = await getPlaiceholder(postMetadata.coverImage.src);

@@ -29,17 +29,6 @@ export default function Page() {
             <About />
             <Writings />
           </div>
-          <div
-            style={{
-              position: 'fixed',
-              bottom: 0,
-              left: 0,
-              width: '100%',
-              height: '40px',
-              background: 'linear-gradient(180deg, transparent, #0f0f0f)',
-              pointerEvents: 'none',
-            }}
-          />
         </main>
       </AnimationLayout>
     </>

@@ -1,6 +1,6 @@
 @import 'tailwindcss';
 
-/* Light mode via class (set by next-themes) — dark is the default */
+/* Light mode via class — dark is the default */
 @custom-variant light (&:is(.light *));
 
 /* Elastic spring easing — same as doce.sh */
@@ -120,7 +120,7 @@ html.light .prefs-panel {
 
 html.light .navbar {
   background: rgba(250, 249, 255, 0.88);
-  border-bottom-color: rgba(139, 92, 246, 0.15);
+  border-bottom-color: rgba(39, 39, 42, 0.08);
 }
 
 @media (min-width: 768px) {
@@ -140,7 +140,7 @@ html.light .navbar {
 
   html.light .navbar.scrolled {
     background: rgba(250, 249, 255, 0.88);
-    border-bottom-color: rgba(139, 92, 246, 0.15);
+    border-bottom-color: rgba(39, 39, 42, 0.08);
   }
 }
 

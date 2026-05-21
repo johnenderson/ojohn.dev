@@ -7,6 +7,7 @@ import '@fortawesome/fontawesome-svg-core/styles.css';
 import 'katex/dist/katex.min.css';
 import type { Metadata } from 'next';
 
+import { DevPerformanceMeasurePatch } from './components/DevPerformanceMeasurePatch';
 import { Providers } from './providers';
 
 // Prevent FontAwesome from adding its CSS dynamically on the server (causes SSR errors)
@@ -57,6 +58,7 @@ export default function RootLayout({
   return (
     <html lang="pt-BR" className={`${geistSans.variable} ${geistMono.variable}`} suppressHydrationWarning>
       <body>
+        <DevPerformanceMeasurePatch />
         <Providers>{children}</Providers>
       </body>
     </html>

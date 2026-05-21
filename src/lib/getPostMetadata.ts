@@ -29,6 +29,20 @@ export type PostMetadata = {
   alternativeArticle: AlternativeArticle;
 };
 
+export function hasPostMetadata(
+  slug: string,
+  locale: Locale = Language.EN,
+) {
+  const postPath = path.join(
+    process.cwd(),
+    'content',
+    slug,
+    locale,
+    'metadata.json',
+  );
+  return fs.existsSync(postPath);
+}
+
 export function getPostMetadata(
   slug: string,
   locale: Locale = Language.EN,

@@ -1,7 +1,8 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { useTheme } from 'next-themes';
+
+import { Theme, useTheme } from 'Base/components/Theme';
 
 const FONT_SIZES = ['14px', '16px', '17px', '18px', '20px'];
 const DEFAULT_FONT_SIZE = '17px';
@@ -87,8 +88,8 @@ const ThemeSelector = ({
   theme,
   setTheme,
 }: {
-  theme: string | undefined;
-  setTheme: (t: string) => void;
+  theme: Theme;
+  setTheme: (theme: Theme) => void;
 }) => {
   const activeIdx = THEME_OPTIONS.findIndex((o) => o.value === theme);
   const idx = activeIdx >= 0 ? activeIdx : 0;

@@ -5,6 +5,17 @@ import readingTime from 'reading-time';
 import { Language } from './languages';
 import { Locale } from 'src/types/Locale';
 
+export function hasPostContent(slug: string, locale: string = Language.EN) {
+  const postPath = path.join(
+    process.cwd(),
+    'content',
+    slug,
+    locale,
+    'index.mdx',
+  );
+  return fs.existsSync(postPath);
+}
+
 export function getPostContent(slug: string, locale: string = Language.EN) {
   const postsDir = path.join(process.cwd(), 'content');
   const postPath = path.join(postsDir, slug, locale, 'index.mdx');

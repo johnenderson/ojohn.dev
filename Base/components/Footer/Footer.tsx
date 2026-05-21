@@ -2,8 +2,6 @@
 
 import { FC, useEffect, useState } from 'react';
 
-import { SocialIcons } from 'Base/components/SocialIcons';
-
 const ScrollToTop: FC = () => {
   const [visible, setVisible] = useState(false);
 
@@ -36,9 +34,7 @@ const ScrollToTop: FC = () => {
 
 export const Footer: FC = () => (
   <>
-    <footer className="mt-12 mb-6 flex flex-col justify-between gap-6 border-t border-[#8b5cf6]/20 light:border-[#8b5cf6]/25 py-12 text-center md:flex-row md:pt-6 md:pb-0 md:text-left mx-auto max-w-5xl px-6 lg:px-0">
-
-      {/* Left: copyright */}
+    <footer className="mt-12 mb-6 border-t border-[#8b5cf6]/20 light:border-[#e4e4e7] pt-6 text-center md:text-left mx-auto max-w-5xl px-6 lg:px-0">
       <div className="flex flex-col items-center md:items-start text-sm text-[#8f879b] light:text-[#777]">
         <p className="m-0">
           &copy; {new Date().getFullYear()} John Enderson
@@ -47,9 +43,6 @@ export const Footer: FC = () => (
           Feito com Next.js
         </p>
       </div>
-
-      {/* Right: social icons */}
-      <SocialIcons className="mx-auto mt-auto translate-y-1.5" />
     </footer>
 
     <ScrollToTop />
