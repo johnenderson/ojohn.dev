@@ -1,103 +1,142 @@
-# Guia de Desenvolvimento
+# Development
 
-## Requisitos
+Development notes for `johnenderson.dev`.
 
-- **Node.js** `>=18` (testado com v24)
-- **Yarn** `>=1.22`
+## Requirements
 
-Para instalar o Yarn globalmente caso não tenha:
+- Node 22, preferably via `nvm`
+- Yarn 1.x
 
 ```bash
+nvm install 22.15.0
+nvm use 22.15.0
+
 npm install -g yarn
-```
-
-## Configuração inicial
-
-1. Clone o repositório e entre na pasta:
-
-```bash
-git clone <repo-url>
-cd johnenderson.dev
-```
-
-2. Instale as dependências:
-
-```bash
 yarn install
-```
-
-Isso também executa `husky install` via o script `prepare`, configurando os git hooks para lint automático nos commits.
-
-## Subindo localmente
-
-```bash
 yarn dev
 ```
 
-O site ficará disponível em [http://localhost:3000](http://localhost:3000).
+The site runs at `http://localhost:3000`.
 
-## Scripts disponíveis
+## Commands
 
-| Comando               | Descrição                                                                  |
-| --------------------- | -------------------------------------------------------------------------- |
-| `yarn dev`            | Inicia o servidor de desenvolvimento                                       |
-| `yarn build`          | Gera o build de produção                                                   |
-| `yarn start`          | Inicia o build de produção localmente                                      |
-| `yarn lint`           | Executa o ESLint                                                           |
-| `yarn prettier:check` | Verifica a formatação do código                                            |
-| `yarn prettier:fix`   | Corrige a formatação automaticamente                                       |
-| `yarn eslint:fix`     | Corrige problemas de lint automaticamente                                  |
-| `yarn typecheck`      | Executa a verificação de tipos do TypeScript                               |
-| `yarn cypress`        | Abre o Cypress para testes E2E                                             |
-| `yarn update:webperf` | Regenera o conteúdo de web performance a partir dos repositórios no GitHub |
+| Command | Description |
+|---|---|
+| `yarn dev` | Start the development server |
+| `yarn build` | Build the production site |
+| `yarn start` | Start the production server after `yarn build` |
+| `yarn lint` | Run ESLint against `app`, `Base`, `Home`, and `src` |
+| `yarn typecheck` | Run TypeScript checks |
+| `yarn prettier:check` | Check formatting |
+| `yarn prettier:fix` | Format supported files |
+| `yarn cypress` | Open Cypress |
 
-## Qualidade de código
+`yarn build` uses `next/font` and may need network access to download Geist
+fonts from Google Fonts.
 
-Os hooks de pré-commit (via Husky + lint-staged) rodam automaticamente o ESLint e o Prettier nos arquivos `.js`, `.ts`, `.tsx`, `.css` e `.md` antes de cada commit.
+## Project Structure
 
-Para rodar as verificações manualmente:
-
-```bash
-yarn typecheck
-yarn prettier:check
-yarn lint
+```text
+.
+├── app/                # Next.js App Router routes and providers
+│   ├── [slug]/         # Article pages generated from content
+│   ├── rss.xml/        # RSS route handler
+│   ├── sobre/          # About page
+│   └── writings/       # Article index
+├── Base/               # Shared UI and article components
+│   ├── Article/        # Article layout, metadata, ToC, cover, footer
+│   ├── components/     # Navbar, footer, MDX components, command UI
+│   └── LinksGraph/     # Link graph utilities/components
+├── Home/               # Home and writings-list components
+├── content/            # Article content and metadata
+├── src/lib/            # Content loading, route generation, metadata helpers
+├── src/types/          # Shared TypeScript types
+├── public/             # Static assets
+└── styles/             # Global CSS and syntax highlighting styles
 ```
 
-## Testes E2E
+## Adding Content
 
-Os testes do Cypress precisam que o servidor de desenvolvimento esteja rodando:
+Each article currently lives in:
 
-```bash
-# Terminal 1
-yarn dev
-
-# Terminal 2
-yarn cypress
+```text
+content/<slug>/en/
+├── index.mdx
+└── metadata.json
 ```
 
-Os testes rodam contra `http://localhost:3000`.
+Example metadata:
 
-## Scripts de conteúdo
-
-A pasta `packages/scripts` contém scripts auxiliares. Para regenerar o conteúdo de tópicos de web performance a partir do GitHub:
-
-```bash
-yarn update:webperf
+```json
+{
+  "title": "Article title",
+  "description": "Short description",
+  "date": "2026-01-05",
+  "tags": [
+    {
+      "href": "/tags/example",
+      "name": "example"
+    }
+  ],
+  "coverImage": {
+    "src": "/article-slug/cover.jpg",
+    "width": "640",
+    "height": "425",
+    "alt": "Cover image description",
+    "authorHref": "",
+    "authorName": ""
+  }
+}
 ```
 
-Se o script precisar de autenticação, crie um arquivo `.env.local` na raiz com um token do GitHub:
+The article body goes in `index.mdx`. Headings receive IDs through the MDX
+pipeline and are used by the article table of contents.
 
+## MDX Components
+
+The MDX renderer supports:
+
+- GitHub Flavored Markdown tables and lists via `remark-gfm`
+- Syntax highlighting via `rehype-highlight`
+- Math with `<InlineMath>` and `<BlockMath>`
+- `<PostAndDate>`
+- `<SideBySideImages>`
+- `<SideBySideVideos>`
+- `<SmoothRender>`
+- `<TweetEmbed>`
+- `<Venn>`
+
+Example:
+
+```mdx
+<SmoothRender>
+
+Intro paragraph.
+
+<InlineMath math="E = mc^2" />
+
+<BlockMath math="\int_0^\infty e^{-x^2} dx = \frac{\sqrt{\pi}}{2}" />
+
+</SmoothRender>
 ```
-GITHUB_TOKEN=seu_token_aqui
-```
 
-O arquivo `.env.local` está no `.gitignore` e não será commitado.
+## Preferences
 
-## Stack tecnológica
+The navbar includes a preferences panel for:
 
-- **Framework**: [Next.js](https://nextjs.org/) 13
-- **Linguagem**: TypeScript
-- **Estilização**: Emotion (CSS-in-JS) + MUI
-- **Conteúdo**: MDX via `next-mdx-remote`
-- **Animações**: Framer Motion
-- **Deploy**: Vercel
+- theme: system, light, or dark
+- content text size: `14px`, `16px`, `17px`, `18px`, or `20px`
+
+The selected text size is stored in `localStorage` as `prose_font_size` and
+applied through the `--prose-font-size` CSS variable.
+
+## Keyboard Shortcuts
+
+| Shortcut | Action |
+|---|---|
+| `Ctrl+K` / `Cmd+K` | Open command palette |
+| `g` `h` | Go to Home |
+| `g` `w` | Go to Articles |
+| `f` `g` | Open GitHub |
+| `f` `t` | Open Twitter |
+| `f` `l` | Open LinkedIn |
