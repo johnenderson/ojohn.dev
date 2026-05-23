@@ -16,60 +16,75 @@ import {
 type LayoutPropTypes = {
   title: string;
   date: string;
+  icon?: string;
   alternativeArticle?: ArticleAlternative;
   coverImage: ArticleCoverImage;
   minutes: number;
+  tags: string[];
 };
 
 export const Layout: FC<PropsWithChildren<LayoutPropTypes>> = ({
   children,
   title,
   date,
+  icon,
   coverImage,
   alternativeArticle,
   minutes,
+  tags,
 }) => (
   <>
     <Navbar />
     <AnimationLayout>
-      <div className="content">
-        {/* Flex row: article (main) + ToC (aside) — mirrors doce.sh layout */}
-        <div className="flex w-full gap-12">
-          <main className="w-full min-w-0 max-w-2xl flex-1 flex flex-col gap-12">
-            <article
-              className="post"
-              itemScope
-              itemType="http://schema.org/BlogPosting"
-            >
-              <header className="flex flex-col gap-3">
-                <Title text={title} />
-                <Meta
-                  date={date}
-                  alternativeArticle={alternativeArticle}
-                  minutes={minutes}
-                />
-              </header>
+      <div className="content article-content">
+        <div className="flex w-full flex-col gap-12 py-12">
+          <div className="flex w-full gap-12 pt-12 md:pb-12">
+            <main className="flex w-full min-w-0 max-w-2xl flex-1 flex-col gap-12">
+              <article
+                className="post"
+                itemScope
+                itemType="http://schema.org/BlogPosting"
+              >
+                <header className="mb-10">
+                  <div className="flex items-start gap-4">
+                    {icon ? (
+                      <span className="mt-1 flex size-10 shrink-0 items-center justify-center rounded-full border border-site-border bg-site-primary-soft text-2xl leading-none text-site-primary">
+                        {icon}
+                      </span>
+                    ) : null}
+                    <div className="flex min-w-0 flex-col gap-3">
+                      <Title text={title} />
+                      <Meta
+                        date={date}
+                        alternativeArticle={alternativeArticle}
+                        minutes={minutes}
+                        tags={tags}
+                      />
+                    </div>
+                  </div>
+                </header>
 
-              {coverImage?.src && (
-                <CoverImage
-                  src={coverImage.src}
-                  width={coverImage.width}
-                  height={coverImage.height}
-                  alt={coverImage.alt}
-                  authorHref={coverImage.authorHref}
-                  authorName={coverImage.authorName}
-                  blurDataURL={coverImage.blurDataURL}
-                />
-              )}
+                {coverImage?.src && (
+                  <CoverImage
+                    src={coverImage.src}
+                    width={coverImage.width}
+                    height={coverImage.height}
+                    alt={coverImage.alt}
+                    authorHref={coverImage.authorHref}
+                    authorName={coverImage.authorName}
+                    blurDataURL={coverImage.blurDataURL}
+                  />
+                )}
 
-              {children}
-              <CodeCopyButtons />
-            </article>
+                {children}
+                <CodeCopyButtons />
+              </article>
 
-            <Footer />
-          </main>
+              <Footer />
+            </main>
 
-          <TableOfContents />
+            <TableOfContents />
+          </div>
         </div>
       </div>
     </AnimationLayout>

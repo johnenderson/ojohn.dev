@@ -12,7 +12,7 @@ import { PreferencesPanel } from './PreferencesPanel';
 import { SITE_NAME } from '@/lib/site';
 
 const navLinks = [
-  { href: '/writings', label: 'Artigos', icon: faNewspaper },
+  { href: '/writings', label: 'Blog', icon: faNewspaper },
   { href: '/me', label: 'Sobre mim', icon: faUser },
 ];
 

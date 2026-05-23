@@ -60,6 +60,8 @@ export default async function Page({ params }: Props) {
     <Layout
       title={articleMetadata.title}
       date={articleMetadata.date}
+      icon={articleMetadata.icon}
+      tags={articleMetadata.tags ?? []}
       alternativeArticle={articleMetadata.alternativeArticle}
       minutes={minutes}
       coverImage={coverImage}

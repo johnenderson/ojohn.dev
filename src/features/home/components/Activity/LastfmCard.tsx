@@ -6,6 +6,10 @@ import { CSSProperties, ReactNode, useEffect, useState } from 'react';
 
 import { LastfmStats, LastfmTrack } from '@/types/Lastfm';
 
+type LastfmNowPlayingResponse = {
+  nowPlaying: LastfmTrack | null;
+};
+
 const MusicIcon = ({ size = 18 }: { size?: number }) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
@@ -100,7 +104,7 @@ const TrackArtwork = ({
       alt={track.album ?? track.name}
       width={size}
       height={size}
-      className="shrink-0 rounded"
+      className="shrink-0 rounded transition-transform duration-200 group-hover:scale-[1.03] group-focus-within:scale-[1.03]"
       style={{ width: size, height: size }}
       onError={() => setFailed(true)}
     />
@@ -108,14 +112,14 @@ const TrackArtwork = ({
 };
 
 const TrackRow = ({ track }: { track: LastfmTrack }) => (
-  <li className="flex min-w-0 items-center gap-3 rounded p-1 transition-colors hover:bg-site-card-hover">
+  <li className="interactive-row group flex min-w-0 items-center gap-3 rounded p-1">
     <TrackArtwork track={track} size={40} />
     <div className="flex min-w-0 flex-col">
       <Link
         href={track.url}
         target="_blank"
         rel="noopener noreferrer"
-        className="truncate text-sm font-medium no-underline transition-colors hover:text-site-primary-hover"
+        className="truncate text-sm font-medium no-underline transition-colors hover:text-site-primary-hover focus-visible:text-site-primary-hover focus-visible:outline-none"
         title={track.name}
       >
         {track.name}
@@ -134,10 +138,30 @@ export const LastfmCard = () => {
   useEffect(() => {
     let active = true;
 
-    fetch('/api/lastfm')
-      .then((response) => response.json() as Promise<LastfmStats>)
-      .then((data) => {
-        if (active) setLastfm(data);
+    Promise.allSettled([
+      fetch('/api/lastfm/now-playing', { cache: 'no-store' }).then(
+        (response) => response.json() as Promise<LastfmNowPlayingResponse>,
+      ),
+      fetch('/api/lastfm/recent').then(
+        (response) => response.json() as Promise<LastfmStats>,
+      ),
+    ])
+      .then(([nowPlayingResult, recentResult]) => {
+        if (!active) return;
+
+        const nowPlaying =
+          nowPlayingResult.status === 'fulfilled'
+            ? nowPlayingResult.value.nowPlaying
+            : null;
+        const recent =
+          recentResult.status === 'fulfilled'
+            ? recentResult.value
+            : { nowPlaying: null, lastPlayed: null, tracks: [] };
+
+        setLastfm({
+          ...recent,
+          nowPlaying,
+        });
       })
       .catch(() => {
         if (active) {
@@ -160,7 +184,7 @@ export const LastfmCard = () => {
     <section id="activity" className="mt-12 md:mt-14">
       <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
         <FadeIn
-          className="col-span-1 flex min-h-36 flex-col gap-4 rounded-md border border-site-border-muted bg-site-card p-4 shadow-sm shadow-transparent transition duration-200 hover:-translate-y-0.5 hover:border-site-border hover:bg-site-card-hover light:shadow-[var(--site-card-shadow)] sm:p-5 md:col-span-2"
+          className="interactive-card col-span-1 flex min-h-36 flex-col gap-4 rounded-md border border-site-border-muted bg-site-card p-4 sm:p-5 md:col-span-2"
           duration={500}
         >
           <div className="flex flex-wrap items-center justify-between gap-2">
@@ -185,7 +209,7 @@ export const LastfmCard = () => {
                   href={featuredTrack.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="truncate text-lg font-bold no-underline transition-colors hover:text-site-primary-hover"
+                  className="truncate text-lg font-bold no-underline transition-colors hover:text-site-primary-hover focus-visible:text-site-primary-hover focus-visible:outline-none"
                   title={featuredTrack.name}
                 >
                   {featuredTrack.name}
@@ -213,7 +237,7 @@ export const LastfmCard = () => {
               href={featuredTrack.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="mt-auto w-fit text-xs font-medium text-site-body-muted no-underline transition-colors hover:text-site-primary-hover"
+              className="mt-auto w-fit text-xs font-medium text-site-body-muted no-underline transition-colors hover:text-site-primary-hover focus-visible:text-site-primary-hover focus-visible:outline-none"
             >
               Ver no Last.fm
             </Link>
@@ -221,7 +245,7 @@ export const LastfmCard = () => {
         </FadeIn>
 
         <FadeIn
-          className="col-span-1 flex min-h-36 flex-col gap-4 rounded-md border border-site-border-muted bg-site-card p-4 shadow-sm shadow-transparent transition duration-200 hover:-translate-y-0.5 hover:border-site-border hover:bg-site-card-hover light:shadow-[var(--site-card-shadow)] sm:p-5 md:col-span-2"
+          className="interactive-card col-span-1 flex min-h-36 flex-col gap-4 rounded-md border border-site-border-muted bg-site-card p-4 sm:p-5 md:col-span-2"
           delay={100}
           duration={500}
         >

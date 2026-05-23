@@ -30,6 +30,7 @@ export type ArticleMetadata = {
   title: string;
   description: string;
   date: string;
+  icon?: string;
   tags?: string[];
   coverImage: ArticleCoverImage;
   alternativeArticle?: ArticleAlternative;
@@ -40,6 +41,7 @@ export type ArticleListItem = {
   title: string;
   date: string;
   description: string;
+  icon?: string;
   minutes: number;
   tags: string[];
 };
@@ -151,6 +153,7 @@ function parseArticleMetadata(
     title: stringValue(value, 'title', context),
     description: stringValue(value, 'description', context),
     date: stringValue(value, 'date', context),
+    icon: optionalStringValue(value, 'icon'),
     tags: parseTags(value.tags, context),
     coverImage: parseCoverImage(value.coverImage, context),
     alternativeArticle: parseAlternativeArticle(
@@ -351,6 +354,7 @@ export function getArticlesList(
         title: metadata.title,
         date: metadata.date,
         description: metadata.description,
+        icon: metadata.icon,
         minutes: Math.max(1, Math.round(minutes)),
         tags: metadata.tags ?? [],
       };

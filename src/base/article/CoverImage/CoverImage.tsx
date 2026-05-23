@@ -18,7 +18,7 @@ export const CoverImage: FC<CoverImagePropTypes> = ({
   authorName,
   blurDataURL,
 }) => (
-  <div className="mt-8 mb-8 text-center flex flex-col gap-3">
+  <div className="my-8 flex flex-col gap-3 text-center">
     <Image
       src={src}
       width={width}
@@ -26,6 +26,7 @@ export const CoverImage: FC<CoverImagePropTypes> = ({
       alt={alt}
       blurDataURL={blurDataURL}
       placeholder="blur"
+      className="rounded-md border border-site-border-subtle"
       style={{ height: 'auto' }}
     />
     {authorName ? (

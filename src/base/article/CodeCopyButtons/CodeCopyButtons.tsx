@@ -17,8 +17,8 @@ export function CodeCopyButtons() {
       const button = document.createElement('button');
       button.type = 'button';
       button.className = 'code-copy-button';
-      button.textContent = 'Copy';
-      button.setAttribute('aria-label', 'Copy code');
+      button.textContent = 'Copiar';
+      button.setAttribute('aria-label', 'Copiar código');
 
       let timeout: number | undefined;
 
@@ -27,17 +27,17 @@ export function CodeCopyButtons() {
 
         try {
           await navigator.clipboard.writeText(code);
-          button.textContent = 'Copied';
-          button.setAttribute('aria-label', 'Code copied');
+          button.textContent = 'Copiado';
+          button.setAttribute('aria-label', 'Código copiado');
 
           if (timeout) window.clearTimeout(timeout);
           timeout = window.setTimeout(() => {
-            button.textContent = 'Copy';
-            button.setAttribute('aria-label', 'Copy code');
+            button.textContent = 'Copiar';
+            button.setAttribute('aria-label', 'Copiar código');
           }, COPIED_LABEL_TIMEOUT);
         } catch {
-          button.textContent = 'Failed';
-          button.setAttribute('aria-label', 'Failed to copy code');
+          button.textContent = 'Falhou';
+          button.setAttribute('aria-label', 'Falha ao copiar código');
         }
       };
 

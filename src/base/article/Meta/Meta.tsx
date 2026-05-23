@@ -7,6 +7,7 @@ type MetaPropTypes = {
   date: string;
   alternativeArticle?: ArticleAlternative;
   minutes: number;
+  tags: string[];
 };
 
 const CalendarIcon = () => (
@@ -58,14 +59,14 @@ export const Meta: FC<MetaPropTypes> = ({
   date,
   alternativeArticle,
   minutes,
+  tags,
 }) => (
-  <div className="mt-1.5">
-    <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[0.8rem] text-site-body-muted">
+  <div className="mt-1 flex flex-col gap-3">
+    <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm font-medium text-site-body-muted">
       {date && (
         <span className="flex items-center gap-1.5">
           <CalendarIcon />
           <span>
-            Publicado em{' '}
             <time dateTime={`${date}T00:00:00.000Z`} itemProp="datePublished">
               {formatDate(date)}
             </time>
@@ -76,10 +77,24 @@ export const Meta: FC<MetaPropTypes> = ({
         <span className="flex items-center gap-1.5">
           <span className="text-site-border">•</span>
           <ClockIcon />
-          <span>{minutes} min de leitura</span>
+          <strong className="font-semibold text-site-body">
+            {minutes} min de leitura
+          </strong>
         </span>
       ) : null}
     </div>
+    {tags.length > 0 && (
+      <ul className="m-0 flex list-none flex-wrap gap-2 p-0">
+        {tags.map((tag) => (
+          <li
+            key={tag}
+            className="rounded border border-site-border-subtle px-2 py-0.5 text-xs font-medium leading-5 text-site-body-muted transition-colors hover:border-site-border hover:text-site-foreground"
+          >
+            {tag}
+          </li>
+        ))}
+      </ul>
+    )}
     {alternativeArticle ? (
       <AlternativeArticle alternativeArticle={alternativeArticle} />
     ) : null}

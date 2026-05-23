@@ -2,13 +2,15 @@ import { NextResponse } from 'next/server';
 
 import { getLastfmStats } from '@/lib/lastfm';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET() {
   try {
     const lastfm = await getLastfmStats();
 
     return NextResponse.json(lastfm, {
       headers: {
-        'Cache-Control': 'public, s-maxage=120, stale-while-revalidate=300',
+        'Cache-Control': 'no-store',
       },
     });
   } catch (error) {

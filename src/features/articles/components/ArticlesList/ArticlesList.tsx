@@ -35,6 +35,7 @@ export const ArticlesList: FC<ArticlesListProps> = ({ header = 'h2' }) => {
             key={article.slug}
             datetime={article.date}
             description={article.description}
+            icon={article.icon}
             link={`/${article.slug}`}
             minutes={article.minutes}
             tags={article.tags}

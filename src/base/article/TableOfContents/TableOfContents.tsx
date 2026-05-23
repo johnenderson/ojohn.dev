@@ -3,7 +3,7 @@
 import { useEffect, useLayoutEffect, useState } from 'react';
 
 const NAVBAR_OFFSET = 96;
-const ITEM_HEIGHT = 30; // h-6 (24px) + gap-1.5 (6px)
+const ITEM_HEIGHT = 36; // h-8 (32px) + gap-1 (4px)
 
 type Heading = {
   id: string;
@@ -56,11 +56,13 @@ export const TableOfContents = () => {
 
   return (
     <aside
-      className="sticky hidden h-fit w-full max-w-[19rem] shrink-0 flex-col gap-3 border-l border-site-border lg:flex text-lg"
+      className="sticky hidden h-fit w-full max-w-[18rem] shrink-0 flex-col gap-3 border-l border-site-border-subtle py-1 pl-5 lg:flex"
       style={{ top: '8rem' }}
     >
-      <p className="ml-6 font-semibold text-site-foreground">Nesse artigo</p>
-      <div className="relative flex flex-col gap-1.5">
+      <p className="m-0 text-base font-semibold text-site-foreground">
+        Nesse artigo
+      </p>
+      <div className="relative flex flex-col gap-1">
         {headings.map((heading) => (
           <a
             key={heading.id}
@@ -78,8 +80,8 @@ export const TableOfContents = () => {
               }
               setActiveId(heading.id);
             }}
-            className={`flex h-7 items-center truncate transition-colors duration-200 no-underline ${
-              heading.level === 3 ? 'pl-10' : 'pl-6'
+            className={`flex h-8 items-center truncate text-base font-semibold no-underline transition-colors duration-200 ${
+              heading.level === 3 ? 'pl-6' : 'pl-3'
             } ${
               activeId === heading.id
                 ? 'text-site-primary'
@@ -92,7 +94,7 @@ export const TableOfContents = () => {
 
         {/* Moving active indicator bar — same as doce.sh */}
         <span
-          className="absolute -left-px w-px h-6 bg-site-primary transition-all duration-300 ease-elastic"
+          className="absolute left-0 h-7 w-px bg-site-primary transition-all duration-300 ease-elastic"
           style={{ top: `${(activeIdx >= 0 ? activeIdx : 0) * ITEM_HEIGHT}px` }}
         />
       </div>
