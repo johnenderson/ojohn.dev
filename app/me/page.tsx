@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import type { CSSProperties } from 'react';
 
 import { PageWrapper } from '../components/PageWrapper';
 import {
@@ -43,27 +44,21 @@ export const metadata: Metadata = {
 const tldrCards = [
   {
     icon: faCakeCandles,
-    cardClassName: 'border-pink-500 bg-pink-500/20',
-    iconClassName: 'bg-pink-500',
-    pretitleClassName: 'text-pink-300',
+    accent: '#ec4899',
     pretitle: 'Aniversário',
     title: '02 de fevereiro',
     description: 'Aquário',
   },
   {
     icon: faHandshake,
-    cardClassName: 'border-yellow-500 bg-yellow-500/20',
-    iconClassName: 'bg-yellow-500',
-    pretitleClassName: 'text-yellow-300',
+    accent: '#f0a66d',
     pretitle: 'Pronomes',
     title: 'ele/dele',
     description: 'Pronomes pessoais',
   },
   {
     icon: faCode,
-    cardClassName: 'border-blue-500 bg-blue-500/20',
-    iconClassName: 'bg-blue-500',
-    pretitleClassName: 'text-blue-300',
+    accent: '#5bd3c7',
     pretitle: 'Trampo',
     title: 'Itaú Unibanco',
     description: 'Engenheiro de Software',
@@ -71,9 +66,7 @@ const tldrCards = [
   },
   {
     icon: faGraduationCap,
-    cardClassName: 'border-emerald-500 bg-emerald-500/20',
-    iconClassName: 'bg-emerald-500',
-    pretitleClassName: 'text-emerald-300',
+    accent: '#10b981',
     pretitle: 'Educação',
     title: 'Uninove',
     description: '2020 - 2025',
@@ -101,24 +94,21 @@ export default function Page() {
                 id="tldr-title"
                 className="m-0 text-2xl font-bold text-site-foreground"
               >
-                TL;DR
+                Em poucas palavras
               </h2>
 
               <ul className="m-0 grid w-full list-none grid-cols-1 gap-3 p-0 sm:grid-cols-2 lg:grid-cols-4">
                 {tldrCards.map((card) => (
                   <li
                     key={card.pretitle}
-                    className={`flex gap-3 rounded border p-3 ${card.cardClassName}`}
+                    className="tldr-card interactive-card flex min-h-28 gap-4 rounded-md border p-4"
+                    style={{ '--tldr-accent': card.accent } as CSSProperties}
                   >
-                    <span
-                      className={`flex size-10 shrink-0 items-center justify-center rounded text-white ${card.iconClassName}`}
-                    >
+                    <span className="tldr-card-icon flex size-11 shrink-0 items-center justify-center rounded-md">
                       <FontAwesomeIcon icon={card.icon} className="size-5" />
                     </span>
-                    <div>
-                      <h3
-                        className={`m-0 text-xs font-semibold uppercase ${card.pretitleClassName}`}
-                      >
+                    <div className="min-w-0">
+                      <h3 className="tldr-card-label m-0 text-xs font-bold uppercase tracking-[0.12em]">
                         {card.pretitle}
                       </h3>
                       {card.href ? (
@@ -126,16 +116,16 @@ export default function Page() {
                           href={card.href}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="mb-0.5 block font-semibold leading-5 text-site-foreground hover:text-site-primary-hover transition-colors"
+                          className="mb-1 mt-1 block truncate text-lg font-bold leading-5 text-site-foreground transition-colors hover:text-site-primary-hover"
                         >
                           {card.title}
                         </Link>
                       ) : (
-                        <p className="mb-0.5 mt-0 font-semibold leading-5 text-site-foreground">
+                        <p className="mb-1 mt-1 truncate text-lg font-bold leading-5 text-site-foreground">
                           {card.title}
                         </p>
                       )}
-                      <p className="m-0 text-sm leading-4 text-site-body-muted">
+                      <p className="m-0 text-sm leading-5 text-site-body-muted">
                         {card.description}
                       </p>
                     </div>
