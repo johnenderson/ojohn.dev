@@ -32,7 +32,6 @@ export const ArticleListItem: FC<PostPropType> = ({
         <Link
           href={link}
           className="interactive-card article-card-glass group block rounded-md border border-site-border-muted p-4 no-underline focus-visible:outline-none sm:p-5"
-          aria-label={`Ler ${title}`}
         >
           <div className="article-card-content flex items-start gap-4">
             {icon ? (
@@ -66,7 +65,6 @@ export const ArticleListItem: FC<PostPropType> = ({
       <Link
         href={link}
         className="interactive-card article-card-glass group block rounded-md border border-site-border-muted p-5 no-underline focus-visible:outline-none"
-        aria-label={`Ler ${title}`}
       >
         <div className="article-card-content">
           <div className="flex items-start gap-2">

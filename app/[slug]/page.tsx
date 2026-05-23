@@ -12,6 +12,7 @@ import {
   hasArticleContent,
   hasArticleMetadata,
 } from '@/features/articles/lib/articles';
+import { SITE_NAME, SITE_URL } from '@/lib/site';
 
 type Props = {
   params: Promise<{ slug: string }>;
@@ -29,12 +30,27 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 
   const articleMetadata = getArticleMetadata(slug);
+  const articleUrl = `${SITE_URL}/${slug}`;
 
   return {
     title: articleMetadata.title,
     description: articleMetadata.description,
+    alternates: {
+      canonical: articleUrl,
+    },
     openGraph: {
+      title: articleMetadata.title,
+      description: articleMetadata.description,
       images: [{ url: articleMetadata.coverImage.src }],
+      siteName: SITE_NAME,
+      type: 'article',
+      url: articleUrl,
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: articleMetadata.title,
+      description: articleMetadata.description,
+      images: [articleMetadata.coverImage.src],
     },
   };
 }
