@@ -1,15 +1,25 @@
 import { ImageResponse } from 'next/og';
 
 import {
+  getArticleContent,
   getArticleMetadata,
   hasArticleMetadata,
+  parseArticleDate,
 } from '@/features/articles/lib/articles';
-import { SITE_NAME } from '@/lib/site';
+import { AUTHOR_NAME, SITE_NAME } from '@/lib/site';
 
 const size = {
   width: 1200,
   height: 630,
 };
+
+const formatDate = (raw: string) =>
+  new Intl.DateTimeFormat('pt-BR', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
+    timeZone: 'UTC',
+  }).format(parseArticleDate(raw));
 
 export async function GET(
   _request: Request,
@@ -22,6 +32,7 @@ export async function GET(
   }
 
   const article = getArticleMetadata(slug);
+  const { minutes } = getArticleContent(slug);
 
   return new ImageResponse(
     (
@@ -88,7 +99,7 @@ export async function GET(
                 textTransform: 'uppercase',
               }}
             >
-              Blog
+              {AUTHOR_NAME}
             </div>
           </div>
         </div>
@@ -105,7 +116,12 @@ export async function GET(
               maxWidth: '980px',
               margin: 0,
               color: '#fffaf5',
-              fontSize: article.title.length > 56 ? '60px' : '72px',
+              fontSize:
+                article.title.length > 72
+                  ? '54px'
+                  : article.title.length > 48
+                  ? '62px'
+                  : '72px',
               fontWeight: 800,
               lineHeight: 1.05,
               letterSpacing: '-0.02em',
@@ -125,6 +141,24 @@ export async function GET(
           >
             {article.description}
           </p>
+        </div>
+
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            color: 'rgba(255, 250, 245, 0.68)',
+            fontSize: '24px',
+            fontWeight: 700,
+          }}
+        >
+          <div style={{ display: 'flex', gap: '18px' }}>
+            <span>{formatDate(article.date)}</span>
+            <span>•</span>
+            <span>{minutes} min de leitura</span>
+          </div>
+          <span style={{ color: '#f0a66d' }}>Blog</span>
         </div>
       </div>
     ),

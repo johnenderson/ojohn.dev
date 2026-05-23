@@ -11,13 +11,21 @@ type Heading = {
   level: number;
 };
 
-export const TableOfContents = () => {
+type TableOfContentsProps = {
+  variant?: 'desktop' | 'mobile';
+};
+
+export const TableOfContents = ({
+  variant = 'desktop',
+}: TableOfContentsProps) => {
   const [headings, setHeadings] = useState<Heading[]>([]);
   const [activeId, setActiveId] = useState<string>('');
 
   useLayoutEffect(() => {
     const elements = Array.from(
-      document.querySelectorAll('article h2, article h3'),
+      document.querySelectorAll(
+        'article h2:not([data-toc-ignore]), article h3:not([data-toc-ignore])',
+      ),
     );
     const parsed = elements
       .filter((el) => el.id)
@@ -36,7 +44,9 @@ export const TableOfContents = () => {
     if (headings.length === 0) return;
 
     const headingEls = Array.from(
-      document.querySelectorAll('article h2, article h3'),
+      document.querySelectorAll(
+        'article h2:not([data-toc-ignore]), article h3:not([data-toc-ignore])',
+      ),
     ) as HTMLElement[];
 
     const onScroll = () => {
@@ -53,6 +63,45 @@ export const TableOfContents = () => {
   if (headings.length === 0) return null;
 
   const activeIdx = headings.findIndex((h) => h.id === activeId);
+  const links = headings.map((heading) => (
+    <a
+      key={heading.id}
+      href={`#${heading.id}`}
+      onClick={(e) => {
+        e.preventDefault();
+        const el = document.getElementById(heading.id);
+        if (el) {
+          const top =
+            el.getBoundingClientRect().top +
+            window.scrollY -
+            NAVBAR_OFFSET -
+            24;
+          window.scrollTo({ top, behavior: 'smooth' });
+        }
+        setActiveId(heading.id);
+      }}
+      className={`flex h-8 items-center truncate text-base font-semibold no-underline transition-colors duration-200 ${
+        heading.level === 3 ? 'pl-6' : 'pl-3'
+      } ${
+        activeId === heading.id
+          ? 'text-site-primary'
+          : 'text-site-body hover:text-site-primary-hover'
+      }`}
+    >
+      {heading.text}
+    </a>
+  ));
+
+  if (variant === 'mobile') {
+    return (
+      <details className="mb-8 rounded-md border border-site-border-muted bg-site-card p-4 lg:hidden">
+        <summary className="cursor-pointer text-base font-semibold text-site-foreground">
+          Nesse artigo
+        </summary>
+        <div className="mt-3 flex flex-col gap-1">{links}</div>
+      </details>
+    );
+  }
 
   return (
     <aside
@@ -63,34 +112,7 @@ export const TableOfContents = () => {
         Nesse artigo
       </p>
       <div className="relative flex flex-col gap-1">
-        {headings.map((heading) => (
-          <a
-            key={heading.id}
-            href={`#${heading.id}`}
-            onClick={(e) => {
-              e.preventDefault();
-              const el = document.getElementById(heading.id);
-              if (el) {
-                const top =
-                  el.getBoundingClientRect().top +
-                  window.scrollY -
-                  NAVBAR_OFFSET -
-                  24;
-                window.scrollTo({ top, behavior: 'smooth' });
-              }
-              setActiveId(heading.id);
-            }}
-            className={`flex h-8 items-center truncate text-base font-semibold no-underline transition-colors duration-200 ${
-              heading.level === 3 ? 'pl-6' : 'pl-3'
-            } ${
-              activeId === heading.id
-                ? 'text-site-primary'
-                : 'text-site-body hover:text-site-primary-hover'
-            }`}
-          >
-            {heading.text}
-          </a>
-        ))}
+        {links}
 
         {/* Moving active indicator bar — same as doce.sh */}
         <span

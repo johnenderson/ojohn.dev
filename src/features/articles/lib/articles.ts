@@ -46,6 +46,16 @@ export type ArticleListItem = {
   tags: string[];
 };
 
+export type ArticleNavigationItem = Pick<
+  ArticleListItem,
+  'slug' | 'title' | 'description' | 'icon'
+>;
+
+export type ArticleNavigation = {
+  newer: ArticleNavigationItem | null;
+  older: ArticleNavigationItem | null;
+};
+
 export function parseArticleDate(raw: string): Date {
   const slashDate = raw.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
   if (slashDate) {
@@ -62,6 +72,25 @@ export function parseArticleDate(raw: string): Date {
   return new Date(raw);
 }
 
+function isValidDate(date: Date) {
+  return !Number.isNaN(date.getTime());
+}
+
+function isValidIsoDate(raw: string) {
+  const match = raw.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (!match) return false;
+
+  const [, year, month, day] = match;
+  const date = parseArticleDate(raw);
+
+  return (
+    isValidDate(date) &&
+    date.getUTCFullYear() === Number(year) &&
+    date.getUTCMonth() + 1 === Number(month) &&
+    date.getUTCDate() === Number(day)
+  );
+}
+
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
 }
@@ -75,6 +104,11 @@ function stringValue(
   if (typeof value !== 'string') {
     throw new Error(
       `Invalid article metadata for ${context}: ${key} must be a string.`,
+    );
+  }
+  if (!value.trim()) {
+    throw new Error(
+      `Invalid article metadata for ${context}: ${key} cannot be empty.`,
     );
   }
   return value;
@@ -165,10 +199,22 @@ function parseArticleMetadata(
     );
   }
 
-  return {
+  const date = stringValue(value, 'date', context);
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) {
+    throw new Error(
+      `Invalid article metadata for ${context}: date must use YYYY-MM-DD format.`,
+    );
+  }
+  if (!isValidIsoDate(date)) {
+    throw new Error(
+      `Invalid article metadata for ${context}: date must be a valid calendar date.`,
+    );
+  }
+
+  const metadata = {
     title: stringValue(value, 'title', context),
     description: stringValue(value, 'description', context),
-    date: stringValue(value, 'date', context),
+    date,
     icon: optionalStringValue(value, 'icon'),
     tags: parseTags(value.tags, context),
     coverImage: parseCoverImage(value.coverImage, context),
@@ -177,6 +223,8 @@ function parseArticleMetadata(
       context,
     ),
   };
+
+  return metadata;
 }
 
 function parseInlineArray(value: string) {
@@ -379,4 +427,36 @@ export function getArticlesList(
       (a, b) =>
         parseArticleDate(b.date).getTime() - parseArticleDate(a.date).getTime(),
     );
+}
+
+const toNavigationItem = (
+  article: ArticleListItem | undefined,
+): ArticleNavigationItem | null =>
+  article
+    ? {
+        slug: article.slug,
+        title: article.title,
+        description: article.description,
+        icon: article.icon,
+      }
+    : null;
+
+export function getArticleNavigation(
+  slug: string,
+  locale: Locale = DEFAULT_ARTICLE_LOCALE,
+): ArticleNavigation {
+  const articles = getArticlesList(locale);
+  const currentIndex = articles.findIndex((article) => article.slug === slug);
+
+  if (currentIndex === -1) {
+    return {
+      newer: null,
+      older: null,
+    };
+  }
+
+  return {
+    newer: toNavigationItem(articles[currentIndex - 1]),
+    older: toNavigationItem(articles[currentIndex + 1]),
+  };
 }

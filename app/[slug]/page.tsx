@@ -8,6 +8,7 @@ import { MDXServer } from '@/base/components/MDX/MDXServer';
 import {
   getArticleContent,
   getArticleMetadata,
+  getArticleNavigation,
   getArticlePaths,
   hasArticleContent,
   hasArticleMetadata,
@@ -77,6 +78,7 @@ export default async function Page({ params }: Props) {
 
   const { content, minutes } = getArticleContent(slug);
   const articleMetadata = getArticleMetadata(slug);
+  const navigation = getArticleNavigation(slug);
   const { base64, img } = await getPlaiceholder(articleMetadata.coverImage.src);
   const articleUrl = `${SITE_URL}/${slug}`;
   const articleImageUrl = `${SITE_URL}/og/${slug}`;
@@ -117,6 +119,7 @@ export default async function Page({ params }: Props) {
       tags={articleMetadata.tags ?? []}
       alternativeArticle={articleMetadata.alternativeArticle}
       minutes={minutes}
+      navigation={navigation}
       coverImage={coverImage}
     >
       <script

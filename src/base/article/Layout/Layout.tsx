@@ -1,5 +1,6 @@
 import { FC, PropsWithChildren } from 'react';
 
+import { ArticleNavigation } from '@/base/article/ArticleNavigation';
 import { CodeCopyButtons } from '@/base/article/CodeCopyButtons';
 import { CoverImage } from '@/base/article/CoverImage';
 import { Footer } from '@/base/article/Layout/Footer';
@@ -11,6 +12,7 @@ import { Navbar } from '@/base/components/Navbar';
 import {
   ArticleAlternative,
   ArticleCoverImage,
+  ArticleNavigation as ArticleNavigationType,
 } from '@/features/articles/lib/articles';
 
 type LayoutPropTypes = {
@@ -20,6 +22,7 @@ type LayoutPropTypes = {
   alternativeArticle?: ArticleAlternative;
   coverImage: ArticleCoverImage;
   minutes: number;
+  navigation: ArticleNavigationType;
   tags: string[];
 };
 
@@ -31,6 +34,7 @@ export const Layout: FC<PropsWithChildren<LayoutPropTypes>> = ({
   coverImage,
   alternativeArticle,
   minutes,
+  navigation,
   tags,
 }) => (
   <>
@@ -63,6 +67,7 @@ export const Layout: FC<PropsWithChildren<LayoutPropTypes>> = ({
                     </div>
                   </div>
                 </header>
+                <TableOfContents variant="mobile" />
 
                 {coverImage?.src && (
                   <CoverImage
@@ -78,12 +83,13 @@ export const Layout: FC<PropsWithChildren<LayoutPropTypes>> = ({
 
                 {children}
                 <CodeCopyButtons />
+                <ArticleNavigation navigation={navigation} />
               </article>
 
               <Footer />
             </main>
 
-            <TableOfContents />
+            <TableOfContents variant="desktop" />
           </div>
         </div>
       </div>
