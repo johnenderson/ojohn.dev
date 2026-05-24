@@ -7,6 +7,13 @@ const DEFAULT_GITHUB_USERNAME = 'johnenderson';
 // Dados do GitHub mudam pouco minuto a minuto; cacheamos o resultado por 30min.
 const REVALIDATE_SECONDS = 60 * 30;
 
+// Logs de diagnóstico do Pulso de dev. Ative com GITHUB_DEBUG=true no ambiente.
+const debugLog = (...args: unknown[]) => {
+  if (process.env.GITHUB_DEBUG === 'true') {
+    console.warn('[github-debug]', ...args);
+  }
+};
+
 export type GithubActivity = {
   repo: string;
   message: string;
@@ -121,13 +128,22 @@ const fetchContributions = async (login: string, token: string) => {
     }),
   });
 
-  if (!response.ok) return null;
+  if (!response.ok) {
+    const body = await response.text().catch(() => '');
+    debugLog(`contributions falhou: ${response.status} ${body}`);
+    return null;
+  }
 
   const data = (await response.json()) as ContributionsResponse;
   const calendar =
     data.data?.user?.contributionsCollection?.contributionCalendar;
 
-  if (!calendar) return null;
+  if (!calendar) {
+    debugLog(
+      `contributions sem calendário: ${JSON.stringify(data).slice(0, 400)}`,
+    );
+    return null;
+  }
 
   const days = (calendar.weeks ?? []).flatMap(
     (week) => week.contributionDays ?? [],
@@ -222,29 +238,42 @@ const loadGithubPulse = async (): Promise<GithubPulse | null> => {
   const token = process.env.GITHUB_TOKEN;
   const username = process.env.GITHUB_USERNAME ?? DEFAULT_GITHUB_USERNAME;
 
-  if (!token) return null;
-
-  try {
-    const [contributions, lastActivity] = await Promise.all([
-      fetchContributions(username, token),
-      fetchLastActivity(username, token),
-    ]);
-
-    if (!contributions) return null;
-
-    return {
-      username,
-      ...contributions,
-      lastActivity,
-    };
-  } catch {
+  // Estado estável (sem credencial): pode ser cacheado tranquilamente.
+  if (!token) {
+    debugLog('GITHUB_TOKEN ausente no ambiente');
     return null;
   }
+
+  // A atividade é opcional; uma falha nela não deve esconder o card.
+  const [contributions, lastActivity] = await Promise.all([
+    fetchContributions(username, token),
+    fetchLastActivity(username, token).catch(() => null),
+  ]);
+
+  // Falha/instabilidade na fonte principal: lançamos para NÃO cachear o erro
+  // por 30min — assim a próxima visita tenta de novo e o card se recupera
+  // rápido (o unstable_cache não armazena resultados que lançam).
+  if (!contributions) {
+    debugLog('contribuições indisponíveis — não vamos cachear a falha');
+    throw new Error('Falha ao carregar contribuições do GitHub');
+  }
+
+  debugLog(
+    `ok: ${contributions.totalContributions} contrib, streak ${
+      contributions.currentStreak
+    }, lastActivity ${lastActivity ? 'sim' : 'não'}`,
+  );
+
+  return {
+    username,
+    ...contributions,
+    lastActivity,
+  };
 };
 
 export const getGithubPulse = unstable_cache(
   loadGithubPulse,
-  ['github-pulse'],
+  ['github-pulse', 'v2'],
   {
     revalidate: REVALIDATE_SECONDS,
   },

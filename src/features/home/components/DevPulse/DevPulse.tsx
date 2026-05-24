@@ -39,7 +39,7 @@ const Stat = ({
 );
 
 export async function DevPulse() {
-  const pulse = await getGithubPulse();
+  const pulse = await getGithubPulse().catch(() => null);
 
   if (!pulse) return null;
 

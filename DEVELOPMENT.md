@@ -18,6 +18,29 @@ yarn dev
 
 The site runs at `http://localhost:3000`.
 
+## Environment variables
+
+Copy `.env.example` to `.env.local` and fill in the values. All variables are
+server-only (never exposed to the client). Every integration **degrades
+gracefully**: if a variable is missing, the related widget simply doesn't
+render — the app keeps working.
+
+| Variable                | Required | Used by                                             |
+| ----------------------- | -------- | --------------------------------------------------- |
+| `LASTFM_USERNAME`       | optional | `/now` + home activity (defaults to `johnenderson`) |
+| `LASTFM_API_KEY`        | yes\*    | Last.fm tracks/artists                              |
+| `SPOTIFY_CLIENT_ID`     | yes\*    | Spotify cover art on `/now`                         |
+| `SPOTIFY_CLIENT_SECRET` | yes\*    | Spotify cover art on `/now`                         |
+| `GITHUB_TOKEN`          | yes\*    | "Pulso de dev" card (GitHub contributions)          |
+| `GITHUB_USERNAME`       | optional | GitHub user (defaults to `johnenderson`)            |
+| `GITHUB_DEBUG`          | optional | `true` to log GitHub fetch diagnostics              |
+
+\* Required only for that specific widget. A classic `GITHUB_TOKEN` with the
+`read:user` scope is enough for public contributions. The GitHub card only ever
+reads public activity (`events/public`), so it never exposes private repos.
+
+After changing `.env.local`, restart the dev server (Next reads env at boot).
+
 ## Commands
 
 | Command               | Description                                    |
