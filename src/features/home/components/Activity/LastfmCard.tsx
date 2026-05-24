@@ -143,10 +143,10 @@ export const LastfmCard = () => {
     let active = true;
 
     Promise.allSettled([
-      fetch('/api/lastfm/now-playing').then(
+      fetch('/api/lastfm/now-playing', { cache: 'no-store' }).then(
         (response) => response.json() as Promise<LastfmNowPlayingResponse>,
       ),
-      fetch('/api/lastfm/recent').then(
+      fetch('/api/lastfm/recent', { cache: 'no-store' }).then(
         (response) => response.json() as Promise<LastfmStats>,
       ),
     ])

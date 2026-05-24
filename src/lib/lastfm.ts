@@ -250,7 +250,7 @@ async function getLastfmTracks(
     user: username,
     api_key: apiKey,
     format: 'json',
-    limit: '6',
+    limit: '7',
   });
 
   const response = await fetch(
@@ -277,7 +277,7 @@ const createLastfmStats = (tracks: LastfmTrack[]): LastfmStats => {
   const recentTracks = tracks
     .filter((track) => !track.nowPlaying)
     .filter((track) => (nowPlaying ? true : track.name !== lastPlayed?.name))
-    .slice(0, 5);
+    .slice(0, 6);
 
   return {
     nowPlaying,
@@ -287,13 +287,13 @@ const createLastfmStats = (tracks: LastfmTrack[]): LastfmStats => {
 };
 
 export async function getLastfmNowPlaying(): Promise<LastfmTrack | null> {
-  const tracks = await getLastfmTracks({ next: { revalidate: 30 } });
+  const tracks = await getLastfmTracks({ cache: 'no-store' });
 
   return tracks.find((track) => track.nowPlaying) ?? null;
 }
 
 export async function getLastfmRecentStats(): Promise<LastfmStats> {
-  const tracks = await getLastfmTracks({ next: { revalidate: 120 } });
+  const tracks = await getLastfmTracks({ cache: 'no-store' });
 
   return createLastfmStats(tracks);
 }

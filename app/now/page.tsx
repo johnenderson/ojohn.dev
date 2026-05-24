@@ -2,6 +2,9 @@ import Image from 'next/image';
 import Link from 'next/link';
 
 import { PageWrapper } from '../components/PageWrapper';
+import { faSpotify } from '@fortawesome/free-brands-svg-icons';
+import { faArrowRight } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import type { Metadata } from 'next';
 
 import { getLastfmRecentStats, getLastfmTopArtists } from '@/lib/lastfm';
@@ -125,9 +128,9 @@ const ArtistCard = ({ artist }: { artist: LastfmArtist }) => (
     target="_blank"
     rel="noopener noreferrer"
     aria-label={`${artist.name}, ${artist.playcount} plays na semana`}
-    className="interactive-card group relative overflow-visible rounded-md border border-site-border-muted bg-site-card no-underline transition-colors hover:border-site-primary"
+    className="interactive-card group relative block overflow-visible rounded-md border border-site-border-muted bg-site-card no-underline transition-colors hover:z-20 hover:border-site-primary focus-visible:z-20"
   >
-    <div className="relative aspect-square overflow-hidden rounded-t-md bg-site-card-hover">
+    <div className="relative aspect-square overflow-hidden rounded-md bg-site-card-hover">
       {artist.imageUrl ? (
         <Image
           src={artist.imageUrl}
@@ -140,16 +143,32 @@ const ArtistCard = ({ artist }: { artist: LastfmArtist }) => (
         <MusicFallback label={artist.name} />
       )}
     </div>
-    <span className="pointer-events-none absolute left-1/2 top-2 z-10 min-w-36 -translate-x-1/2 -translate-y-2 rounded border border-site-border-muted bg-site-card px-2.5 py-2 text-center opacity-0 shadow-lg shadow-black/20 transition duration-200 group-hover:-translate-y-0 group-hover:opacity-100 group-focus-visible:-translate-y-0 group-focus-visible:opacity-100">
-      <span className="block truncate text-xs font-bold text-site-foreground">
+    <span className="pointer-events-none absolute left-3 top-full z-30 mt-2 min-w-24 max-w-[calc(100%-1.5rem)] rounded border border-site-border bg-[#0b0910] px-2.5 py-2 text-left opacity-0 shadow-lg shadow-black/40 transition duration-200 group-hover:translate-y-0.5 group-hover:opacity-100 group-focus-visible:translate-y-0.5 group-focus-visible:opacity-100">
+      <span className="block truncate text-xs font-bold leading-4 text-site-foreground">
         {artist.name}
       </span>
-      <span className="mt-0.5 block text-[11px] font-medium text-site-body-muted">
+      <span className="mt-0.5 block text-[11px] font-medium leading-4 text-site-body-muted">
         {artist.playcount} plays
       </span>
     </span>
   </Link>
 );
+
+const getTrackIdentity = (track: LastfmTrack) =>
+  track.playedAt ?? `${track.name}-${track.artist}-${track.url}`;
+
+const getUniqueTracks = (tracks: LastfmTrack[]) => {
+  const seen = new Set<string>();
+
+  return tracks.filter((track) => {
+    const identity = getTrackIdentity(track);
+
+    if (seen.has(identity)) return false;
+
+    seen.add(identity);
+    return true;
+  });
+};
 
 export default async function NowPage() {
   const [lastfm, artists] = await Promise.all([
@@ -161,9 +180,9 @@ export default async function NowPage() {
     getLastfmTopArtists({ period: '7day' }).catch(() => []),
   ]);
 
-  const recentTracks = [lastfm.lastPlayed, ...lastfm.tracks].filter(
-    Boolean,
-  ) as LastfmTrack[];
+  const recentTracks = getUniqueTracks(
+    [lastfm.lastPlayed, ...lastfm.tracks].filter(Boolean) as LastfmTrack[],
+  );
 
   return (
     <PageWrapper>
@@ -183,16 +202,18 @@ export default async function NowPage() {
             </div>
           </header>
 
-          <div className="grid gap-12 lg:grid-cols-[1fr_1.05fr]">
+          <div className="grid gap-12 lg:grid-cols-[1fr_28rem]">
             <section aria-labelledby="recent-tracks-title">
-              <h2
-                id="recent-tracks-title"
-                className="mb-5 mt-0 text-2xl font-bold text-site-foreground sm:text-3xl"
-              >
-                Tocado recentemente
-              </h2>
+              <div className="mb-5 flex flex-wrap items-end justify-between gap-3">
+                <h2
+                  id="recent-tracks-title"
+                  className="m-0 text-2xl font-bold text-site-foreground sm:text-3xl"
+                >
+                  Tocado recentemente
+                </h2>
+              </div>
               {recentTracks.length > 0 ? (
-                <ul className="m-0 flex list-none flex-col gap-2 p-0">
+                <ul className="m-0 flex max-w-lg list-none flex-col gap-2 p-0">
                   {recentTracks.slice(0, 8).map((track, index) => (
                     <RecentTrack
                       key={`${track.name}-${track.artist}-${
@@ -218,29 +239,38 @@ export default async function NowPage() {
                 >
                   Artistas da semana
                 </h2>
-                <Link
-                  href="https://www.last.fm/user/johnenderson"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-sm font-medium text-site-body-muted no-underline transition-colors hover:text-site-primary-hover"
-                >
-                  Ver no Last.fm
-                </Link>
               </div>
               {artists.length > 0 ? (
                 <>
-                  <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+                  <div className="grid grid-cols-3 gap-3">
                     {artists.slice(0, 9).map((artist) => (
                       <ArtistCard key={artist.name} artist={artist} />
                     ))}
                   </div>
-                  <p className="mb-0 mt-3 inline-flex items-center gap-1.5 text-xs font-medium text-site-body-muted">
-                    <span
-                      aria-hidden="true"
-                      className="size-2 rounded-full bg-[#1DB954]"
-                    />
-                    Imagens dos artistas via Spotify.
-                  </p>
+                  <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
+                    <p className="m-0 inline-flex items-center gap-1.5 text-xs font-medium text-site-body-muted">
+                      Imagens dos artistas via
+                      <FontAwesomeIcon
+                        icon={faSpotify}
+                        aria-label="Spotify"
+                        role="img"
+                        className="text-sm text-[#1DB954]"
+                      />
+                    </p>
+                    <Link
+                      href="https://www.last.fm/user/johnenderson"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 border-b border-site-primary pb-0.5 text-sm font-bold text-site-primary no-underline transition-colors hover:border-site-primary-hover hover:text-site-primary-hover"
+                    >
+                      Ver no Last.fm
+                      <FontAwesomeIcon
+                        icon={faArrowRight}
+                        aria-hidden="true"
+                        className="text-xs"
+                      />
+                    </Link>
+                  </div>
                 </>
               ) : (
                 <p className="m-0 text-site-body-muted">
