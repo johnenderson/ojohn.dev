@@ -36,6 +36,8 @@ const formatRelativeTime = (iso: string) => {
   return `há ${days}d`;
 };
 
+const formatRepoName = (repo: string) => repo.split('/').at(-1) ?? repo;
+
 type ActivityFeedProps = {
   items: GithubFeedItem[];
 };
@@ -68,14 +70,17 @@ export const ActivityFeed = ({ items }: ActivityFeedProps) => {
                   className="text-sm"
                 />
               </span>
-              <div className="min-w-0">
+              <div className="min-w-0 flex-1">
                 <p className="m-0 truncate text-sm font-bold leading-snug text-site-foreground transition-colors group-hover:text-site-primary-hover">
-                  {item.label}
+                  {formatRepoName(item.repo)}
                 </p>
                 <p className="m-0 truncate text-xs text-site-body-muted">
-                  {item.repo} · {formatRelativeTime(item.at)}
+                  {item.label} · {item.repo}
                 </p>
               </div>
+              <span className="hidden shrink-0 rounded-full border border-site-border-subtle px-2 py-1 text-[11px] font-bold leading-none text-site-body-muted sm:inline-flex">
+                {formatRelativeTime(item.at)}
+              </span>
             </Link>
           </li>
         ))}
