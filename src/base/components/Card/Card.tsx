@@ -80,16 +80,22 @@ export const Card = ({
     : {};
 
   const overlay = spotlight ? (
-    <span
-      aria-hidden="true"
-      className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 motion-reduce:transition-none"
-      style={
-        {
-          opacity: active ? 1 : 0,
-          background: `radial-gradient(240px circle at ${position.x}px ${position.y}px, var(--site-spotlight), transparent 70%)`,
-        } as CSSProperties
-      }
-    />
+    <>
+      <span
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 shadow-[inset_0_1px_0_color-mix(in_srgb,var(--site-foreground)_8%,transparent)]"
+      />
+      <span
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 motion-reduce:transition-none"
+        style={
+          {
+            opacity: active ? 1 : 0,
+            background: `radial-gradient(190px circle at ${position.x}px ${position.y}px, var(--site-spotlight), transparent 68%)`,
+          } as CSSProperties
+        }
+      />
+    </>
   ) : null;
 
   if (href) {
