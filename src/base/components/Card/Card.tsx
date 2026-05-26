@@ -11,9 +11,6 @@ import {
   type ReactNode,
 } from 'react';
 
-// Cor do spotlight = --site-primary (teal) com opacidade suave.
-const SPOTLIGHT_COLOR = 'rgba(91, 211, 199, 0.18)';
-
 type CardProps = {
   children: ReactNode;
   className?: string;
@@ -89,7 +86,7 @@ export const Card = ({
       style={
         {
           opacity: active ? 1 : 0,
-          background: `radial-gradient(240px circle at ${position.x}px ${position.y}px, ${SPOTLIGHT_COLOR}, transparent 70%)`,
+          background: `radial-gradient(240px circle at ${position.x}px ${position.y}px, var(--site-spotlight), transparent 70%)`,
         } as CSSProperties
       }
     />
