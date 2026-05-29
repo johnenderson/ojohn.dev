@@ -55,7 +55,6 @@ const NOW_URL = `${SITE_URL}/now`;
 const NOW_OG_IMAGE = `${SITE_URL}/og/site/now`;
 
 export const revalidate = 3600;
-export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: NOW_TITLE,
