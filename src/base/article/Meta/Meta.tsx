@@ -55,7 +55,7 @@ function formatDate(raw: string): string {
   // If already DD-MM-YYYY, convert to DD/MM/YYYY
   if (/^\d{2}-\d{2}-\d{4}$/.test(raw)) return raw.replaceAll('-', '/');
   // If YYYY-MM-DD, convert to DD/MM/YYYY
-  const match = raw.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  const match = /^(\d{4})-(\d{2})-(\d{2})/.exec(raw);
   if (match) return `${match[3]}/${match[2]}/${match[1]}`;
   return raw;
 }

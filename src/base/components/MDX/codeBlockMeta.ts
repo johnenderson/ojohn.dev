@@ -3,7 +3,7 @@ import type { ShikiTransformer } from '@shikijs/types';
 const getTitleFromMeta = (meta: string | undefined) => {
   if (!meta) return null;
 
-  const match = meta.match(/(?:^|\s)title=(?:"([^"]+)"|'([^']+)'|([^\s]+))/);
+  const match = /(?:^|\s)title=(?:"([^"]+)"|'([^']+)'|([^\s]+))/.exec(meta);
 
   return match?.[1] ?? match?.[2] ?? match?.[3] ?? null;
 };
