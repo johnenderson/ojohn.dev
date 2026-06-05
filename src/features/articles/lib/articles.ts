@@ -259,6 +259,79 @@ function parseValue(value: string) {
   return parseInlineArray(value) ?? parseScalar(value);
 }
 
+function parseTagEntry(
+  lines: string[],
+  index: number,
+): { tag: string | null; nextIndex: number } {
+  const tagLine = lines[index].slice(4);
+  const tagObjectMatch = tagLine.match(/^([A-Za-z][\w-]*):\s*(.*)$/);
+
+  if (!tagObjectMatch) {
+    return { tag: parseScalar(tagLine), nextIndex: index };
+  }
+
+  const tagObject: Record<string, unknown> = {
+    [tagObjectMatch[1]]: parseScalar(tagObjectMatch[2]),
+  };
+
+  let nextIndex = index;
+  while (lines[nextIndex + 1]?.startsWith('    ')) {
+    nextIndex += 1;
+    const nestedMatch = lines[nextIndex]
+      .trim()
+      .match(/^([A-Za-z][\w-]*):\s*(.*)$/);
+    if (nestedMatch) {
+      tagObject[nestedMatch[1]] = parseScalar(nestedMatch[2]);
+    }
+  }
+
+  const tag = typeof tagObject.name === 'string' ? tagObject.name : null;
+  return { tag, nextIndex };
+}
+
+function parseTagsBlock(
+  lines: string[],
+  startIndex: number,
+): { tags: string[]; nextIndex: number } {
+  const tags: string[] = [];
+  let index = startIndex;
+
+  while (lines[index + 1]?.startsWith('  ')) {
+    index += 1;
+    if (!lines[index].startsWith('  - ')) continue;
+
+    const { tag, nextIndex } = parseTagEntry(lines, index);
+    if (tag !== null) tags.push(tag);
+    index = nextIndex;
+  }
+
+  return { tags, nextIndex: index };
+}
+
+function parseNestedBlock(
+  lines: string[],
+  startIndex: number,
+  context: string,
+): { nested: Record<string, unknown>; nextIndex: number } {
+  const nested: Record<string, unknown> = {};
+  let index = startIndex;
+
+  while (lines[index + 1]?.startsWith('  ')) {
+    index += 1;
+    const nestedMatch = lines[index].trim().match(/^([A-Za-z][\w-]*):\s*(.*)$/);
+
+    if (!nestedMatch) {
+      throw new Error(
+        `Invalid article frontmatter for ${context}: ${lines[index]}`,
+      );
+    }
+
+    nested[nestedMatch[1]] = parseValue(nestedMatch[2]);
+  }
+
+  return { nested, nextIndex: index };
+}
+
 function parseFrontmatter(frontmatter: string, context: string) {
   const metadata: Record<string, unknown> = {};
   const lines = frontmatter.split(/\r?\n/);
@@ -279,61 +352,15 @@ function parseFrontmatter(frontmatter: string, context: string) {
     }
 
     if (key === 'tags') {
-      const tags: string[] = [];
-
-      while (lines[index + 1]?.startsWith('  ')) {
-        index += 1;
-        if (!lines[index].startsWith('  - ')) continue;
-
-        const tagLine = lines[index].slice(4);
-        const tagObjectMatch = tagLine.match(/^([A-Za-z][\w-]*):\s*(.*)$/);
-
-        if (!tagObjectMatch) {
-          tags.push(parseScalar(tagLine));
-          continue;
-        }
-
-        const tagObject: Record<string, unknown> = {
-          [tagObjectMatch[1]]: parseScalar(tagObjectMatch[2]),
-        };
-
-        while (lines[index + 1]?.startsWith('    ')) {
-          index += 1;
-          const nestedMatch = lines[index]
-            .trim()
-            .match(/^([A-Za-z][\w-]*):\s*(.*)$/);
-
-          if (nestedMatch) {
-            tagObject[nestedMatch[1]] = parseScalar(nestedMatch[2]);
-          }
-        }
-
-        if (typeof tagObject.name === 'string') {
-          tags.push(tagObject.name);
-        }
-      }
-
+      const { tags, nextIndex } = parseTagsBlock(lines, index);
       metadata[key] = tags;
+      index = nextIndex;
       continue;
     }
 
-    const nested: Record<string, unknown> = {};
-    while (lines[index + 1]?.startsWith('  ')) {
-      index += 1;
-      const nestedMatch = lines[index]
-        .trim()
-        .match(/^([A-Za-z][\w-]*):\s*(.*)$/);
-
-      if (!nestedMatch) {
-        throw new Error(
-          `Invalid article frontmatter for ${context}: ${lines[index]}`,
-        );
-      }
-
-      nested[nestedMatch[1]] = parseValue(nestedMatch[2]);
-    }
-
+    const { nested, nextIndex } = parseNestedBlock(lines, index, context);
     metadata[key] = nested;
+    index = nextIndex;
   }
 
   return metadata;
