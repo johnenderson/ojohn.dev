@@ -1,1 +1,1 @@
-export { Date } from './Date';
+export { ArticleDate } from './Date';
