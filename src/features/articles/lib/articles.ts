@@ -11,6 +11,11 @@ import { Language } from '@/lib/languages';
 import { Locale } from '@/types/Locale';
 
 const DEFAULT_ARTICLE_LOCALE: Locale = Language.PT_BR;
+const ISO_DATE_PATTERN = /^(\d{4})-(\d{2})-(\d{2})$/;
+const SLASH_DATE_PATTERN = /^(\d{2})\/(\d{2})\/(\d{4})$/;
+const DASH_DATE_PATTERN = /^(\d{2})-(\d{2})-(\d{4})$/;
+const FRONTMATTER_BLOCK_PATTERN = /^---\r?\n([\s\S]*?)\r?\n---\r?\n?/;
+const FRONTMATTER_FIELD_PATTERN = /^([A-Za-z][\w-]*):(?:[ \t]+(\S[^\r\n]*))?$/;
 
 export type ArticleCoverImage = {
   src: string;
@@ -58,13 +63,13 @@ export type ArticleNavigation = {
 };
 
 export function parseArticleDate(raw: string): Date {
-  const slashDate = raw.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+  const slashDate = SLASH_DATE_PATTERN.exec(raw);
   if (slashDate) {
     const [, day, month, year] = slashDate;
     return new Date(`${year}-${month}-${day}T00:00:00.000Z`);
   }
 
-  const dashDate = raw.match(/^(\d{2})-(\d{2})-(\d{4})$/);
+  const dashDate = DASH_DATE_PATTERN.exec(raw);
   if (dashDate) {
     const [, day, month, year] = dashDate;
     return new Date(`${year}-${month}-${day}T00:00:00.000Z`);
@@ -78,7 +83,7 @@ function isValidDate(date: Date) {
 }
 
 function isValidIsoDate(raw: string) {
-  const match = raw.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  const match = ISO_DATE_PATTERN.exec(raw);
   if (!match) return false;
 
   const [, year, month, day] = match;
@@ -264,7 +269,7 @@ function parseTagEntry(
   index: number,
 ): { tag: string | null; nextIndex: number } {
   const tagLine = lines[index].slice(4);
-  const tagObjectMatch = tagLine.match(/^([A-Za-z][\w-]*):(?:\s+([^\r\n]+))?$/);
+  const tagObjectMatch = FRONTMATTER_FIELD_PATTERN.exec(tagLine);
 
   if (!tagObjectMatch) {
     return { tag: parseScalar(tagLine), nextIndex: index };
@@ -277,9 +282,7 @@ function parseTagEntry(
   let nextIndex = index;
   while (lines[nextIndex + 1]?.startsWith('    ')) {
     nextIndex += 1;
-    const nestedMatch = lines[nextIndex]
-      .trim()
-      .match(/^([A-Za-z][\w-]*):(?:\s+([^\r\n]+))?$/);
+    const nestedMatch = FRONTMATTER_FIELD_PATTERN.exec(lines[nextIndex].trim());
     if (nestedMatch) {
       tagObject[nestedMatch[1]] = parseScalar(nestedMatch[2] ?? '');
     }
@@ -318,9 +321,7 @@ function parseNestedBlock(
 
   while (lines[index + 1]?.startsWith('  ')) {
     index += 1;
-    const nestedMatch = lines[index]
-      .trim()
-      .match(/^([A-Za-z][\w-]*):(?:\s+([^\r\n]+))?$/);
+    const nestedMatch = FRONTMATTER_FIELD_PATTERN.exec(lines[index].trim());
 
     if (!nestedMatch) {
       throw new Error(
@@ -347,7 +348,7 @@ function parseFrontmatter(frontmatter: string, context: string) {
       continue;
     }
 
-    const rootMatch = line.match(/^([A-Za-z][\w-]*):(?:\s+([^\r\n]+))?$/);
+    const rootMatch = FRONTMATTER_FIELD_PATTERN.exec(line);
     if (!rootMatch) {
       throw new Error(`Invalid article frontmatter for ${context}: ${line}`);
     }
@@ -383,7 +384,7 @@ const readArticleFile = cache(
       throw new Error(`Missing article content for ${context}.`);
     }
 
-    const match = source.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n?/);
+    const match = FRONTMATTER_BLOCK_PATTERN.exec(source);
 
     if (!match) {
       throw new Error(`Missing article frontmatter for ${context}.`);

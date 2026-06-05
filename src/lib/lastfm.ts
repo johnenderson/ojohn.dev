@@ -9,8 +9,11 @@ import {
 const LASTFM_API_URL = 'https://ws.audioscrobbler.com/2.0/';
 const DEFAULT_LASTFM_USERNAME = 'johnenderson';
 
-const normalizeToArray = <T>(value: T | T[] | undefined): T[] =>
-  Array.isArray(value) ? value : value ? [value] : [];
+function normalizeToArray<T>(value: T | T[] | undefined): T[] {
+  if (Array.isArray(value)) return value;
+  if (value !== undefined) return [value];
+  return [];
+}
 
 type LastfmApiImage = {
   '#text'?: string;
