@@ -264,7 +264,9 @@ function parseTagEntry(
   index: number,
 ): { tag: string | null; nextIndex: number } {
   const tagLine = lines[index].slice(4);
-  const tagObjectMatch = tagLine.match(/^([A-Za-z][\w-]*):(?:\s+([^\r\n]+))?$/);
+  const tagObjectMatch = tagLine.match(
+    /^([A-Za-z][\w-]*):(?:[ \t]+(\S[^\r\n]*))?$/,
+  );
 
   if (!tagObjectMatch) {
     return { tag: parseScalar(tagLine), nextIndex: index };
@@ -279,7 +281,7 @@ function parseTagEntry(
     nextIndex += 1;
     const nestedMatch = lines[nextIndex]
       .trim()
-      .match(/^([A-Za-z][\w-]*):(?:\s+([^\r\n]+))?$/);
+      .match(/^([A-Za-z][\w-]*):(?:[ \t]+(\S[^\r\n]*))?$/);
     if (nestedMatch) {
       tagObject[nestedMatch[1]] = parseScalar(nestedMatch[2] ?? '');
     }
@@ -320,7 +322,7 @@ function parseNestedBlock(
     index += 1;
     const nestedMatch = lines[index]
       .trim()
-      .match(/^([A-Za-z][\w-]*):(?:\s+([^\r\n]+))?$/);
+      .match(/^([A-Za-z][\w-]*):(?:[ \t]+(\S[^\r\n]*))?$/);
 
     if (!nestedMatch) {
       throw new Error(
@@ -347,7 +349,7 @@ function parseFrontmatter(frontmatter: string, context: string) {
       continue;
     }
 
-    const rootMatch = line.match(/^([A-Za-z][\w-]*):(?:\s+([^\r\n]+))?$/);
+    const rootMatch = line.match(/^([A-Za-z][\w-]*):(?:[ \t]+(\S[^\r\n]*))?$/);
     if (!rootMatch) {
       throw new Error(`Invalid article frontmatter for ${context}: ${line}`);
     }
