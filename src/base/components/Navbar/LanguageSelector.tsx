@@ -53,7 +53,8 @@ export const LanguageSelector = ({
     const handler = (event: MouseEvent) => {
       if (
         panelRef.current &&
-        !panelRef.current.contains(event.target as Node)
+        event.target instanceof Node &&
+        !panelRef.current.contains(event.target)
       ) {
         setOpen(false);
       }
