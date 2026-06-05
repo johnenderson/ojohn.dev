@@ -233,7 +233,7 @@ export const LastfmCard = () => {
                   href={featuredTrack.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-fit text-xs font-medium text-site-body-muted no-underline transition-colors hover:text-site-primary-hover focus-visible:text-site-primary-hover focus-visible:outline-none"
+                  className="mt-auto w-fit text-xs font-medium text-site-body-muted no-underline transition-colors hover:text-site-primary-hover focus-visible:text-site-primary-hover focus-visible:outline-none"
                 >
                   Ver no Last.fm
                 </Link>
