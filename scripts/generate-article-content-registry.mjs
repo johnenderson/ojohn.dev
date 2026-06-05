@@ -28,10 +28,17 @@ function toImportPath(filePath) {
   return relativePath.startsWith('.') ? relativePath : `./${relativePath}`;
 }
 
+const ESCAPED_BACKSLASH = String.raw`\\`;
+const ESCAPED_SINGLE_QUOTE = String.raw`\'`;
+
 function toSingleQuotedString(value) {
-  return `'${value
-    .replaceAll('\\', String.raw`\\`)
-    .replaceAll("'", String.raw`\'`)}'`;
+  return (
+    "'" +
+    value
+      .replaceAll('\\', ESCAPED_BACKSLASH)
+      .replaceAll("'", ESCAPED_SINGLE_QUOTE) +
+    "'"
+  );
 }
 
 function toObjectKey(value) {
