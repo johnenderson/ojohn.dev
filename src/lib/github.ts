@@ -636,8 +636,11 @@ const loadGithubProjects = async (): Promise<GithubProject[]> => {
 
   const nodes = data?.data?.user?.pinnedItems?.nodes ?? [];
 
+  // Filtra o próprio repo do site para não aparecer no showcase
+  const SITE_REPO_NAME = process.env.SITE_REPO_NAME ?? 'ojohn.dev';
+
   return nodes
-    .filter((node) => Boolean(node.name))
+    .filter((node) => Boolean(node.name) && node.name !== SITE_REPO_NAME)
     .map((node) => ({
       name: node.name!,
       description: node.description ?? null,
@@ -732,6 +735,9 @@ const loadGithubStarred = async (): Promise<GithubStarredRepo[]> => {
       starredAt: item.starred_at ?? new Date().toISOString(),
     }));
 };
+
+export const getGithubUsername = () =>
+  process.env.GITHUB_USERNAME ?? DEFAULT_GITHUB_USERNAME;
 
 export const getGithubProjects = unstable_cache(
   loadGithubProjects,

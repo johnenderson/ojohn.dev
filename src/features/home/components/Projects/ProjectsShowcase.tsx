@@ -7,7 +7,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Card } from '@/base/components/Card';
 import { formatRelativeTime } from '@/lib/formatRelativeTime';
 import type { GithubProject } from '@/lib/github';
-import { getGithubProjects } from '@/lib/github';
+import { getGithubProjects, getGithubUsername } from '@/lib/github';
 
 const formatCount = (n: number) =>
   n >= 1000 ? `${(n / 1000).toFixed(1)}k` : String(n);
@@ -95,7 +95,10 @@ function ProjectCard({ project }: Readonly<{ project: GithubProject }>) {
 }
 
 export async function ProjectsShowcase() {
-  const projects = await getGithubProjects().catch(() => []);
+  const [projects, username] = await Promise.all([
+    getGithubProjects().catch(() => []),
+    Promise.resolve(getGithubUsername()),
+  ]);
 
   if (projects.length === 0) return null;
 
@@ -113,7 +116,7 @@ export async function ProjectsShowcase() {
           />
         </div>
         <Link
-          href="https://github.com/johnenderson"
+          href={`https://github.com/${username}`}
           target="_blank"
           rel="noopener noreferrer"
           className="text-xs font-medium text-site-body-muted no-underline transition-colors hover:text-site-primary-hover focus-visible:text-site-primary-hover focus-visible:outline-none"
