@@ -12,7 +12,7 @@ type PageWrapperProps = {
 // AnimationLayout here handles the enter transition on every client-side navigation.
 // There is a separate AnimationLayout in Layout (Providers) that wraps the entire
 // page shell — see its comment for why both must coexist.
-export function PageWrapper({ children }: PageWrapperProps) {
+export function PageWrapper({ children }: Readonly<PageWrapperProps>) {
   return (
     <>
       <Navbar />

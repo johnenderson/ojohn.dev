@@ -101,7 +101,7 @@ export function Admonition({
   type = 'info',
   title,
   children,
-}: AdmonitionProps) {
+}: Readonly<AdmonitionProps>) {
   const normalizedType = type === 'success' ? 'tip' : type;
   const accent = accents[type];
   const style = {
