@@ -49,23 +49,26 @@ export const ArticlesList: FC<ArticlesListProps> = ({
     new Set(articles.flatMap((article) => article.tags)),
   ).sort((a, b) => a.localeCompare(b));
 
-  const headerContent =
-    header === false ? null : header === 'h1' ? (
-      <Title text="artigos" />
-    ) : (
-      <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
-        <h2 className="m-0 text-2xl font-bold tracking-normal text-site-foreground sm:text-3xl">
-          Artigos recentes
-        </h2>
-        <Link
-          href="/writings"
-          passHref
-          className="text-sm font-medium text-site-body-muted no-underline transition-colors hover:text-site-primary-hover"
-        >
-          Ver todos
-        </Link>
-      </div>
-    );
+  let headerContent: React.ReactNode = null;
+  if (header !== false) {
+    headerContent =
+      header === 'h1' ? (
+        <Title text="artigos" />
+      ) : (
+        <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
+          <h2 className="m-0 text-2xl font-bold tracking-normal text-site-foreground sm:text-3xl">
+            Artigos recentes
+          </h2>
+          <Link
+            href="/writings"
+            passHref
+            className="text-sm font-medium text-site-body-muted no-underline transition-colors hover:text-site-primary-hover"
+          >
+            Ver todos
+          </Link>
+        </div>
+      );
+  }
 
   return (
     <section id="articles" className={header === false ? 'mt-8' : 'mt-20'}>
