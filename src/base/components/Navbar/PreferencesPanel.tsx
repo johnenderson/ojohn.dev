@@ -165,7 +165,7 @@ const ThemeSelector = ({
   setTheme: (theme: Theme) => void;
 }) => {
   const activeIdx = THEME_OPTIONS.findIndex((o) => o.value === theme);
-  const idx = activeIdx >= 0 ? activeIdx : 0;
+  const idx = Math.max(0, activeIdx);
 
   return (
     <div className="relative flex gap-0 rounded border border-site-border p-1">
@@ -250,7 +250,11 @@ export const PreferencesPanel = ({
   useEffect(() => {
     if (!open) return;
     const handler = (e: MouseEvent) => {
-      if (panelRef.current && !panelRef.current.contains(e.target as Node)) {
+      if (
+        panelRef.current &&
+        e.target instanceof Node &&
+        !panelRef.current.contains(e.target)
+      ) {
         setOpen(false);
       }
     };
