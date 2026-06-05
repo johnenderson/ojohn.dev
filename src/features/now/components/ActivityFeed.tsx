@@ -10,6 +10,7 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
+import { formatRelativeTime } from '@/lib/formatRelativeTime';
 import type { GithubFeedItem } from '@/lib/github';
 
 const ICONS: Record<GithubFeedItem['type'], IconDefinition> = {
@@ -20,20 +21,6 @@ const ICONS: Record<GithubFeedItem['type'], IconDefinition> = {
   create: faCodeBranch,
   issue: faCircleDot,
   other: faCodeCommit,
-};
-
-const formatRelativeTime = (iso: string) => {
-  const diffMs = Date.now() - new Date(iso).getTime();
-  const minutes = Math.round(diffMs / 60000);
-
-  if (minutes < 1) return 'agora';
-  if (minutes < 60) return `há ${minutes} min`;
-
-  const hours = Math.round(minutes / 60);
-  if (hours < 24) return `há ${hours}h`;
-
-  const days = Math.round(hours / 24);
-  return `há ${days}d`;
 };
 
 const formatRepoName = (repo: string) => repo.split('/').at(-1) ?? repo;
