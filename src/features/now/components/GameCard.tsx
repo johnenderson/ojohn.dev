@@ -1,4 +1,5 @@
 import Image from 'next/image';
+import React from 'react';
 
 import {
   CARD_HOVER_LARGE,
@@ -47,6 +48,29 @@ export const GameCard = ({ game }: { game: SteamGame }) => {
   const hasRecentPlaytime = game.playtime2weeks > 0;
   const hasLastPlayed = game.lastPlayedAt && game.lastPlayedAt > 0;
 
+  let playtimeContent: React.ReactNode;
+  if (hasRecentPlaytime) {
+    playtimeContent = (
+      <>
+        <span className="text-site-foreground">
+          {formatPlaytime(game.playtime2weeks)}
+        </span>{' '}
+        nas últimas 2 semanas
+      </>
+    );
+  } else if (hasLastPlayed) {
+    playtimeContent = <>jogado {timeAgo(game.lastPlayedAt!)}</>;
+  } else {
+    playtimeContent = (
+      <>
+        <span className="text-site-foreground">
+          {formatPlaytime(game.playtimeForever)}
+        </span>{' '}
+        no total
+      </>
+    );
+  }
+
   return (
     <CardTooltip
       content={
@@ -61,23 +85,7 @@ export const GameCard = ({ game }: { game: SteamGame }) => {
               className="size-3 shrink-0 text-site-body-muted"
             />
             <p className="text-[11px] leading-none text-site-body-muted">
-              {hasRecentPlaytime ? (
-                <>
-                  <span className="text-site-foreground">
-                    {formatPlaytime(game.playtime2weeks)}
-                  </span>{' '}
-                  nas últimas 2 semanas
-                </>
-              ) : hasLastPlayed ? (
-                <>jogado {timeAgo(game.lastPlayedAt!)}</>
-              ) : (
-                <>
-                  <span className="text-site-foreground">
-                    {formatPlaytime(game.playtimeForever)}
-                  </span>{' '}
-                  no total
-                </>
-              )}
+              {playtimeContent}
             </p>
           </div>
         </>
