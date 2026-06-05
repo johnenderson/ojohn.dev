@@ -337,12 +337,17 @@ function parseNestedBlock(
 function parseFrontmatter(frontmatter: string, context: string) {
   const metadata: Record<string, unknown> = {};
   const lines = frontmatter.split(/\r?\n/);
+  let index = 0;
 
-  for (let index = 0; index < lines.length; index += 1) {
+  while (index < lines.length) {
     const line = lines[index];
-    if (!line.trim()) continue;
 
-    const rootMatch = line.match(/^([A-Za-z][\w-]*):(?:\s*(.*))?$/);
+    if (!line.trim()) {
+      index += 1;
+      continue;
+    }
+
+    const rootMatch = line.match(/^([A-Za-z][\w-]*):(?:\s+(.+))?$/);
     if (!rootMatch) {
       throw new Error(`Invalid article frontmatter for ${context}: ${line}`);
     }
@@ -350,19 +355,20 @@ function parseFrontmatter(frontmatter: string, context: string) {
     const [, key, rawValue = ''] = rootMatch;
     if (rawValue) {
       metadata[key] = parseValue(rawValue);
+      index += 1;
       continue;
     }
 
     if (key === 'tags') {
       const { tags, nextIndex } = parseTagsBlock(lines, index);
       metadata[key] = tags;
-      index = nextIndex;
+      index = nextIndex + 1;
       continue;
     }
 
     const { nested, nextIndex } = parseNestedBlock(lines, index, context);
     metadata[key] = nested;
-    index = nextIndex;
+    index = nextIndex + 1;
   }
 
   return metadata;
