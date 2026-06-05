@@ -122,7 +122,6 @@ export const Navbar = () => {
 
       {mobileMenuOpen && (
         <div
-          role="presentation"
           aria-hidden="true"
           className="fixed inset-0 z-50 bg-black/50 backdrop-blur md:hidden"
           onClick={() => setMobileMenuOpen(false)}

@@ -9,6 +9,9 @@ import {
 const LASTFM_API_URL = 'https://ws.audioscrobbler.com/2.0/';
 const DEFAULT_LASTFM_USERNAME = 'johnenderson';
 
+const normalizeToArray = <T>(value: T | T[] | undefined): T[] =>
+  Array.isArray(value) ? value : value ? [value] : [];
+
 type LastfmApiImage = {
   '#text'?: string;
   size?: string;
@@ -159,9 +162,7 @@ async function getLastfmTracks(
 
   const data = (await response.json()) as LastfmApiResponse;
   const rawTracks = data.recenttracks?.track;
-  return (
-    Array.isArray(rawTracks) ? rawTracks : rawTracks ? [rawTracks] : []
-  ).map(mapTrack);
+  return normalizeToArray(rawTracks).map(mapTrack);
 }
 
 const createLastfmStats = (tracks: LastfmTrack[]): LastfmStats => {
@@ -193,11 +194,7 @@ export async function getLastfmRecentStats(): Promise<LastfmStats> {
   return createLastfmStats(tracks);
 }
 
-export async function getLastfmStats(): Promise<LastfmStats> {
-  const tracks = await getLastfmTracks({ cache: 'no-store' });
-
-  return createLastfmStats(tracks);
-}
+export const getLastfmStats = getLastfmRecentStats;
 
 export async function getLastfmTopTracks({
   period = '7day',
@@ -228,9 +225,7 @@ export async function getLastfmTopTracks({
 
   const data = (await response.json()) as LastfmApiResponse;
   const rawTracks = data.toptracks?.track;
-  const tracks = (
-    Array.isArray(rawTracks) ? rawTracks : rawTracks ? [rawTracks] : []
-  ).map((track) => ({
+  const tracks = normalizeToArray(rawTracks).map((track) => ({
     ...mapTrack(track),
     imageUrl: null,
   }));
@@ -281,9 +276,7 @@ export async function getLastfmTopArtists({
   const data = (await response.json()) as LastfmApiResponse;
   const rawArtists = data.topartists?.artist;
 
-  const artists = (
-    Array.isArray(rawArtists) ? rawArtists : rawArtists ? [rawArtists] : []
-  ).map(mapArtist);
+  const artists = normalizeToArray(rawArtists).map(mapArtist);
 
   return Promise.all(
     artists.map(async (artist) => {
@@ -354,7 +347,7 @@ const fetchArtistTags = async (
   const data = (await response.json()) as LastfmArtistTagsResponse;
   const raw = data.toptags?.tag;
 
-  return Array.isArray(raw) ? raw : raw ? [raw] : [];
+  return normalizeToArray(raw);
 };
 
 export async function getLastfmTopTags({
@@ -386,9 +379,7 @@ export async function getLastfmTopTags({
 
   const data = (await response.json()) as LastfmApiResponse;
   const rawArtists = data.topartists?.artist;
-  const names = (
-    Array.isArray(rawArtists) ? rawArtists : rawArtists ? [rawArtists] : []
-  )
+  const names = normalizeToArray(rawArtists)
     .map((artist) => artist.name)
     .filter((name): name is string => Boolean(name));
 

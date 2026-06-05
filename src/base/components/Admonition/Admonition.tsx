@@ -79,6 +79,14 @@ const DangerIcon = () => (
   </svg>
 );
 
+function getAdmonitionIcon(type: AdmonitionType) {
+  if (type === 'info') return <InfoIcon />;
+  if (type === 'tip' || type === 'success') return <TipIcon />;
+  if (type === 'warning') return <WarningIcon />;
+  if (type === 'danger') return <DangerIcon />;
+  return icons[type];
+}
+
 const accents: Record<AdmonitionType, string> = {
   info: '#6bb7ff',
   note: 'var(--site-primary)',
@@ -148,17 +156,7 @@ export function Admonition({
             lineHeight: 1,
           }}
         >
-          {type === 'info' ? (
-            <InfoIcon />
-          ) : type === 'tip' || type === 'success' ? (
-            <TipIcon />
-          ) : type === 'warning' ? (
-            <WarningIcon />
-          ) : type === 'danger' ? (
-            <DangerIcon />
-          ) : (
-            icons[type]
-          )}
+          {getAdmonitionIcon(type)}
         </span>
         <strong>{title ?? defaultTitles[type]}</strong>
       </div>

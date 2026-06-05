@@ -14,14 +14,12 @@ export const Dialog = ({ onClose, open, title, content }: DialogPropsType) => {
 
   return (
     <div
-      role="presentation"
       aria-hidden="true"
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/60"
       onClick={onClose}
       onKeyDown={onClose}
     >
       <div
-        role="presentation"
         className="bg-[#222] text-white w-full max-w-[700px] max-h-[90vh] overflow-y-auto rounded light:bg-white light:text-black"
         onClick={(e) => e.stopPropagation()}
         onKeyDown={(e) => e.stopPropagation()}

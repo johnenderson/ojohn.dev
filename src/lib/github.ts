@@ -301,12 +301,14 @@ const mapEvent = (event: GithubEvent): GithubFeedItem | null => {
     case 'PullRequestEvent': {
       const action = event.payload?.action;
       const merged = event.payload?.pull_request?.merged;
-      const label =
-        action === 'merged' || (action === 'closed' && merged)
-          ? 'Pull request mesclado'
-          : action === 'closed'
-          ? 'Pull request fechado'
-          : 'Pull request aberto';
+      let label: string;
+      if (action === 'merged' || (action === 'closed' && merged)) {
+        label = 'Pull request mesclado';
+      } else if (action === 'closed') {
+        label = 'Pull request fechado';
+      } else {
+        label = 'Pull request aberto';
+      }
 
       return {
         type: 'pr',

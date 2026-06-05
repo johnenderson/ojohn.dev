@@ -21,7 +21,7 @@ interface SmoothRenderElementPropTypes {
   children: ReactElement;
 }
 
-const HEADERS = ['h2', 'h3', 'h4'];
+const HEADERS = new Set(['h2', 'h3', 'h4']);
 
 interface Text {
   props: {
@@ -45,11 +45,11 @@ function slugify(children: Children): string {
     .toLowerCase()
     .trim()
     .replace(/\s+/g, '-')
-    .replace(/[^\w\-]+/g, '')
+    .replace(/[^\w-]+/g, '')
     .replaceAll('_', '-')
-    .replace(/\-\-+/g, '-')
+    .replace(/--+/g, '-')
     .replace(/^-/, '')
-    .replace(/\-$/g, '');
+    .replace(/-$/g, '');
 }
 
 const HTML_ATTR_MAP: Record<string, string> = {
@@ -121,7 +121,7 @@ const SmoothRenderElement = ({ children }: SmoothRenderElementPropTypes) => {
   const type = children.type;
   const props = children.props as Record<string, unknown>;
   const id =
-    typeof type === 'string' && HEADERS.includes(type)
+    typeof type === 'string' && HEADERS.has(type)
       ? slugify(props.children as Children)
       : null;
 
@@ -157,5 +157,5 @@ const SmoothRenderElement = ({ children }: SmoothRenderElementPropTypes) => {
 
 export const SmoothRender = ({ children }: SmoothRenderPropTypes) =>
   children.map((child, id) => (
-    <SmoothRenderElement key={id}>{child}</SmoothRenderElement>
+    <SmoothRenderElement key={child.key ?? id}>{child}</SmoothRenderElement>
   ));
