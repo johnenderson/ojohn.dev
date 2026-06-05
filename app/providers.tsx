@@ -7,7 +7,7 @@ import { MotionConfig } from 'motion/react';
 import { Layout } from '@/base/components/Layout';
 import { ThemeProvider } from '@/base/components/Theme';
 
-export function Providers({ children }: { children: ReactNode }) {
+export function Providers({ children }: Readonly<{ children: ReactNode }>) {
   return (
     <ThemeProvider>
       <MotionConfig reducedMotion="user">

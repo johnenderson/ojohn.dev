@@ -66,7 +66,7 @@ type ErrorProps = {
   reset: () => void;
 };
 
-export default function ErrorPage({ error, reset }: ErrorProps) {
+export default function ErrorPage({ error, reset }: Readonly<ErrorProps>) {
   useEffect(() => {
     console.error(error);
   }, [error]);

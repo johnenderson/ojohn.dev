@@ -14,7 +14,7 @@ type Props = {
   params: Promise<{ slug: string }>;
 };
 
-export default async function OgPreviewPage({ params }: Props) {
+export default async function OgPreviewPage({ params }: Readonly<Props>) {
   // This is a development-only debugging page for inspecting OG images.
   // In any non-development environment it should not be reachable.
   if (process.env.NODE_ENV !== 'development') {
