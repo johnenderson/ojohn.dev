@@ -187,7 +187,10 @@ export const LastfmCard = () => {
   const title = lastfm?.nowPlaying ? 'Ouvindo agora' : 'Última música';
 
   return (
-    <section id="activity" className="mt-12 md:mt-14">
+    <section
+      id="activity"
+      className="mt-12 border-t border-site-border-subtle pt-12 md:mt-14 md:pt-14"
+    >
       <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
         <FadeIn className="col-span-1 md:col-span-2" duration={500}>
           <Card interactive className="flex h-full flex-col gap-4 p-4 sm:p-5">
