@@ -209,9 +209,9 @@ export const LastfmCard = () => {
             )}
 
             {!loading && featuredTrack && (
-              <div className="flex min-w-0 items-start gap-3 sm:gap-4">
-                <TrackArtwork eager track={featuredTrack} />
-                <div className="flex min-w-0 flex-col">
+              <div className="flex min-w-0 items-center gap-3 sm:gap-4">
+                <TrackArtwork eager track={featuredTrack} size={96} />
+                <div className="flex min-w-0 flex-col gap-0.5">
                   <Link
                     href={featuredTrack.url}
                     target="_blank"
@@ -226,7 +226,7 @@ export const LastfmCard = () => {
                       {featuredTrack.album}
                     </p>
                   )}
-                  <p className="m-0 truncate text-sm text-site-body">
+                  <p className="m-0 truncate text-sm text-site-body-muted">
                     {featuredTrack.artist}
                   </p>
                 </div>
