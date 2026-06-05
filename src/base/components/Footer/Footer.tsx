@@ -35,7 +35,7 @@ const ScrollToTop: FC = () => {
     let startTime: number | null = null;
 
     const animation = (currentTime: number) => {
-      if (startTime === null) startTime = currentTime;
+      startTime ??= currentTime;
 
       const timeElapsed = currentTime - startTime;
       const progress = Math.min(timeElapsed / duration, 1);
