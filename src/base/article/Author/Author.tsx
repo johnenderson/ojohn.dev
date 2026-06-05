@@ -11,7 +11,7 @@ export const Author: FC<AuthorPropTypes> = ({ name = 'John Enderson' }) => (
     className="author"
     itemProp="author"
     itemScope
-    itemType="http://schema.org/Person"
+    itemType="https://schema.org/Person"
   >
     <span itemProp="name" style={authorNameStyle}>
       {name}
