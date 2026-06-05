@@ -188,9 +188,9 @@ export const LastfmCard = () => {
 
   return (
     <section id="activity" className="mt-12 md:mt-14">
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-4 md:items-start">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
         <FadeIn className="col-span-1 md:col-span-2" duration={500}>
-          <Card interactive className="flex flex-col gap-4 p-4 sm:p-5">
+          <Card interactive className="flex h-full flex-col gap-4 p-4 sm:p-5">
             <div className="flex flex-wrap items-center justify-between gap-2">
               <div className="flex items-center gap-2">
                 <h2 className="m-0 text-base font-semibold text-site-foreground">
