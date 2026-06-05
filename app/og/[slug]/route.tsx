@@ -41,6 +41,13 @@ export async function GET(
     return new Response('Not found', { status: 404 });
   }
 
+  const titleFontSize =
+    article.title.length > 72
+      ? '54px'
+      : article.title.length > 48
+      ? '62px'
+      : '72px';
+
   return new ImageResponse(
     (
       <div
@@ -123,12 +130,7 @@ export async function GET(
               maxWidth: '980px',
               margin: 0,
               color: '#fffaf5',
-              fontSize:
-                article.title.length > 72
-                  ? '54px'
-                  : article.title.length > 48
-                  ? '62px'
-                  : '72px',
+              fontSize: titleFontSize,
               fontWeight: 800,
               lineHeight: 1.05,
               letterSpacing: '-0.02em',
