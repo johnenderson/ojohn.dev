@@ -740,11 +740,10 @@ article blockquote {
   color: var(--site-foreground);
   margin-top: 1.5em;
   text-align: center;
-  line-height: 1.25;
+  line-height: 30px;
   word-spacing: -4px;
   letter-spacing: -1px;
   position: relative;
-  line-height: 30px;
 }
 
 html.light article blockquote {
