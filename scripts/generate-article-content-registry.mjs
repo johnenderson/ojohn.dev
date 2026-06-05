@@ -29,7 +29,7 @@ function toImportPath(filePath) {
 }
 
 function toSingleQuotedString(value) {
-  return `'${value.replace(/\\/g, '\\\\').replace(/'/g, "\\'")}'`;
+  return `'${value.replaceAll('\\', '\\\\').replaceAll("'", "\\'")}'`;
 }
 
 function toObjectKey(value) {

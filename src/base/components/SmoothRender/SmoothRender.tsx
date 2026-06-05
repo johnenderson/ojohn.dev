@@ -46,7 +46,7 @@ function slugify(children: Children): string {
     .trim()
     .replace(/\s+/g, '-')
     .replace(/[^\w\-]+/g, '')
-    .replace(/\_/g, '-')
+    .replaceAll('_', '-')
     .replace(/\-\-+/g, '-')
     .replace(/^-/, '')
     .replace(/\-$/g, '');

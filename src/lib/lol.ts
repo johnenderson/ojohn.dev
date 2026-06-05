@@ -141,9 +141,144 @@ type CachedIdentity = {
   summonerName: string;
 };
 
+const resolveIdentity = async (
+  apiKey: string,
+  gameName: string,
+  tagLine: string,
+): Promise<CachedIdentity | null> => {
+  const cached = await cacheGet<CachedIdentity>(CACHE_KEY_IDENTITY);
+  if (cached) {
+    debugLog('identity cache hit');
+    return cached;
+  }
+
+  debugLog('identity cache miss — buscando na API');
+
+  const account = await riotFetch<AccountDto>(
+    `${RIOT_REGIONAL}/riot/account/v1/accounts/by-riot-id/${encodeURIComponent(
+      gameName,
+    )}/${encodeURIComponent(tagLine)}`,
+    apiKey,
+  );
+  if (!account) {
+    debugLog('conta não encontrada para', `${gameName}#${tagLine}`);
+    return null;
+  }
+  debugLog('account ok, puuid:', account.puuid.slice(0, 8) + '...');
+
+  const summoner = await riotFetch<SummonerDto>(
+    `${RIOT_PLATFORM}/lol/summoner/v4/summoners/by-puuid/${account.puuid}`,
+    apiKey,
+  );
+  debugLog('summoner raw:', JSON.stringify(summoner).slice(0, 200));
+  if (!summoner) {
+    debugLog('summoner não encontrado');
+    return null;
+  }
+  debugLog('summoner ok, profileIconId:', summoner.profileIconId);
+
+  const identity: CachedIdentity = {
+    puuid: account.puuid,
+    profileIconId: summoner.profileIconId,
+    summonerName: `${account.gameName}#${account.tagLine}`,
+  };
+  await cacheSet(CACHE_KEY_IDENTITY, identity, CACHE_TTL_IDENTITY);
+  return identity;
+};
+
+const fetchRankedData = async (
+  apiKey: string,
+  puuid: string,
+): Promise<LolRanked | null> => {
+  const cached = await cacheGet<LolRanked>(CACHE_KEY_RANKED);
+  if (cached) {
+    debugLog('cache hit ranked');
+    return cached;
+  }
+
+  debugLog('buscando ranked para puuid:', puuid.slice(0, 8) + '...');
+  const entries = await riotFetch<LeagueEntryDto[]>(
+    `${RIOT_PLATFORM}/lol/league/v4/entries/by-puuid/${puuid}`,
+    apiKey,
+  ).catch((e) => {
+    debugLog('ranked error:', e);
+    return null;
+  });
+
+  const soloQ = entries?.find((e) => e.queueType === 'RANKED_SOLO_5x5');
+  if (!soloQ) return null;
+
+  const total = soloQ.wins + soloQ.losses;
+  const ranked: LolRanked = {
+    tier: soloQ.tier,
+    rank: soloQ.rank,
+    leaguePoints: soloQ.leaguePoints,
+    wins: soloQ.wins,
+    losses: soloQ.losses,
+    winRate: total > 0 ? Math.round((soloQ.wins / total) * 100) : 0,
+    emblemUrl: buildEmblemUrl(soloQ.tier),
+  };
+  await cacheSet(CACHE_KEY_RANKED, ranked, CACHE_TTL_RANKED);
+  return ranked;
+};
+
+const fetchTopChampionsData = async (
+  apiKey: string,
+  puuid: string,
+  version: string,
+): Promise<LolChampion[]> => {
+  const cached = await cacheGet<LolChampion[]>(CACHE_KEY_CHAMPIONS);
+  if (cached && cached.length > 0) {
+    debugLog(`cache hit champions: ${cached.length}`);
+    return cached;
+  }
+
+  debugLog('buscando maestrias e champion list');
+  const [masteries, championListData] = await Promise.all([
+    riotFetch<MasteryDto[]>(
+      `${RIOT_PLATFORM}/lol/champion-mastery/v4/champion-masteries/by-puuid/${puuid}/top?count=5`,
+      apiKey,
+    ).catch((e) => {
+      debugLog('masteries error:', e);
+      return null;
+    }),
+    riotFetch<ChampionListData>(
+      `${DDRAGON_BASE}/cdn/${version}/data/pt_BR/champion.json`,
+      apiKey,
+    ).catch(() => null),
+  ]);
+
+  if (!masteries || !championListData) return [];
+
+  const idToChampion = new Map(
+    Object.values(championListData.data).map((c) => [Number(c.key), c]),
+  );
+
+  const topChampions = masteries
+    .map((m) => {
+      const champ = idToChampion.get(m.championId);
+      if (!champ) return null;
+      return {
+        id: champ.id,
+        name: champ.name,
+        masteryPoints: m.championPoints,
+        masteryLevel: m.championLevel,
+        iconUrl: `${DDRAGON_BASE}/cdn/${version}/img/champion/${champ.id}.png`,
+        splashUrl: `${DDRAGON_BASE}/cdn/img/champion/splash/${champ.id}_0.jpg`,
+      };
+    })
+    .filter((c): c is LolChampion => c !== null);
+
+  if (topChampions.length > 0) {
+    await cacheSet(CACHE_KEY_CHAMPIONS, topChampions, CACHE_TTL_CHAMPIONS);
+  }
+
+  return topChampions;
+};
+
 const loadLolProfile = async (): Promise<LolProfile | null> => {
   const apiKey = process.env.RIOT_API_KEY;
-  const riotId = process.env.LOL_RIOT_ID; // formato "NomeDeJogo#TAG"
+  const riotId = process.env.LOL_RIOT_ID;
 
   if (!apiKey || !riotId) {
     debugLog('RIOT_API_KEY ou LOL_RIOT_ID ausentes');
@@ -157,131 +292,18 @@ const loadLolProfile = async (): Promise<LolProfile | null> => {
   }
 
   debugLog('carregando perfil para', riotId);
-  // 1. Identidade (PUUID + summonerId) — cache de 30 dias
-  let identity = await cacheGet<CachedIdentity>(CACHE_KEY_IDENTITY);
 
-  if (!identity) {
-    debugLog('identity cache miss — buscando na API');
-
-    const account = await riotFetch<AccountDto>(
-      `${RIOT_REGIONAL}/riot/account/v1/accounts/by-riot-id/${encodeURIComponent(
-        gameName,
-      )}/${encodeURIComponent(tagLine)}`,
-      apiKey,
-    );
-    if (!account) {
-      debugLog('conta não encontrada para', riotId);
-      return null;
-    }
-    debugLog('account ok, puuid:', account.puuid.slice(0, 8) + '...');
-
-    const summoner = await riotFetch<SummonerDto>(
-      `${RIOT_PLATFORM}/lol/summoner/v4/summoners/by-puuid/${account.puuid}`,
-      apiKey,
-    );
-    debugLog('summoner raw:', JSON.stringify(summoner).slice(0, 200));
-    if (!summoner) {
-      debugLog('summoner não encontrado');
-      return null;
-    }
-    debugLog('summoner ok, profileIconId:', summoner.profileIconId);
-
-    identity = {
-      puuid: account.puuid,
-      profileIconId: summoner.profileIconId,
-      summonerName: `${account.gameName}#${account.tagLine}`,
-    };
-    await cacheSet(CACHE_KEY_IDENTITY, identity, CACHE_TTL_IDENTITY);
-  } else {
-    debugLog('identity cache hit');
-  }
+  const identity = await resolveIdentity(apiKey, gameName, tagLine);
+  if (!identity) return null;
 
   const version = await getDDragonVersion(apiKey);
   const profileIconUrl = `${DDRAGON_BASE}/cdn/${version}/img/profileicon/${identity.profileIconId}.png`;
   const summonerName = identity.summonerName;
 
-  // 3. Ranked (com cache Redis) ────────────────────────────────────────────
-  let ranked: LolRanked | null = null;
-
-  const cachedRanked = await cacheGet<LolRanked>(CACHE_KEY_RANKED);
-  if (cachedRanked) {
-    debugLog('cache hit ranked');
-    ranked = cachedRanked;
-  } else {
-    debugLog('buscando ranked para puuid:', identity.puuid.slice(0, 8) + '...');
-    const entries = await riotFetch<LeagueEntryDto[]>(
-      `${RIOT_PLATFORM}/lol/league/v4/entries/by-puuid/${identity.puuid}`,
-      apiKey,
-    ).catch((e) => {
-      debugLog('ranked error:', e);
-      return null;
-    });
-
-    const soloQ = entries?.find((e) => e.queueType === 'RANKED_SOLO_5x5');
-    if (soloQ) {
-      const total = soloQ.wins + soloQ.losses;
-      ranked = {
-        tier: soloQ.tier,
-        rank: soloQ.rank,
-        leaguePoints: soloQ.leaguePoints,
-        wins: soloQ.wins,
-        losses: soloQ.losses,
-        winRate: total > 0 ? Math.round((soloQ.wins / total) * 100) : 0,
-        emblemUrl: buildEmblemUrl(soloQ.tier),
-      };
-      await cacheSet(CACHE_KEY_RANKED, ranked, CACHE_TTL_RANKED);
-    }
-  }
-
-  // 4. Top campeões (com cache Redis) ──────────────────────────────────────
-  let topChampions: LolChampion[] = [];
-
-  const cachedChampions = await cacheGet<LolChampion[]>(CACHE_KEY_CHAMPIONS);
-  if (cachedChampions && cachedChampions.length > 0) {
-    debugLog(`cache hit champions: ${cachedChampions.length}`);
-    topChampions = cachedChampions;
-  } else {
-    debugLog('buscando maestrias e champion list');
-    const [masteries, championListData] = await Promise.all([
-      riotFetch<MasteryDto[]>(
-        `${RIOT_PLATFORM}/lol/champion-mastery/v4/champion-masteries/by-puuid/${identity.puuid}/top?count=5`,
-        apiKey,
-      ).catch((e) => {
-        debugLog('masteries error:', e);
-        return null;
-      }),
-      riotFetch<ChampionListData>(
-        `${DDRAGON_BASE}/cdn/${version}/data/pt_BR/champion.json`,
-        apiKey,
-      ).catch(() => null),
-    ]);
-
-    if (masteries && championListData) {
-      // Mapeia championId → metadados do campeão
-      const idToChampion = new Map(
-        Object.values(championListData.data).map((c) => [Number(c.key), c]),
-      );
-
-      topChampions = masteries
-        .map((m) => {
-          const champ = idToChampion.get(m.championId);
-          if (!champ) return null;
-          return {
-            id: champ.id,
-            name: champ.name,
-            masteryPoints: m.championPoints,
-            masteryLevel: m.championLevel,
-            iconUrl: `${DDRAGON_BASE}/cdn/${version}/img/champion/${champ.id}.png`,
-            splashUrl: `${DDRAGON_BASE}/cdn/img/champion/splash/${champ.id}_0.jpg`,
-          };
-        })
-        .filter((c): c is LolChampion => c !== null);
-
-      if (topChampions.length > 0) {
-        await cacheSet(CACHE_KEY_CHAMPIONS, topChampions, CACHE_TTL_CHAMPIONS);
-      }
-    }
-  }
+  const [ranked, topChampions] = await Promise.all([
+    fetchRankedData(apiKey, identity.puuid),
+    fetchTopChampionsData(apiKey, identity.puuid, version),
+  ]);
 
   debugLog(
     `profile ok: ranked=${ranked?.tier ?? 'none'}, champions=${

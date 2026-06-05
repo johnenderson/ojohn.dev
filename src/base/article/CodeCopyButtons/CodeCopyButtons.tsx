@@ -10,79 +10,79 @@ const COPY_ICON =
 const CHECK_ICON =
   '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16" height="16" aria-hidden="true"><path d="M9.9997 15.1709L19.1921 5.97852L20.6063 7.39273L9.9997 17.9993L3.63574 11.6354L5.04996 10.2212L9.9997 15.1709Z"></path></svg>';
 
+function setupCodeBlock(pre: HTMLElement): () => void {
+  if (pre.querySelector('.code-copy-button')) return () => {};
+
+  const title = pre.dataset.codeTitle;
+  const language = pre.dataset.codeLanguage;
+  let header: HTMLDivElement | undefined;
+
+  if (title || language) {
+    header = document.createElement('div');
+    header.className = 'code-block-header';
+
+    if (language) {
+      const languageElement = document.createElement('span');
+      languageElement.className = 'code-block-language';
+      languageElement.textContent = language;
+      header.appendChild(languageElement);
+    }
+
+    if (title) {
+      const titleElement = document.createElement('span');
+      titleElement.className = 'code-block-title';
+      titleElement.textContent = title;
+      header.appendChild(titleElement);
+    }
+
+    pre.prepend(header);
+  }
+
+  const button = document.createElement('button');
+  button.type = 'button';
+  button.className = 'code-copy-button';
+  button.innerHTML = COPY_ICON;
+  button.setAttribute('aria-label', 'Copiar código');
+
+  let timeout: number | undefined;
+
+  const onClick = async () => {
+    const code = pre.querySelector('code')?.textContent ?? '';
+
+    try {
+      await navigator.clipboard.writeText(code);
+      button.innerHTML = CHECK_ICON;
+      button.classList.add('is-copied');
+      button.setAttribute('aria-label', 'Código copiado');
+
+      if (timeout) window.clearTimeout(timeout);
+      timeout = window.setTimeout(() => {
+        button.innerHTML = COPY_ICON;
+        button.classList.remove('is-copied');
+        button.setAttribute('aria-label', 'Copiar código');
+      }, COPIED_LABEL_TIMEOUT);
+    } catch {
+      button.setAttribute('aria-label', 'Falha ao copiar código');
+    }
+  };
+
+  button.addEventListener('click', onClick);
+  pre.appendChild(button);
+
+  return () => {
+    if (timeout) window.clearTimeout(timeout);
+    button.removeEventListener('click', onClick);
+    button.remove();
+    header?.remove();
+  };
+}
+
 export function CodeCopyButtons() {
   useEffect(() => {
     const codeBlocks =
       document.querySelectorAll<HTMLElement>('article.post pre');
 
-    const cleanups = Array.from(codeBlocks).map((pre) => {
-      if (pre.querySelector('.code-copy-button')) {
-        return () => {};
-      }
-
-      const title = pre.dataset.codeTitle;
-      const language = pre.dataset.codeLanguage;
-      let header: HTMLDivElement | undefined;
-
-      if (title || language) {
-        header = document.createElement('div');
-        header.className = 'code-block-header';
-
-        if (language) {
-          const languageElement = document.createElement('span');
-          languageElement.className = 'code-block-language';
-          languageElement.textContent = language;
-          header.appendChild(languageElement);
-        }
-
-        if (title) {
-          const titleElement = document.createElement('span');
-          titleElement.className = 'code-block-title';
-          titleElement.textContent = title;
-          header.appendChild(titleElement);
-        }
-
-        pre.prepend(header);
-      }
-
-      const button = document.createElement('button');
-      button.type = 'button';
-      button.className = 'code-copy-button';
-      button.innerHTML = COPY_ICON;
-      button.setAttribute('aria-label', 'Copiar código');
-
-      let timeout: number | undefined;
-
-      const onClick = async () => {
-        const code = pre.querySelector('code')?.textContent ?? '';
-
-        try {
-          await navigator.clipboard.writeText(code);
-          button.innerHTML = CHECK_ICON;
-          button.classList.add('is-copied');
-          button.setAttribute('aria-label', 'Código copiado');
-
-          if (timeout) window.clearTimeout(timeout);
-          timeout = window.setTimeout(() => {
-            button.innerHTML = COPY_ICON;
-            button.classList.remove('is-copied');
-            button.setAttribute('aria-label', 'Copiar código');
-          }, COPIED_LABEL_TIMEOUT);
-        } catch {
-          button.setAttribute('aria-label', 'Falha ao copiar código');
-        }
-      };
-
-      button.addEventListener('click', onClick);
-      pre.appendChild(button);
-
-      return () => {
-        if (timeout) window.clearTimeout(timeout);
-        button.removeEventListener('click', onClick);
-        button.remove();
-        header?.remove();
-      };
-    });
+    const cleanups = Array.from(codeBlocks).map(setupCodeBlock);
 
     return () => {
       cleanups.forEach((cleanup) => cleanup());

@@ -98,6 +98,27 @@ const HeadphonesIcon = () => (
 const getTrackIdentity = (track: LastfmTrack) =>
   track.playedAt ?? `${track.name}-${track.artist}-${track.url}`;
 
+type LastfmData = {
+  nowPlaying: LastfmTrack | null;
+  lastPlayed: LastfmTrack | null;
+  tracks: LastfmTrack[];
+};
+
+const computeTrackData = (topTracks: LastfmTrack[], lastfm: LastfmData) => {
+  const recentTracks = getUniqueTracks(
+    [lastfm.lastPlayed, ...lastfm.tracks].filter(Boolean) as LastfmTrack[],
+  );
+  const featuredTrack = topTracks[0] ?? recentTracks[0];
+  const recentTrackList = featuredTrack
+    ? recentTracks.filter(
+        (track) =>
+          track.name !== featuredTrack.name ||
+          track.artist !== featuredTrack.artist,
+      )
+    : recentTracks;
+  return { recentTracks, featuredTrack, recentTrackList };
+};
+
 const getUniqueTracks = (tracks: LastfmTrack[]) => {
   const seen = new Set<string>();
 
@@ -129,17 +150,10 @@ export default async function NowPage() {
     dev && (dev.rhythm || dev.languages.length > 0 || dev.activity.length > 0),
   );
 
-  const recentTracks = getUniqueTracks(
-    [lastfm.lastPlayed, ...lastfm.tracks].filter(Boolean) as LastfmTrack[],
+  const { featuredTrack, recentTrackList } = computeTrackData(
+    topTracks,
+    lastfm,
   );
-  const featuredTrack = topTracks[0] ?? recentTracks[0];
-  const recentTrackList = featuredTrack
-    ? recentTracks.filter(
-        (track) =>
-          track.name !== featuredTrack.name ||
-          track.artist !== featuredTrack.artist,
-      )
-    : recentTracks;
 
   return (
     <PageWrapper>
