@@ -7,7 +7,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Card } from '@/base/components/Card';
 import { formatRelativeTime } from '@/lib/formatRelativeTime';
 import type { GithubProject } from '@/lib/github';
-import { getGithubProjects } from '@/lib/github';
+import { getGithubProjects, getGithubUsername } from '@/lib/github';
 
 const formatCount = (n: number) =>
   n >= 1000 ? `${(n / 1000).toFixed(1)}k` : String(n);
@@ -95,37 +95,44 @@ function ProjectCard({ project }: Readonly<{ project: GithubProject }>) {
 }
 
 export async function ProjectsShowcase() {
-  const projects = await getGithubProjects().catch(() => []);
+  const [projects, username] = await Promise.all([
+    getGithubProjects().catch(() => []),
+    Promise.resolve(getGithubUsername()),
+  ]);
 
   if (projects.length === 0) return null;
 
   return (
-    <section id="projects" className="mt-12 md:mt-14">
-      <div className="mb-5 flex flex-wrap items-end justify-between gap-3">
-        <div className="flex items-center gap-2">
-          <h2 className="m-0 text-base font-semibold text-site-foreground">
-            Projetos em destaque
-          </h2>
-          <FontAwesomeIcon
-            icon={faGithub}
-            aria-hidden="true"
-            className="text-site-body-muted"
-          />
-        </div>
-        <Link
-          href="https://github.com/johnenderson"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-xs font-medium text-site-body-muted no-underline transition-colors hover:text-site-primary-hover focus-visible:text-site-primary-hover focus-visible:outline-none"
-        >
-          Ver todos no GitHub →
-        </Link>
+    <section
+      id="projects"
+      className="mt-12 border-t border-site-border-subtle pt-12 md:mt-14 md:pt-14"
+    >
+      <div className="mb-5 flex items-center gap-2">
+        <h2 className="m-0 text-base font-semibold text-site-foreground">
+          Projetos em destaque
+        </h2>
+        <FontAwesomeIcon
+          icon={faGithub}
+          aria-hidden="true"
+          className="text-site-body-muted"
+        />
       </div>
 
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {projects.map((project) => (
           <ProjectCard key={project.name} project={project} />
         ))}
+      </div>
+
+      <div className="mt-4 flex justify-end">
+        <Link
+          href={`https://github.com/${username}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-xs font-medium text-site-body-muted no-underline transition-colors hover:text-site-primary-hover focus-visible:text-site-primary-hover focus-visible:outline-none"
+        >
+          Ver todos no GitHub →
+        </Link>
       </div>
     </section>
   );

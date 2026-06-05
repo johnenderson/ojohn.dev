@@ -9,5 +9,11 @@ export function formatRelativeTime(iso: string): string {
   if (hours < 24) return `há ${hours}h`;
 
   const days = Math.round(hours / 24);
-  return `há ${days}d`;
+  if (days < 30) return `há ${days}d`;
+
+  const months = Math.round(days / 30);
+  if (months < 12) return `há ${months} ${months === 1 ? 'mês' : 'meses'}`;
+
+  const years = Math.round(days / 365);
+  return `há ${years} ${years === 1 ? 'ano' : 'anos'}`;
 }

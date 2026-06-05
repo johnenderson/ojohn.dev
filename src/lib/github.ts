@@ -733,6 +733,9 @@ const loadGithubStarred = async (): Promise<GithubStarredRepo[]> => {
     }));
 };
 
+export const getGithubUsername = () =>
+  process.env.GITHUB_USERNAME ?? DEFAULT_GITHUB_USERNAME;
+
 export const getGithubProjects = unstable_cache(
   loadGithubProjects,
   ['github-projects', 'v1'],

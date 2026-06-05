@@ -187,13 +187,13 @@ export const LastfmCard = () => {
   const title = lastfm?.nowPlaying ? 'Ouvindo agora' : 'Última música';
 
   return (
-    <section id="activity" className="mt-12 md:mt-14">
+    <section
+      id="activity"
+      className="mt-12 border-t border-site-border-subtle pt-12 md:mt-14 md:pt-14"
+    >
       <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
         <FadeIn className="col-span-1 md:col-span-2" duration={500}>
-          <Card
-            interactive
-            className="flex h-full min-h-36 flex-col gap-4 p-4 sm:p-5"
-          >
+          <Card interactive className="flex h-full flex-col gap-4 p-4 sm:p-5">
             <div className="flex flex-wrap items-center justify-between gap-2">
               <div className="flex items-center gap-2">
                 <h2 className="m-0 text-base font-semibold text-site-foreground">
@@ -209,45 +209,44 @@ export const LastfmCard = () => {
             )}
 
             {!loading && featuredTrack && (
-              <div className="flex min-w-0 items-start gap-3 sm:gap-4">
-                <TrackArtwork eager track={featuredTrack} />
-                <div className="flex min-w-0 flex-col">
-                  <Link
-                    href={featuredTrack.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="truncate text-lg font-bold no-underline transition-colors hover:text-site-primary-hover focus-visible:text-site-primary-hover focus-visible:outline-none"
-                    title={featuredTrack.name}
-                  >
-                    {featuredTrack.name}
-                  </Link>
-                  {featuredTrack.album && (
-                    <p className="m-0 truncate text-sm text-site-body">
-                      {featuredTrack.album}
+              <>
+                <div className="flex min-w-0 items-center gap-3 sm:gap-4">
+                  <TrackArtwork eager track={featuredTrack} size={96} />
+                  <div className="flex min-w-0 flex-col gap-0.5">
+                    <Link
+                      href={featuredTrack.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="truncate text-lg font-bold no-underline transition-colors hover:text-site-primary-hover focus-visible:text-site-primary-hover focus-visible:outline-none"
+                      title={featuredTrack.name}
+                    >
+                      {featuredTrack.name}
+                    </Link>
+                    {featuredTrack.album && (
+                      <p className="m-0 truncate text-sm text-site-body">
+                        {featuredTrack.album}
+                      </p>
+                    )}
+                    <p className="m-0 truncate text-sm text-site-body-muted">
+                      {featuredTrack.artist}
                     </p>
-                  )}
-                  <p className="m-0 truncate text-sm text-site-body">
-                    {featuredTrack.artist}
-                  </p>
+                  </div>
                 </div>
-              </div>
+                <Link
+                  href={featuredTrack.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mt-auto w-fit text-xs font-medium text-site-body-muted no-underline transition-colors hover:text-site-primary-hover focus-visible:text-site-primary-hover focus-visible:outline-none"
+                >
+                  Ver no Last.fm
+                </Link>
+              </>
             )}
 
             {!loading && !featuredTrack && (
               <p className="m-0 text-sm text-site-body-muted">
                 Nenhuma música recente encontrada.
               </p>
-            )}
-
-            {featuredTrack && (
-              <Link
-                href={featuredTrack.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="mt-auto w-fit text-xs font-medium text-site-body-muted no-underline transition-colors hover:text-site-primary-hover focus-visible:text-site-primary-hover focus-visible:outline-none"
-              >
-                Ver no Last.fm
-              </Link>
             )}
           </Card>
         </FadeIn>
