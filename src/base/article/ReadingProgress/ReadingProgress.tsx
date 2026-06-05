@@ -29,7 +29,7 @@ export const ReadingProgress = () => {
 
     const onScroll = () => {
       if (frame) return;
-      frame = window.requestAnimationFrame(update);
+      frame = globalThis.requestAnimationFrame(update);
     };
 
     update();
@@ -37,7 +37,7 @@ export const ReadingProgress = () => {
     window.addEventListener('resize', onScroll, { passive: true });
 
     return () => {
-      if (frame) window.cancelAnimationFrame(frame);
+      if (frame) globalThis.cancelAnimationFrame(frame);
       window.removeEventListener('scroll', onScroll);
       window.removeEventListener('resize', onScroll);
     };

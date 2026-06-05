@@ -12,8 +12,8 @@ const isFontSize = (value: string | null): value is typeof FONT_SIZES[number] =>
   value !== null && FONT_SIZES.includes(value);
 
 function useLocalFontSize() {
-  const [fontSize, setFontSizeState] = useState(() => {
-    if (typeof window === 'undefined') return DEFAULT_FONT_SIZE;
+  const [fontSize, setFontSize] = useState(() => {
+    if (typeof globalThis.window === 'undefined') return DEFAULT_FONT_SIZE;
     const storedFontSize = localStorage.getItem('prose_font_size');
     return isFontSize(storedFontSize) ? storedFontSize : DEFAULT_FONT_SIZE;
   });
@@ -22,27 +22,27 @@ function useLocalFontSize() {
     document.documentElement.style.setProperty('--prose-font-size', fontSize);
   }, [fontSize]);
 
-  const setFontSize = (size: string) => {
+  const applyFontSize = (size: string) => {
     if (!isFontSize(size)) return;
-    setFontSizeState(size);
+    setFontSize(size);
     localStorage.setItem('prose_font_size', size);
   };
 
-  return [fontSize, setFontSize] as const;
+  return [fontSize, applyFontSize] as const;
 }
 
 function useElevatorSpeed() {
-  const [makeElevatorFaster, setMakeElevatorFasterState] = useState(() => {
-    if (typeof window === 'undefined') return false;
+  const [makeElevatorFaster, setMakeElevatorFaster] = useState(() => {
+    if (typeof globalThis.window === 'undefined') return false;
     return localStorage.getItem(ELEVATOR_SPEED_KEY) === 'true';
   });
 
-  const setMakeElevatorFaster = (enabled: boolean) => {
-    setMakeElevatorFasterState(enabled);
+  const applyElevatorSpeed = (enabled: boolean) => {
+    setMakeElevatorFaster(enabled);
     localStorage.setItem(ELEVATOR_SPEED_KEY, String(enabled));
   };
 
-  return [makeElevatorFaster, setMakeElevatorFaster] as const;
+  return [makeElevatorFaster, applyElevatorSpeed] as const;
 }
 
 /* ── Icons ── */
