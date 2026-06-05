@@ -43,6 +43,17 @@ export type GithubFeedItem = {
   at: string;
 };
 
+export type GithubStarredRepo = {
+  name: string;
+  fullName: string;
+  description: string | null;
+  url: string;
+  language: string | null;
+  stars: number;
+  topics: string[];
+  starredAt: string;
+};
+
 export type GithubProject = {
   name: string;
   description: string | null;
@@ -668,8 +679,68 @@ export const getGithubLanguages = unstable_cache(
   },
 );
 
+type StarredApiItem = {
+  starred_at?: string;
+  repo?: {
+    name?: string;
+    full_name?: string;
+    description?: string | null;
+    html_url?: string;
+    language?: string | null;
+    stargazers_count?: number;
+    topics?: string[];
+  };
+};
+
+const loadGithubStarred = async (): Promise<GithubStarredRepo[]> => {
+  const token = process.env.GITHUB_TOKEN;
+  const username = process.env.GITHUB_USERNAME ?? DEFAULT_GITHUB_USERNAME;
+
+  if (!token) {
+    debugLog('GITHUB_TOKEN ausente — starred indisponível');
+    return [];
+  }
+
+  const response = await fetch(
+    `${GITHUB_API_URL}/users/${username}/starred?sort=created&per_page=8`,
+    {
+      next: { revalidate: REVALIDATE_SECONDS },
+      headers: {
+        Authorization: `Bearer ${token}`,
+        Accept: 'application/vnd.github.star+json',
+      },
+    },
+  );
+
+  if (!response.ok) {
+    debugLog(`starred falhou: ${response.status}`);
+    return [];
+  }
+
+  const items = (await response.json()) as StarredApiItem[];
+
+  return items
+    .filter((item) => Boolean(item.repo?.name))
+    .map((item) => ({
+      name: item.repo!.name!,
+      fullName: item.repo!.full_name ?? item.repo!.name!,
+      description: item.repo?.description ?? null,
+      url: item.repo?.html_url ?? `https://github.com/${item.repo?.full_name}`,
+      language: item.repo?.language ?? null,
+      stars: item.repo?.stargazers_count ?? 0,
+      topics: item.repo?.topics ?? [],
+      starredAt: item.starred_at ?? new Date().toISOString(),
+    }));
+};
+
 export const getGithubProjects = unstable_cache(
   loadGithubProjects,
   ['github-projects', 'v1'],
+  { revalidate: REVALIDATE_SECONDS },
+);
+
+export const getGithubStarred = unstable_cache(
+  loadGithubStarred,
+  ['github-starred', 'v1'],
   { revalidate: REVALIDATE_SECONDS },
 );
