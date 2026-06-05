@@ -13,7 +13,7 @@ const isFontSize = (value: string | null): value is typeof FONT_SIZES[number] =>
 
 function useLocalFontSize() {
   const [fontSize, setFontSize] = useState(() => {
-    if (typeof globalThis.window === 'undefined') return DEFAULT_FONT_SIZE;
+    if (globalThis.window === undefined) return DEFAULT_FONT_SIZE;
     const storedFontSize = localStorage.getItem('prose_font_size');
     return isFontSize(storedFontSize) ? storedFontSize : DEFAULT_FONT_SIZE;
   });
@@ -33,7 +33,7 @@ function useLocalFontSize() {
 
 function useElevatorSpeed() {
   const [makeElevatorFaster, setMakeElevatorFaster] = useState(() => {
-    if (typeof globalThis.window === 'undefined') return false;
+    if (globalThis.window === undefined) return false;
     return localStorage.getItem(ELEVATOR_SPEED_KEY) === 'true';
   });
 
