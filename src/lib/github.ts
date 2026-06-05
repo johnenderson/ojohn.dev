@@ -43,6 +43,17 @@ export type GithubFeedItem = {
   at: string;
 };
 
+export type GithubProject = {
+  name: string;
+  description: string | null;
+  url: string;
+  stars: number;
+  forks: number;
+  language: { name: string; color: string | null } | null;
+  topics: string[];
+  updatedAt: string;
+};
+
 export type GithubDev = {
   // Contribuições somadas por dia da semana (índice 0 = domingo … 6 = sábado).
   rhythm: number[] | null;
@@ -99,6 +110,57 @@ type GithubEvent = {
     issue?: { html_url?: string };
   };
 };
+
+type PinnedItemsResponse = {
+  data?: {
+    user?: {
+      pinnedItems?: {
+        nodes?: {
+          name?: string;
+          description?: string | null;
+          url?: string;
+          stargazerCount?: number;
+          forkCount?: number;
+          primaryLanguage?: { name?: string; color?: string | null } | null;
+          updatedAt?: string;
+          repositoryTopics?: {
+            nodes?: { topic?: { name?: string } }[];
+          };
+        }[];
+      };
+    };
+  };
+};
+
+const PINNED_ITEMS_QUERY = `
+  query ($login: String!) {
+    user(login: $login) {
+      pinnedItems(first: 6, types: [REPOSITORY]) {
+        nodes {
+          ... on Repository {
+            name
+            description
+            url
+            stargazerCount
+            forkCount
+            primaryLanguage {
+              name
+              color
+            }
+            updatedAt
+            repositoryTopics(first: 5) {
+              nodes {
+                topic {
+                  name
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+`;
 
 const CONTRIBUTIONS_QUERY = `
   query ($login: String!) {
@@ -546,6 +608,44 @@ const loadGithubLanguages = async (): Promise<GithubLanguage[]> => {
   return fetchLanguages(username, token).catch(() => []);
 };
 
+const loadGithubProjects = async (): Promise<GithubProject[]> => {
+  const token = process.env.GITHUB_TOKEN;
+  const username = process.env.GITHUB_USERNAME ?? DEFAULT_GITHUB_USERNAME;
+
+  if (!token) {
+    debugLog('GITHUB_TOKEN ausente — projetos indisponíveis');
+    return [];
+  }
+
+  const data = await githubGraphql<PinnedItemsResponse>(
+    token,
+    PINNED_ITEMS_QUERY,
+    username,
+  );
+
+  const nodes = data?.data?.user?.pinnedItems?.nodes ?? [];
+
+  return nodes
+    .filter((node) => Boolean(node.name))
+    .map((node) => ({
+      name: node.name!,
+      description: node.description ?? null,
+      url: node.url ?? `https://github.com/${username}/${node.name}`,
+      stars: node.stargazerCount ?? 0,
+      forks: node.forkCount ?? 0,
+      language: node.primaryLanguage?.name
+        ? {
+            name: node.primaryLanguage.name,
+            color: node.primaryLanguage.color ?? null,
+          }
+        : null,
+      topics: (node.repositoryTopics?.nodes ?? [])
+        .map((t) => t.topic?.name)
+        .filter((name): name is string => Boolean(name)),
+      updatedAt: node.updatedAt ?? new Date().toISOString(),
+    }));
+};
+
 export const getGithubPulse = unstable_cache(
   loadGithubPulse,
   ['github-pulse', 'v2'],
@@ -566,4 +666,10 @@ export const getGithubLanguages = unstable_cache(
   {
     revalidate: REVALIDATE_SECONDS,
   },
+);
+
+export const getGithubProjects = unstable_cache(
+  loadGithubProjects,
+  ['github-projects', 'v1'],
+  { revalidate: REVALIDATE_SECONDS },
 );
