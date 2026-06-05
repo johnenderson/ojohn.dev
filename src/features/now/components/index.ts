@@ -10,3 +10,4 @@ export { LolRankedCard } from './LolRankedCard';
 export { RadarCard } from './RadarCard';
 export { RecentTrack } from './RecentTrack';
 export { SectionIcon } from './SectionIcon';
+export { StarredRepos } from './StarredRepos';

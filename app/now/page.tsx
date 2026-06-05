@@ -24,8 +24,9 @@ import {
   RadarCard,
   RecentTrack,
   SectionIcon,
+  StarredRepos,
 } from '@/features/now/components';
-import { getGithubDev } from '@/lib/github';
+import { getGithubDev, getGithubStarred } from '@/lib/github';
 import {
   getLastfmRecentStats,
   getLastfmTopArtists,
@@ -133,18 +134,20 @@ const getUniqueTracks = (tracks: LastfmTrack[]) => {
 };
 
 export default async function NowPage() {
-  const [lastfm, artists, topTracks, dev, steam, lol] = await Promise.all([
-    getLastfmRecentStats().catch(() => ({
-      nowPlaying: null,
-      lastPlayed: null,
-      tracks: [],
-    })),
-    getLastfmTopArtists({ period: '7day' }).catch(() => []),
-    getLastfmTopTracks({ period: '7day' }).catch(() => []),
-    getGithubDev().catch(() => null),
-    getSteamGames().catch(() => ({ games: [], source: 'recent' as const })),
-    getLolProfile().catch(() => null),
-  ]);
+  const [lastfm, artists, topTracks, dev, steam, lol, starred] =
+    await Promise.all([
+      getLastfmRecentStats().catch(() => ({
+        nowPlaying: null,
+        lastPlayed: null,
+        tracks: [],
+      })),
+      getLastfmTopArtists({ period: '7day' }).catch(() => []),
+      getLastfmTopTracks({ period: '7day' }).catch(() => []),
+      getGithubDev().catch(() => null),
+      getSteamGames().catch(() => ({ games: [], source: 'recent' as const })),
+      getLolProfile().catch(() => null),
+      getGithubStarred().catch(() => []),
+    ]);
 
   const hasDevData = Boolean(
     dev && (dev.rhythm || dev.languages.length > 0 || dev.activity.length > 0),
@@ -234,9 +237,32 @@ export default async function NowPage() {
                   <LanguageStack languages={dev?.languages ?? []} />
                 </div>
                 <ActivityFeed items={dev?.activity ?? []} />
+                {starred.length > 0 && <StarredRepos repos={starred} />}
               </div>
             </section>
           ) : null}
+
+          {!hasDevData && starred.length > 0 && (
+            <section
+              aria-labelledby="starred-title"
+              className="border-b border-site-border-subtle py-16"
+            >
+              <header className="mb-10 flex max-w-3xl items-start gap-3 lg:gap-6 xl:-ml-[4.5rem]">
+                <SectionIcon>
+                  <FontAwesomeIcon icon={faCode} className="size-6" />
+                </SectionIcon>
+                <div>
+                  <h2
+                    id="starred-title"
+                    className="m-0 text-3xl font-bold leading-none text-site-foreground sm:text-4xl"
+                  >
+                    Código
+                  </h2>
+                </div>
+              </header>
+              <StarredRepos repos={starred} />
+            </section>
+          )}
 
           <section
             aria-labelledby="listening-title"
