@@ -29,13 +29,13 @@ function toImportPath(filePath) {
 }
 
 function toSingleQuotedString(value) {
-  return `'${value.replaceAll('\\', '\\\\').replaceAll("'", "\\'")}'`;
+  return `'${value
+    .replaceAll('\\', String.raw`\\`)
+    .replaceAll("'", String.raw`\'`)}'`;
 }
 
 function toObjectKey(value) {
-  return /^[A-Za-z_$][\w$]*$/.test(value)
-    ? value
-    : toSingleQuotedString(value);
+  return /^[A-Za-z_$][\w$]*$/.test(value) ? value : toSingleQuotedString(value);
 }
 
 async function collectArticles() {
@@ -72,7 +72,9 @@ function renderRegistry(articles) {
     return {
       ...article,
       importName,
-      importLine: `import ${importName} from '${toImportPath(article.filePath)}?raw';`,
+      importLine: `import ${importName} from '${toImportPath(
+        article.filePath,
+      )}?raw';`,
     };
   });
 
@@ -90,7 +92,9 @@ function renderRegistry(articles) {
       const localeEntries = translations
         .map(
           (translation) =>
-            `    ${toObjectKey(translation.locale)}: ${translation.importName},`,
+            `    ${toObjectKey(translation.locale)}: ${
+              translation.importName
+            },`,
         )
         .join('\n');
 
