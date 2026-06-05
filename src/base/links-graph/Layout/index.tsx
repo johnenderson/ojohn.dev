@@ -14,7 +14,7 @@ export const Layout: FC<PropsWithChildren<LayoutPropTypes>> = ({
     <article
       className="post"
       itemScope
-      itemType="http://schema.org/BlogPosting"
+      itemType="https://schema.org/BlogPosting"
     >
       {title ? (
         <header>

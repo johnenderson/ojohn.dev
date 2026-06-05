@@ -50,7 +50,7 @@ export const Layout: FC<PropsWithChildren<LayoutPropTypes>> = ({
               <article
                 className="post"
                 itemScope
-                itemType="http://schema.org/BlogPosting"
+                itemType="https://schema.org/BlogPosting"
               >
                 <header className="mb-10">
                   <div className="flex items-start gap-4">
