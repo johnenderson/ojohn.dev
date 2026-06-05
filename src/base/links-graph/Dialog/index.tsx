@@ -20,6 +20,8 @@ export const Dialog = ({ onClose, open, title, content }: DialogPropsType) => {
       onKeyDown={onClose}
     >
       <div
+        role="dialog"
+        aria-modal="true"
         className="bg-[#222] text-white w-full max-w-[700px] max-h-[90vh] overflow-y-auto rounded light:bg-white light:text-black"
         onClick={(e) => e.stopPropagation()}
         onKeyDown={(e) => e.stopPropagation()}
