@@ -41,12 +41,10 @@ export async function GET(
     return new Response('Not found', { status: 404 });
   }
 
-  const titleFontSize =
-    article.title.length > 72
-      ? '54px'
-      : article.title.length > 48
-      ? '62px'
-      : '72px';
+  let titleFontSize: string;
+  if (article.title.length > 72) titleFontSize = '54px';
+  else if (article.title.length > 48) titleFontSize = '62px';
+  else titleFontSize = '72px';
 
   return new ImageResponse(
     (

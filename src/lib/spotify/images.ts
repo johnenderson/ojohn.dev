@@ -91,7 +91,7 @@ const getSpotifyTrackScore = (
     score += 3;
   }
 
-  if (spotifyArtistNames.some((artist) => artist === normalizedArtistName)) {
+  if (spotifyArtistNames.includes(normalizedArtistName)) {
     score += 4;
   } else if (
     spotifyArtistNames.some(
