@@ -636,11 +636,8 @@ const loadGithubProjects = async (): Promise<GithubProject[]> => {
 
   const nodes = data?.data?.user?.pinnedItems?.nodes ?? [];
 
-  // Filtra o próprio repo do site para não aparecer no showcase
-  const SITE_REPO_NAME = process.env.SITE_REPO_NAME ?? 'ojohn.dev';
-
   return nodes
-    .filter((node) => Boolean(node.name) && node.name !== SITE_REPO_NAME)
+    .filter((node) => Boolean(node.name))
     .map((node) => ({
       name: node.name!,
       description: node.description ?? null,
