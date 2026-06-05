@@ -136,36 +136,42 @@ const getEmptyStats = (): LastfmStats => ({
   tracks: [],
 });
 
-async function getLastfmTracks(
-  fetchOptions: LastfmFetchOptions = {},
-): Promise<LastfmTrack[]> {
+async function fetchLastfm(
+  params: Record<string, string>,
+  fetchOptions: RequestInit = {},
+): Promise<LastfmApiResponse> {
   const apiKey = process.env.LASTFM_API_KEY;
   const username = process.env.LASTFM_USERNAME ?? DEFAULT_LASTFM_USERNAME;
 
-  if (!apiKey) {
-    return [];
-  }
+  if (!apiKey) return {};
 
-  const params = new URLSearchParams({
-    method: 'user.getrecenttracks',
+  const query = new URLSearchParams({
+    ...params,
     user: username,
     api_key: apiKey,
     format: 'json',
-    limit: '7',
   });
 
   const response = await fetch(
-    `${LASTFM_API_URL}?${params.toString()}`,
+    `${LASTFM_API_URL}?${query.toString()}`,
     fetchOptions,
   );
 
   if (!response.ok) {
-    throw new Error('Failed to fetch Last.fm recent tracks');
+    throw new Error(`Failed to fetch Last.fm: ${params.method}`);
   }
 
-  const data = (await response.json()) as LastfmApiResponse;
-  const rawTracks = data.recenttracks?.track;
-  return normalizeToArray(rawTracks).map(mapTrack);
+  return (await response.json()) as LastfmApiResponse;
+}
+
+async function getLastfmTracks(
+  fetchOptions: LastfmFetchOptions = {},
+): Promise<LastfmTrack[]> {
+  const data = await fetchLastfm(
+    { method: 'user.getrecenttracks', limit: '7' },
+    fetchOptions,
+  );
+  return normalizeToArray(data.recenttracks?.track).map(mapTrack);
 }
 
 const createLastfmStats = (tracks: LastfmTrack[]): LastfmStats => {
@@ -204,29 +210,10 @@ export async function getLastfmTopTracks({
 }: {
   period?: LastfmTopPeriod;
 } = {}): Promise<LastfmTrack[]> {
-  const apiKey = process.env.LASTFM_API_KEY;
-  const username = process.env.LASTFM_USERNAME ?? DEFAULT_LASTFM_USERNAME;
-
-  if (!apiKey) return [];
-
-  const params = new URLSearchParams({
-    method: 'user.gettoptracks',
-    user: username,
-    api_key: apiKey,
-    format: 'json',
-    period,
-    limit: '1',
-  });
-
-  const response = await fetch(`${LASTFM_API_URL}?${params.toString()}`, {
-    next: { revalidate: 3600 },
-  });
-
-  if (!response.ok) {
-    throw new Error('Failed to fetch Last.fm top tracks');
-  }
-
-  const data = (await response.json()) as LastfmApiResponse;
+  const data = await fetchLastfm(
+    { method: 'user.gettoptracks', period, limit: '1' },
+    { next: { revalidate: 3600 } },
+  );
   const rawTracks = data.toptracks?.track;
   const tracks = normalizeToArray(rawTracks).map((track) => ({
     ...mapTrack(track),
@@ -254,29 +241,10 @@ export async function getLastfmTopArtists({
 }: {
   period?: LastfmTopPeriod;
 } = {}): Promise<LastfmArtist[]> {
-  const apiKey = process.env.LASTFM_API_KEY;
-  const username = process.env.LASTFM_USERNAME ?? DEFAULT_LASTFM_USERNAME;
-
-  if (!apiKey) return [];
-
-  const params = new URLSearchParams({
-    method: 'user.gettopartists',
-    user: username,
-    api_key: apiKey,
-    format: 'json',
-    period,
-    limit: '9',
-  });
-
-  const response = await fetch(`${LASTFM_API_URL}?${params.toString()}`, {
-    next: { revalidate: 3600 },
-  });
-
-  if (!response.ok) {
-    throw new Error('Failed to fetch Last.fm top artists');
-  }
-
-  const data = (await response.json()) as LastfmApiResponse;
+  const data = await fetchLastfm(
+    { method: 'user.gettopartists', period, limit: '9' },
+    { next: { revalidate: 3600 } },
+  );
   const rawArtists = data.topartists?.artist;
 
   const artists = normalizeToArray(rawArtists).map(mapArtist);
