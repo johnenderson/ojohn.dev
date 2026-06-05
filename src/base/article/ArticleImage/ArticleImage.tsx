@@ -43,7 +43,7 @@ export async function ArticleImage({
   width: widthProp,
   height: heightProp,
   priority = false,
-}: ArticleImageProps) {
+}: Readonly<ArticleImageProps>) {
   const meta = await getImageMeta(src);
   const width = widthProp ?? meta.width;
   const height = heightProp ?? meta.height;

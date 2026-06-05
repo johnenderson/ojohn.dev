@@ -44,7 +44,7 @@ function setupCodeBlock(pre: HTMLElement): () => void {
   button.innerHTML = COPY_ICON;
   button.setAttribute('aria-label', 'Copiar código');
 
-  let timeout: number | undefined;
+  let timeout: ReturnType<typeof globalThis.setTimeout> | undefined;
 
   const onClick = async () => {
     const code = pre.querySelector('code')?.textContent ?? '';
@@ -55,8 +55,8 @@ function setupCodeBlock(pre: HTMLElement): () => void {
       button.classList.add('is-copied');
       button.setAttribute('aria-label', 'Código copiado');
 
-      if (timeout) window.clearTimeout(timeout);
-      timeout = window.setTimeout(() => {
+      if (timeout) globalThis.clearTimeout(timeout);
+      timeout = globalThis.setTimeout(() => {
         button.innerHTML = COPY_ICON;
         button.classList.remove('is-copied');
         button.setAttribute('aria-label', 'Copiar código');
@@ -70,7 +70,7 @@ function setupCodeBlock(pre: HTMLElement): () => void {
   pre.appendChild(button);
 
   return () => {
-    if (timeout) window.clearTimeout(timeout);
+    if (timeout) globalThis.clearTimeout(timeout);
     button.removeEventListener('click', onClick);
     button.remove();
     header?.remove();

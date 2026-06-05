@@ -73,13 +73,13 @@ export const TableOfContents = ({
         if (el) {
           const top =
             el.getBoundingClientRect().top +
-            window.scrollY -
+            globalThis.scrollY -
             NAVBAR_OFFSET -
             24;
-          const prefersReducedMotion = window.matchMedia(
+          const prefersReducedMotion = globalThis.matchMedia(
             '(prefers-reduced-motion: reduce)',
           ).matches;
-          window.scrollTo({
+          globalThis.scrollTo({
             top,
             behavior: prefersReducedMotion ? 'auto' : 'smooth',
           });
