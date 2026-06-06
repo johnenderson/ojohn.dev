@@ -32,7 +32,7 @@ export function LolMatchHistory({ matches }: Readonly<LolMatchHistoryProps>) {
         Últimas partidas
       </h4>
       <ul className="m-0 flex list-none flex-col gap-2 p-0">
-        {matches.map((match) => (
+        {matches.map((match, index) => (
           <li
             key={match.matchId}
             className={`flex items-center gap-3 rounded-md border px-3 py-2 ${
@@ -47,6 +47,7 @@ export function LolMatchHistory({ matches }: Readonly<LolMatchHistoryProps>) {
               width={36}
               height={36}
               unoptimized
+              priority={index === 0}
               className="shrink-0 rounded"
             />
 
