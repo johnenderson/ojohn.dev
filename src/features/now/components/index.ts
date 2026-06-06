@@ -9,5 +9,7 @@ export { LolChampionCard } from './LolChampionCard';
 export { LolRankedCard } from './LolRankedCard';
 export { RadarCard } from './RadarCard';
 export { RecentTrack } from './RecentTrack';
+export { LolLiveGame } from './LolLiveGame';
+export { LolMatchHistory } from './LolMatchHistory';
 export { SectionIcon } from './SectionIcon';
 export { StarredRepos } from './StarredRepos';

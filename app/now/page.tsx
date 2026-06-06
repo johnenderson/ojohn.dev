@@ -20,6 +20,8 @@ import {
   GameCard,
   LanguageStack,
   LolChampionCard,
+  LolLiveGame,
+  LolMatchHistory,
   LolRankedCard,
   RadarCard,
   RecentTrack,
@@ -32,7 +34,7 @@ import {
   getLastfmTopArtists,
   getLastfmTopTracks,
 } from '@/lib/lastfm';
-import { getLolProfile } from '@/lib/lol';
+import { getLolLiveGame, getLolMatches, getLolProfile } from '@/lib/lol';
 import { SITE_NAME, SITE_URL } from '@/lib/site';
 import { getSteamGames } from '@/lib/steam';
 import { LastfmTrack } from '@/types/Lastfm';
@@ -134,20 +136,31 @@ const getUniqueTracks = (tracks: LastfmTrack[]) => {
 };
 
 export default async function NowPage() {
-  const [lastfm, artists, topTracks, dev, steam, lol, starred] =
-    await Promise.all([
-      getLastfmRecentStats().catch(() => ({
-        nowPlaying: null,
-        lastPlayed: null,
-        tracks: [],
-      })),
-      getLastfmTopArtists({ period: '7day' }).catch(() => []),
-      getLastfmTopTracks({ period: '7day' }).catch(() => []),
-      getGithubDev().catch(() => null),
-      getSteamGames().catch(() => ({ games: [], source: 'recent' as const })),
-      getLolProfile().catch(() => null),
-      getGithubStarred().catch(() => []),
-    ]);
+  const [
+    lastfm,
+    artists,
+    topTracks,
+    dev,
+    steam,
+    lol,
+    starred,
+    lolMatches,
+    lolLiveGame,
+  ] = await Promise.all([
+    getLastfmRecentStats().catch(() => ({
+      nowPlaying: null,
+      lastPlayed: null,
+      tracks: [],
+    })),
+    getLastfmTopArtists({ period: '7day' }).catch(() => []),
+    getLastfmTopTracks({ period: '7day' }).catch(() => []),
+    getGithubDev().catch(() => null),
+    getSteamGames().catch(() => ({ games: [], source: 'recent' as const })),
+    getLolProfile().catch(() => null),
+    getGithubStarred().catch(() => []),
+    getLolMatches().catch(() => []),
+    getLolLiveGame().catch(() => null),
+  ]);
 
   const hasDevData = Boolean(
     dev && (dev.rhythm || dev.languages.length > 0 || dev.activity.length > 0),
@@ -424,7 +437,9 @@ export default async function NowPage() {
                   </p>
                 </header>
 
-                <div className="flex max-w-[52rem] flex-col gap-6">
+                <div className="flex flex-col gap-6">
+                  {lolLiveGame && <LolLiveGame game={lolLiveGame} />}
+
                   {lol.ranked && <LolRankedCard ranked={lol.ranked} />}
 
                   {lol.topChampions.length > 0 && (
@@ -442,6 +457,10 @@ export default async function NowPage() {
                         ))}
                       </div>
                     </div>
+                  )}
+
+                  {lolMatches.length > 0 && (
+                    <LolMatchHistory matches={lolMatches} />
                   )}
 
                   <div className="flex justify-end">
