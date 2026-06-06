@@ -481,7 +481,7 @@ const fetchLastActivity = async (
   if (!push?.repo?.name) return null;
 
   const commits = push.payload?.commits ?? [];
-  const lastCommit = commits[commits.length - 1];
+  const lastCommit = commits.at(-1);
   const sha = lastCommit?.sha ?? push.payload?.head;
   const messageFromEvent = (lastCommit?.message ?? '').split('\n')[0].trim();
 

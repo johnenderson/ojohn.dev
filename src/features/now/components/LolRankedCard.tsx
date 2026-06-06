@@ -39,6 +39,8 @@ export const LolRankedCard = ({ ranked }: { ranked: LolRanked }) => {
             alt={tierLabel}
             fill
             unoptimized
+            priority
+            loading="eager"
             sizes="64px"
             className="object-contain drop-shadow-md"
           />

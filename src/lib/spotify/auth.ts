@@ -72,11 +72,9 @@ export const getSpotifyAccessToken = async (): Promise<string | null> => {
     return tokenCache.token;
   }
 
-  if (!inFlightRequest) {
-    inFlightRequest = requestAccessToken(clientId, clientSecret).finally(() => {
-      inFlightRequest = null;
-    });
-  }
+  inFlightRequest ??= requestAccessToken(clientId, clientSecret).finally(() => {
+    inFlightRequest = null;
+  });
 
   return inFlightRequest;
 };
