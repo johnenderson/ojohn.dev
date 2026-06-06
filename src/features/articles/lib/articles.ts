@@ -109,12 +109,12 @@ function stringValue(
 ) {
   const value = source[key];
   if (typeof value !== 'string') {
-    throw new Error(
+    throw new TypeError(
       `Invalid article metadata for ${context}: ${key} must be a string.`,
     );
   }
   if (!allowEmpty && !value.trim()) {
-    throw new Error(
+    throw new TypeError(
       `Invalid article metadata for ${context}: ${key} cannot be empty.`,
     );
   }
@@ -125,7 +125,7 @@ function optionalStringValue(source: Record<string, unknown>, key: string) {
   const value = source[key];
   if (value == null) return undefined;
   if (typeof value !== 'string') {
-    throw new Error(`Invalid article metadata: ${key} must be a string.`);
+    throw new TypeError(`Invalid article metadata: ${key} must be a string.`);
   }
   return value;
 }
@@ -140,12 +140,12 @@ function optionalImageDimension(
   if (typeof value === 'string' && /^\d+$/.test(value)) {
     return value as `${number}`;
   }
-  throw new Error(`Invalid article metadata: ${key} must be a number.`);
+  throw new TypeError(`Invalid article metadata: ${key} must be a number.`);
 }
 
 function parseCoverImage(value: unknown, context: string): ArticleCoverImage {
   if (!isRecord(value)) {
-    throw new Error(
+    throw new TypeError(
       `Invalid article metadata for ${context}: coverImage is required.`,
     );
   }
@@ -166,7 +166,7 @@ function parseAlternativeArticle(
 ): ArticleAlternative | undefined {
   if (value == null) return undefined;
   if (!isRecord(value)) {
-    throw new Error(
+    throw new TypeError(
       `Invalid article metadata for ${context}: alternativeArticle must be an object.`,
     );
   }
@@ -180,14 +180,14 @@ function parseAlternativeArticle(
 function parseTags(value: unknown, context: string): string[] | undefined {
   if (value == null) return undefined;
   if (!Array.isArray(value)) {
-    throw new Error(
+    throw new TypeError(
       `Invalid article metadata for ${context}: tags must be an array.`,
     );
   }
 
   return value.map((tag, index) => {
     if (typeof tag !== 'string') {
-      throw new Error(
+      throw new TypeError(
         `Invalid article metadata for ${context}: tags[${index}] must be a string.`,
       );
     }
@@ -201,19 +201,19 @@ function parseArticleMetadata(
   context: string,
 ): ArticleMetadata {
   if (!isRecord(value)) {
-    throw new Error(
+    throw new TypeError(
       `Invalid article metadata for ${context}: expected an object.`,
     );
   }
 
   const date = stringValue(value, 'date', context);
   if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) {
-    throw new Error(
+    throw new TypeError(
       `Invalid article metadata for ${context}: date must use YYYY-MM-DD format.`,
     );
   }
   if (!isValidIsoDate(date)) {
-    throw new Error(
+    throw new TypeError(
       `Invalid article metadata for ${context}: date must be a valid calendar date.`,
     );
   }
@@ -324,7 +324,7 @@ function parseNestedBlock(
     const nestedMatch = FRONTMATTER_FIELD_PATTERN.exec(lines[index].trim());
 
     if (!nestedMatch) {
-      throw new Error(
+      throw new TypeError(
         `Invalid article frontmatter for ${context}: ${lines[index]}`,
       );
     }
@@ -350,7 +350,9 @@ function parseFrontmatter(frontmatter: string, context: string) {
 
     const rootMatch = FRONTMATTER_FIELD_PATTERN.exec(line);
     if (!rootMatch) {
-      throw new Error(`Invalid article frontmatter for ${context}: ${line}`);
+      throw new TypeError(
+        `Invalid article frontmatter for ${context}: ${line}`,
+      );
     }
 
     const [, key, rawValue = ''] = rootMatch;

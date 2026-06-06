@@ -25,17 +25,19 @@ const isTheme = (value: string | null): value is Theme =>
   value === 'system' || value === 'light' || value === 'dark';
 
 const getSystemTheme = () =>
-  window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  globalThis.window.matchMedia('(prefers-color-scheme: dark)').matches
+    ? 'dark'
+    : 'light';
 
 const getStoredTheme = (): Theme => {
-  if (typeof window === 'undefined') return DEFAULT_THEME;
-  const storedTheme = localStorage.getItem(STORAGE_KEY);
+  if (typeof globalThis.window === 'undefined') return DEFAULT_THEME;
+  const storedTheme = globalThis.localStorage.getItem(STORAGE_KEY);
   return isTheme(storedTheme) ? storedTheme : DEFAULT_THEME;
 };
 
 const applyTheme = (theme: Theme) => {
   const resolvedTheme = theme === 'system' ? getSystemTheme() : theme;
-  const root = document.documentElement;
+  const root = globalThis.document.documentElement;
 
   root.classList.remove('light', 'dark');
   root.classList.add(resolvedTheme);
@@ -44,27 +46,34 @@ const applyTheme = (theme: Theme) => {
   return resolvedTheme;
 };
 
-export function ThemeProvider({ children }: { children: ReactNode }) {
-  const [theme, setThemeState] = useState<Theme>(getStoredTheme);
+type ThemeProviderProps = Readonly<{
+  children: ReactNode;
+}>;
+
+export function ThemeProvider({ children }: ThemeProviderProps) {
+  const [currentTheme, setCurrentTheme] = useState<Theme>(getStoredTheme);
 
   useEffect(() => {
-    applyTheme(theme);
+    applyTheme(currentTheme);
 
-    if (theme !== 'system') return;
+    if (currentTheme !== 'system') return;
 
-    const media = window.matchMedia('(prefers-color-scheme: dark)');
+    const media = globalThis.window.matchMedia('(prefers-color-scheme: dark)');
     const onChange = () => applyTheme('system');
 
     media.addEventListener('change', onChange);
     return () => media.removeEventListener('change', onChange);
-  }, [theme]);
+  }, [currentTheme]);
 
   const setTheme = useCallback((nextTheme: Theme) => {
-    setThemeState(nextTheme);
-    localStorage.setItem(STORAGE_KEY, nextTheme);
+    setCurrentTheme(nextTheme);
+    globalThis.localStorage.setItem(STORAGE_KEY, nextTheme);
   }, []);
 
-  const value = useMemo(() => ({ theme, setTheme }), [theme, setTheme]);
+  const value = useMemo(
+    () => ({ theme: currentTheme, setTheme }),
+    [currentTheme, setTheme],
+  );
 
   return (
     <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>
