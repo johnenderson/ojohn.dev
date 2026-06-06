@@ -437,7 +437,7 @@ export default async function NowPage() {
                   </p>
                 </header>
 
-                <div className="flex max-w-[52rem] flex-col gap-6">
+                <div className="flex flex-col gap-6">
                   {lolLiveGame && <LolLiveGame game={lolLiveGame} />}
 
                   {lol.ranked && <LolRankedCard ranked={lol.ranked} />}
