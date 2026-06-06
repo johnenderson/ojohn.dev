@@ -9,10 +9,10 @@ const CACHE_TTL_RANKED = 60 * 60 * 6; // 6h — elo muda com frequência
 const CACHE_TTL_CHAMPIONS = 60 * 60 * 24; // 24h — maestria muda menos
 const CACHE_TTL_VERSION = 60 * 60 * 24 * 7; // 7d — versão do patch
 
-const CACHE_KEY_RANKED = 'lol:ranked:v2';
-const CACHE_KEY_CHAMPIONS = 'lol:champions:v1';
-const CACHE_KEY_VERSION = 'lol:ddragon-version:v1';
-const CACHE_KEY_IDENTITY = 'lol:identity:v2'; // puuid + iconId (summonerId removed — Riot deprecated it)
+const CACHE_KEY_RANKED = 'lol:ranked:v3';
+const CACHE_KEY_CHAMPIONS = 'lol:champions:v2';
+const CACHE_KEY_VERSION = 'lol:ddragon-version:v2';
+const CACHE_KEY_IDENTITY = 'lol:identity:v3'; // puuid + iconId — v3: invalidate after API key rotation
 const CACHE_TTL_IDENTITY = 60 * 60 * 24 * 30; // 30d — muda só se trocar de nick
 
 const debugLog = (...args: unknown[]) => {
