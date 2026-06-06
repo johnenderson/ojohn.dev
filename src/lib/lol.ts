@@ -13,7 +13,9 @@ const CACHE_KEY_RANKED = 'lol:ranked:v3';
 const CACHE_KEY_CHAMPIONS = 'lol:champions:v2';
 const CACHE_KEY_VERSION = 'lol:ddragon-version:v2';
 const CACHE_KEY_IDENTITY = 'lol:identity:v3'; // puuid + iconId — v3: invalidate after API key rotation
+const CACHE_KEY_MATCHES = 'lol:matches:v1';
 const CACHE_TTL_IDENTITY = 60 * 60 * 24 * 30; // 30d — muda só se trocar de nick
+const CACHE_TTL_MATCHES = 60 * 15; // 15min — partidas mudam com frequência
 
 const debugLog = (...args: unknown[]) => {
   if (process.env.LOL_DEBUG === 'true') {
@@ -51,6 +53,26 @@ export type LolProfile = {
   topChampions: LolChampion[];
   summonerName: string;
   profileIconUrl: string;
+};
+
+export type LolMatch = {
+  matchId: string;
+  championId: string;
+  championIconUrl: string;
+  win: boolean;
+  kills: number;
+  deaths: number;
+  assists: number;
+  durationSeconds: number;
+  queueId: number;
+  playedAt: number;
+};
+
+export type LolLiveGame = {
+  championId: string;
+  championIconUrl: string;
+  gameMode: string;
+  gameLengthSeconds: number;
 };
 
 // ─── Helpers internos ────────────────────────────────────────────────────────
@@ -315,3 +337,153 @@ const loadLolProfile = async (): Promise<LolProfile | null> => {
 };
 
 export const getLolProfile = loadLolProfile;
+
+// ─── Match History ────────────────────────────────────────────────────────────
+
+const QUEUE_LABELS: Record<number, string> = {
+  420: 'Ranked Solo',
+  440: 'Ranked Flex',
+  400: 'Normal',
+  450: 'ARAM',
+  900: 'URF',
+  1020: 'One for All',
+};
+
+type MatchDto = {
+  metadata: { matchId: string; participants: string[] };
+  info: {
+    gameDuration: number;
+    gameEndTimestamp: number;
+    queueId: number;
+    gameMode: string;
+    participants: {
+      puuid: string;
+      championName: string;
+      win: boolean;
+      kills: number;
+      deaths: number;
+      assists: number;
+    }[];
+  };
+};
+
+type SpectatorDto = {
+  gameId: number;
+  gameMode: string;
+  gameLength: number;
+  participants: { puuid: string; championId: number }[];
+};
+
+const loadLolMatches = async (): Promise<LolMatch[]> => {
+  const apiKey = process.env.RIOT_API_KEY;
+  const riotId = process.env.LOL_RIOT_ID;
+  if (!apiKey || !riotId) return [];
+
+  const [gameName, tagLine] = riotId.split('#');
+  if (!gameName || !tagLine) return [];
+
+  const cached = await cacheGet<LolMatch[]>(CACHE_KEY_MATCHES);
+  if (cached && cached.length > 0) {
+    debugLog(`match cache hit: ${cached.length}`);
+    return cached;
+  }
+
+  const identity = await resolveIdentity(apiKey, gameName, tagLine);
+  if (!identity) return [];
+
+  const version = await getDDragonVersion(apiKey);
+
+  const matchIds = await riotFetch<string[]>(
+    `${RIOT_REGIONAL}/lol/match/v5/matches/by-puuid/${identity.puuid}/ids?count=5`,
+    apiKey,
+  );
+  if (!matchIds || matchIds.length === 0) return [];
+
+  const matches = await Promise.all(
+    matchIds.map((id) =>
+      riotFetch<MatchDto>(
+        `${RIOT_REGIONAL}/lol/match/v5/matches/${id}`,
+        apiKey,
+      ).catch(() => null),
+    ),
+  );
+
+  const result: LolMatch[] = matches
+    .filter((m): m is MatchDto => m !== null)
+    .map((m) => {
+      const player = m.info.participants.find(
+        (p) => p.puuid === identity.puuid,
+      );
+      if (!player) return null;
+      return {
+        matchId: m.metadata.matchId,
+        championId: player.championName,
+        championIconUrl: `${DDRAGON_BASE}/cdn/${version}/img/champion/${player.championName}.png`,
+        win: player.win,
+        kills: player.kills,
+        deaths: player.deaths,
+        assists: player.assists,
+        durationSeconds: m.info.gameDuration,
+        queueId: m.info.queueId,
+        playedAt: m.info.gameEndTimestamp,
+      };
+    })
+    .filter((m): m is LolMatch => m !== null);
+
+  if (result.length > 0) {
+    await cacheSet(CACHE_KEY_MATCHES, result, CACHE_TTL_MATCHES);
+  }
+
+  debugLog(`matches ok: ${result.length}`);
+  return result;
+};
+
+const loadLolLiveGame = async (): Promise<LolLiveGame | null> => {
+  const apiKey = process.env.RIOT_API_KEY;
+  const riotId = process.env.LOL_RIOT_ID;
+  if (!apiKey || !riotId) return null;
+
+  const [gameName, tagLine] = riotId.split('#');
+  if (!gameName || !tagLine) return null;
+
+  const identity = await resolveIdentity(apiKey, gameName, tagLine);
+  if (!identity) return null;
+
+  const version = await getDDragonVersion(apiKey);
+
+  const game = await riotFetch<SpectatorDto>(
+    `${RIOT_PLATFORM}/lol/spectator/v5/active-games/by-summoner/${identity.puuid}`,
+    apiKey,
+  );
+  if (!game) return null; // 404 = not in game
+
+  const participant = game.participants.find((p) => p.puuid === identity.puuid);
+  if (!participant) return null;
+
+  // Map championId → name via Data Dragon
+  const championList = await riotFetch<ChampionListData>(
+    `${DDRAGON_BASE}/cdn/${version}/data/pt_BR/champion.json`,
+    apiKey,
+  ).catch(() => null);
+
+  const champ = championList
+    ? Object.values(championList.data).find(
+        (c) => Number(c.key) === participant.championId,
+      )
+    : null;
+
+  const championName = champ?.id ?? 'Unknown';
+
+  debugLog(`live game: ${championName}, ${game.gameLength}s`);
+
+  return {
+    championId: championName,
+    championIconUrl: `${DDRAGON_BASE}/cdn/${version}/img/champion/${championName}.png`,
+    gameMode: QUEUE_LABELS[game.gameMode as unknown as number] ?? game.gameMode,
+    gameLengthSeconds: game.gameLength,
+  };
+};
+
+export { QUEUE_LABELS };
+export const getLolMatches = loadLolMatches;
+export const getLolLiveGame = loadLolLiveGame;
