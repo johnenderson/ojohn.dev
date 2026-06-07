@@ -52,6 +52,11 @@ const workPc: Product[] = [
     label: 'Notebook',
     product: 'Lenovo ThinkPad E14 Gen 6',
   },
+  {
+    label: 'Sistema',
+    product: 'Red Hat Enterprise Linux 9',
+    detail: 'RHEL 9',
+  },
 ];
 
 const desktop: Product[] = [
