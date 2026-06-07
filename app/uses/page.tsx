@@ -238,29 +238,31 @@ const ProductsGrid = ({ items }: { items: Product[] }) => (
 );
 
 const AppsGrid = ({ items }: { items: App[] }) => (
-  <ul className="m-0 grid w-full list-none grid-cols-3 gap-x-6 gap-y-8 p-0 sm:grid-cols-4 lg:grid-cols-6">
+  <ul className="m-0 flex list-none flex-wrap gap-5 p-0">
     {items.map((item) => (
       <li
         key={item.name}
-        className="flex flex-col items-center gap-2 text-center"
+        className="flex w-[88px] flex-col items-center gap-2 text-center"
       >
         <div className="rounded-xl border border-site-border-subtle bg-site-card p-2 transition-[transform,box-shadow] duration-300 hover:-translate-y-1 hover:shadow-[0_8px_24px_rgba(0,0,0,0.18)]">
           <Image
             src={item.iconSrc}
             alt={item.name}
-            width={72}
-            height={72}
-            className="size-[72px] rounded-lg object-cover"
+            width={64}
+            height={64}
+            className="size-16 rounded-lg object-cover"
           />
         </div>
-        <div className="flex flex-col gap-0.5">
+        <div className="flex w-full flex-col gap-0.5">
           <p
-            className="m-0 text-sm font-medium leading-5 text-site-foreground"
+            className="m-0 line-clamp-2 text-xs font-medium leading-4 text-site-foreground"
             translate="no"
           >
             {item.name}
           </p>
-          <p className="m-0 text-xs text-site-body-muted">{item.label}</p>
+          <p className="m-0 text-xs leading-4 text-site-body-muted">
+            {item.label}
+          </p>
         </div>
       </li>
     ))}
