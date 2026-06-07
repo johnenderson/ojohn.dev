@@ -258,7 +258,7 @@ const fetchTopChampionsData = async (
   debugLog('buscando maestrias e champion list');
   const [masteries, championListData] = await Promise.all([
     riotFetch<MasteryDto[]>(
-      `${RIOT_PLATFORM}/lol/champion-mastery/v4/champion-masteries/by-puuid/${puuid}/top?count=5`,
+      `${RIOT_PLATFORM}/lol/champion-mastery/v4/champion-masteries/by-puuid/${puuid}/top?count=10`,
       apiKey,
     ).catch((e) => {
       debugLog('masteries error:', e);
@@ -289,7 +289,8 @@ const fetchTopChampionsData = async (
         splashUrl: `${DDRAGON_BASE}/cdn/img/champion/splash/${champ.id}_0.jpg`,
       };
     })
-    .filter((c): c is LolChampion => c !== null);
+    .filter((c): c is LolChampion => c !== null)
+    .slice(0, 5);
 
   if (topChampions.length > 0) {
     await cacheSet(CACHE_KEY_CHAMPIONS, topChampions, CACHE_TTL_CHAMPIONS);

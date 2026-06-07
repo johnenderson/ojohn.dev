@@ -105,7 +105,7 @@ const steamFetch = async (
 const fetchRecentlyPlayed = async (
   userId: string,
   apiKey: string,
-  count = 10,
+  count = 20,
 ): Promise<SteamGame[]> => {
   const url = new URL(
     `${STEAM_API_BASE}/IPlayerService/GetRecentlyPlayedGames/v0001/`,
