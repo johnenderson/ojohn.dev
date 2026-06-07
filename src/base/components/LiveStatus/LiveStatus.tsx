@@ -15,7 +15,7 @@ const jsonFetcher = (url: string) => fetch(url).then((r) => r.json());
 
 const DOT_COLORS: Record<NonNullable<StatusType>, string> = {
   gaming: 'bg-[#e84057]', // League red
-  music: 'bg-[#1db954]', // Spotify green
+  music: 'bg-spotify', // Spotify green
   coding: 'bg-site-primary',
 };
 
