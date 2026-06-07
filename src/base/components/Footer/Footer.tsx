@@ -24,8 +24,13 @@ const ScrollToTop: FC = () => {
   }, []);
 
   const scrollToTop = () => {
-    const makeElevatorFaster =
-      localStorage.getItem(ELEVATOR_SPEED_KEY) === 'true';
+    const makeElevatorFaster = (() => {
+      try {
+        return localStorage.getItem(ELEVATOR_SPEED_KEY) === 'true';
+      } catch {
+        return false;
+      }
+    })();
     const scrollSpeed = makeElevatorFaster
       ? FAST_SCROLL_SPEED
       : NORMAL_SCROLL_SPEED;
