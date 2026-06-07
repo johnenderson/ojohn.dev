@@ -31,8 +31,12 @@ const getSystemTheme = () =>
 
 const getStoredTheme = (): Theme => {
   if (typeof globalThis.window === 'undefined') return DEFAULT_THEME;
-  const storedTheme = globalThis.localStorage.getItem(STORAGE_KEY);
-  return isTheme(storedTheme) ? storedTheme : DEFAULT_THEME;
+  try {
+    const storedTheme = globalThis.localStorage.getItem(STORAGE_KEY);
+    return isTheme(storedTheme) ? storedTheme : DEFAULT_THEME;
+  } catch {
+    return DEFAULT_THEME;
+  }
 };
 
 const applyTheme = (theme: Theme) => {
@@ -67,7 +71,9 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
 
   const setTheme = useCallback((nextTheme: Theme) => {
     setCurrentTheme(nextTheme);
-    globalThis.localStorage.setItem(STORAGE_KEY, nextTheme);
+    try {
+      globalThis.localStorage.setItem(STORAGE_KEY, nextTheme);
+    } catch {}
   }, []);
 
   const value = useMemo(

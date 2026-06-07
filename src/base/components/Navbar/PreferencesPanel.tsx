@@ -14,8 +14,12 @@ const isFontSize = (value: string | null): value is typeof FONT_SIZES[number] =>
 function useLocalFontSize() {
   const [fontSize, setFontSize] = useState(() => {
     if (globalThis.window === undefined) return DEFAULT_FONT_SIZE;
-    const storedFontSize = localStorage.getItem('prose_font_size');
-    return isFontSize(storedFontSize) ? storedFontSize : DEFAULT_FONT_SIZE;
+    try {
+      const storedFontSize = localStorage.getItem('prose_font_size');
+      return isFontSize(storedFontSize) ? storedFontSize : DEFAULT_FONT_SIZE;
+    } catch {
+      return DEFAULT_FONT_SIZE;
+    }
   });
 
   useEffect(() => {
@@ -25,7 +29,9 @@ function useLocalFontSize() {
   const applyFontSize = (size: string) => {
     if (!isFontSize(size)) return;
     setFontSize(size);
-    localStorage.setItem('prose_font_size', size);
+    try {
+      localStorage.setItem('prose_font_size', size);
+    } catch {}
   };
 
   return [fontSize, applyFontSize] as const;
@@ -34,12 +40,18 @@ function useLocalFontSize() {
 function useElevatorSpeed() {
   const [makeElevatorFaster, setMakeElevatorFaster] = useState(() => {
     if (globalThis.window === undefined) return false;
-    return localStorage.getItem(ELEVATOR_SPEED_KEY) === 'true';
+    try {
+      return localStorage.getItem(ELEVATOR_SPEED_KEY) === 'true';
+    } catch {
+      return false;
+    }
   });
 
   const applyElevatorSpeed = (enabled: boolean) => {
     setMakeElevatorFaster(enabled);
-    localStorage.setItem(ELEVATOR_SPEED_KEY, String(enabled));
+    try {
+      localStorage.setItem(ELEVATOR_SPEED_KEY, String(enabled));
+    } catch {}
   };
 
   return [makeElevatorFaster, applyElevatorSpeed] as const;
