@@ -2,7 +2,9 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { CSSProperties, ReactNode, useEffect, useState } from 'react';
+import { CSSProperties, ReactNode, useState } from 'react';
+
+import useSWR from 'swr';
 
 import { Card } from '@/base/components/Card';
 import { LastfmStats, LastfmTrack } from '@/types/Lastfm';
@@ -10,6 +12,8 @@ import { LastfmStats, LastfmTrack } from '@/types/Lastfm';
 type LastfmNowPlayingResponse = {
   nowPlaying: LastfmTrack | null;
 };
+
+const jsonFetcher = (url: string) => fetch(url).then((r) => r.json());
 
 const MusicIcon = ({ size = 18 }: { size?: number }) => (
   <svg
@@ -138,50 +142,20 @@ const TrackRow = ({ track }: { track: LastfmTrack }) => (
 );
 
 export const LastfmCard = () => {
-  const [lastfm, setLastfm] = useState<LastfmStats | null>(null);
-  const [loading, setLoading] = useState(true);
+  const { data: nowPlayingData, isLoading: loadingNowPlaying } =
+    useSWR<LastfmNowPlayingResponse>('/api/lastfm/now-playing', jsonFetcher, {
+      revalidateOnFocus: false,
+    });
+  const { data: recent, isLoading: loadingRecent } = useSWR<LastfmStats>(
+    '/api/lastfm/recent',
+    jsonFetcher,
+    { revalidateOnFocus: false },
+  );
 
-  useEffect(() => {
-    let active = true;
-
-    Promise.allSettled([
-      fetch('/api/lastfm/now-playing', { cache: 'no-store' }).then(
-        (response) => response.json() as Promise<LastfmNowPlayingResponse>,
-      ),
-      fetch('/api/lastfm/recent', { cache: 'no-store' }).then(
-        (response) => response.json() as Promise<LastfmStats>,
-      ),
-    ])
-      .then(([nowPlayingResult, recentResult]) => {
-        if (!active) return;
-
-        const nowPlaying =
-          nowPlayingResult.status === 'fulfilled'
-            ? nowPlayingResult.value.nowPlaying
-            : null;
-        const recent =
-          recentResult.status === 'fulfilled'
-            ? recentResult.value
-            : { nowPlaying: null, lastPlayed: null, tracks: [] };
-
-        setLastfm({
-          ...recent,
-          nowPlaying,
-        });
-      })
-      .catch(() => {
-        if (active) {
-          setLastfm({ nowPlaying: null, lastPlayed: null, tracks: [] });
-        }
-      })
-      .finally(() => {
-        if (active) setLoading(false);
-      });
-
-    return () => {
-      active = false;
-    };
-  }, []);
+  const loading = loadingNowPlaying || loadingRecent;
+  const lastfm: LastfmStats | null = recent
+    ? { ...recent, nowPlaying: nowPlayingData?.nowPlaying ?? null }
+    : null;
 
   const featuredTrack = lastfm?.nowPlaying ?? lastfm?.lastPlayed ?? null;
   const title = lastfm?.nowPlaying ? 'Ouvindo agora' : 'Última música';
