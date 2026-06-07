@@ -171,7 +171,7 @@ const ThemeSelector = ({
     <div className="relative flex gap-0 rounded border border-site-border p-1">
       {/* sliding indicator */}
       <span
-        className="absolute top-1 h-7 rounded bg-site-primary transition-all duration-300 ease-elastic"
+        className="absolute top-1 h-7 rounded bg-site-primary transition-[left,width] duration-300 ease-elastic"
         style={{
           width: PILL_WIDTH,
           left: `calc(0.25rem + ${idx * PILL_WIDTH}px)`,

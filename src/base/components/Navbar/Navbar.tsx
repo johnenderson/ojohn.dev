@@ -132,7 +132,7 @@ export const Navbar = () => {
       {mobileMenuOpen && (
         <div
           id="mobile-navigation"
-          className="prefs-panel fixed inset-x-0 bottom-0 z-50 flex flex-col gap-3 rounded-t-lg border border-b-0 border-site-border p-3 shadow-2xl transition-all duration-200 md:hidden"
+          className="prefs-panel fixed inset-x-0 bottom-0 z-50 flex flex-col gap-3 rounded-t-lg border border-b-0 border-site-border p-3 shadow-2xl transition-[transform] duration-200 md:hidden"
         >
           <div className="mx-auto mt-1 h-1.5 w-24 shrink-0 rounded-full bg-site-primary-soft" />
 

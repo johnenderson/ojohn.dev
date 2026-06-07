@@ -55,7 +55,7 @@ const ScrollToTop: FC = () => {
     <button
       onClick={scrollToTop}
       aria-label="Voltar ao topo"
-      className={`fixed bottom-0 right-0 p-4 md:p-6 text-site-body-muted hover:text-site-foreground transition-all duration-300 cursor-pointer ${
+      className={`fixed bottom-0 right-0 p-4 md:p-6 text-site-body-muted hover:text-site-foreground transition-[opacity,transform,color] duration-300 cursor-pointer ${
         visible
           ? 'opacity-100 translate-y-0 pointer-events-auto'
           : 'opacity-0 translate-y-2 pointer-events-none'

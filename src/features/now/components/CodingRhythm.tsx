@@ -53,7 +53,7 @@ export const CodingRhythm = ({ rhythm }: CodingRhythmProps) => {
             >
               <div className="flex h-24 w-full items-end">
                 <div
-                  className={`w-full rounded-sm transition-all ${
+                  className={`w-full rounded-sm transition-[height,background-color] ${
                     isBusiest ? 'bg-site-primary' : 'bg-site-card-hover'
                   }`}
                   style={{ height: `${Math.max(height, 6)}%` }}
