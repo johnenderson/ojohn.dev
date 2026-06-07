@@ -2,6 +2,8 @@
 
 import { FC, useEffect, useState } from 'react';
 
+import { LiveStatus } from '@/base/components/LiveStatus/LiveStatus';
+import { SocialIcons } from '@/base/components/SocialIcons';
 import { AUTHOR_NAME } from '@/lib/site';
 
 const ELEVATOR_SPEED_KEY = 'elevator_speed';
@@ -85,14 +87,35 @@ const ScrollToTop: FC = () => {
 
 export const Footer: FC = () => (
   <>
-    <footer className="mt-12 mb-6 border-t border-site-border pt-6 text-center md:text-left mx-auto max-w-5xl px-6 lg:px-0">
-      <div className="flex flex-col items-center md:items-start text-sm text-site-body-muted">
-        <p className="m-0">
-          &copy; {new Date().getFullYear()} {AUTHOR_NAME}
-        </p>
-        <p className="m-0 text-site-body-muted">
-          Website licenciado sob a MIT.
-        </p>
+    <footer className="mt-12 mb-6 border-t border-site-border pt-6 mx-auto max-w-5xl px-6 lg:px-0">
+      {/* Mobile: fully stacked, centered */}
+      <div className="flex flex-col items-center gap-3 pb-10 md:hidden">
+        <SocialIcons />
+        <LiveStatus />
+        <div className="text-center text-sm text-site-body-muted">
+          <p className="m-0">
+            &copy; {new Date().getFullYear()} {AUTHOR_NAME}
+          </p>
+          <p className="m-0">Website licenciado sob a MIT.</p>
+        </div>
+      </div>
+
+      {/* Desktop: 3-column with equal-width sides so icons stay truly centered */}
+      <div className="hidden md:flex items-center">
+        <div className="flex flex-1 justify-start">
+          <div className="text-sm text-site-body-muted">
+            <p className="m-0">
+              &copy; {new Date().getFullYear()} {AUTHOR_NAME}
+            </p>
+            <p className="m-0">Website licenciado sob a MIT.</p>
+          </div>
+        </div>
+
+        <SocialIcons />
+
+        <div className="flex flex-1 justify-end">
+          <LiveStatus />
+        </div>
       </div>
     </footer>
 

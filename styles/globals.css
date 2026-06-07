@@ -82,6 +82,8 @@ html.light {
   --color-site-border-subtle: var(--site-border-subtle);
   --color-site-code: var(--site-code);
   --color-site-code-inline: var(--site-code-inline);
+  /* Brand colors (theme-independent) */
+  --color-spotify: #1db954;
   --ease-elastic: linear(
     0,
     0.218 2.1%,

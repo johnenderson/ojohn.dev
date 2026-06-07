@@ -55,8 +55,8 @@ const DiscIcon = () => (
 );
 
 const LiveBadge = () => (
-  <span className="inline-flex items-center gap-1.5 rounded-full border border-site-border bg-site-primary-soft px-2 py-0.5 text-xs font-semibold leading-5 text-site-primary-hover">
-    <span className="h-1.5 w-1.5 rounded-full bg-site-primary-hover motion-safe:animate-pulse" />{' '}
+  <span className="inline-flex items-center gap-1.5 rounded-full border border-spotify/30 bg-spotify/10 px-2 py-0.5 text-xs font-semibold leading-5 text-spotify">
+    <span className="h-1.5 w-1.5 rounded-full bg-spotify motion-safe:animate-pulse" />{' '}
     ao vivo
   </span>
 );
