@@ -9,7 +9,7 @@ import { SITE_NAME, SITE_URL } from '@/lib/site';
 
 const USES_TITLE = 'Uso';
 const USES_DESCRIPTION =
-  'Meu setup atual de trabalho, jogos, perifericos e ferramentas.';
+  'Meu setup atual de trabalho, jogos, periféricos e ferramentas.';
 const USES_URL = `${SITE_URL}/uses`;
 const USES_OG_IMAGE = `${SITE_URL}/og/site/uses`;
 
@@ -74,7 +74,7 @@ const desktop: Product[] = [
     product: 'Windows 11 Pro',
   },
   {
-    label: 'Placa-mae',
+    label: 'Placa-mãe',
     product: 'MSI MPG B550 Gaming Plus',
     detail: 'B550, AM4, ATX, DDR4',
   },
@@ -155,7 +155,7 @@ const developmentSoftware: App[] = [
 const generalSoftware: App[] = [
   {
     name: 'Spotify',
-    label: 'musica',
+    label: 'música',
     iconSrc: '/uses/spotify.webp',
   },
   {
@@ -165,7 +165,7 @@ const generalSoftware: App[] = [
   },
   {
     name: 'Obsidian',
-    label: 'anotacoes',
+    label: 'anotações',
     iconSrc: '/uses/obsidian.webp',
   },
 ];
@@ -206,7 +206,9 @@ const ProductsGrid = ({ items }: { items: Product[] }) => (
             {item.label}
           </p>
         ) : null}
-        <p className="m-0 leading-5 text-site-foreground">{item.product}</p>
+        <p className="m-0 leading-5 text-site-foreground" translate="no">
+          {item.product}
+        </p>
         {item.detail ? (
           <p className="mt-1 mb-0 text-sm leading-5 text-site-body-muted">
             {item.detail}
@@ -223,12 +225,14 @@ const AppsGrid = ({ items }: { items: App[] }) => (
       <li key={item.name} className="flex flex-col items-center text-center">
         <Image
           src={item.iconSrc}
-          alt=""
+          alt={item.name}
           width={56}
           height={56}
           className="mb-2 size-14 rounded-md object-cover"
         />
-        <p className="m-0 leading-5 text-site-foreground">{item.name}</p>
+        <p className="m-0 leading-5 text-site-foreground" translate="no">
+          {item.name}
+        </p>
         <p className="m-0 flex shrink-0 text-xs text-site-body-muted">
           {item.label}
         </p>
@@ -245,7 +249,7 @@ export default function UsesPage() {
           <div className="flex max-w-5xl flex-col items-start gap-8">
             <PageTitle
               title="Uso"
-              subtitle="Meu setup atual de trabalho, jogos, perifericos e ferramentas."
+              subtitle="Meu setup atual de trabalho, jogos, periféricos e ferramentas."
             />
 
             <Divider />
@@ -268,7 +272,7 @@ export default function UsesPage() {
 
             <Divider />
 
-            <UsesSection id="audio-title" title="Audio">
+            <UsesSection id="audio-title" title="Áudio">
               <ProductsGrid items={audio} />
             </UsesSection>
 
