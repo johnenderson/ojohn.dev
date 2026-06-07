@@ -19,22 +19,22 @@ function StarredRepoRow({ repo }: Readonly<StarredRepoRowProps>) {
         href={repo.url}
         target="_blank"
         rel="noopener noreferrer"
-        className="flex min-w-0 items-start gap-3 rounded-md p-2 no-underline"
+        className="flex min-w-0 items-start gap-3 rounded-md p-2 no-underline antialiased"
       >
-        <span className="flex size-8 shrink-0 items-center justify-center rounded-md border border-site-border-muted bg-site-card-hover text-site-primary">
+        <span className="flex size-10 shrink-0 items-center justify-center rounded-md border border-site-border-muted bg-site-card-hover text-site-primary">
           <FontAwesomeIcon
             icon={faGithub}
             aria-hidden="true"
-            className="text-sm"
+            className="text-lg"
           />
         </span>
 
         <div className="min-w-0 flex-1">
-          <p className="m-0 truncate text-sm font-bold leading-snug text-site-foreground transition-colors group-hover:text-site-primary-hover">
+          <p className="m-0 truncate text-sm font-semibold leading-5 text-site-foreground transition-colors group-hover:text-site-primary-hover">
             {repo.fullName}
           </p>
           {repo.description && (
-            <p className="m-0 mt-0.5 line-clamp-1 text-xs text-site-body-muted">
+            <p className="m-0 mt-0.5 line-clamp-1 text-[11px] leading-5 text-site-body-muted">
               {repo.description}
             </p>
           )}
@@ -52,27 +52,29 @@ function StarredRepoRow({ repo }: Readonly<StarredRepoRowProps>) {
           )}
         </div>
 
-        <div className="flex shrink-0 flex-col items-end gap-1">
-          <span className="hidden rounded-full border border-site-border-subtle px-2 py-1 text-[11px] font-bold leading-none text-site-body-muted sm:inline-flex">
+        <div className="flex shrink-0 flex-col items-end gap-1 text-right min-w-max">
+          <span className="hidden rounded-full border border-site-border-subtle px-2 py-1 text-[10px] font-semibold leading-none text-site-body-muted sm:inline-flex">
             {formatRelativeTime(repo.starredAt)}
           </span>
-          {repo.language && (
-            <span className="text-[11px] text-site-body-muted">
-              {repo.language}
-            </span>
-          )}
-          {repo.stars > 0 && (
-            <span className="flex items-center gap-0.5 text-[11px] text-site-body-muted">
-              <FontAwesomeIcon
-                icon={faStar}
-                aria-hidden="true"
-                className="text-[9px]"
-              />
-              {repo.stars >= 1000
-                ? `${(repo.stars / 1000).toFixed(1)}k`
-                : repo.stars}
-            </span>
-          )}
+          <div className="flex items-center gap-1 whitespace-nowrap">
+            {repo.language && (
+              <span className="text-[11px] font-medium text-site-body-muted">
+                {repo.language}
+              </span>
+            )}
+            {repo.stars > 0 && (
+              <span className="inline-flex items-center gap-1 text-[11px] font-medium text-site-body-muted">
+                <FontAwesomeIcon
+                  icon={faStar}
+                  aria-hidden="true"
+                  className="text-xs"
+                />
+                {repo.stars >= 1000
+                  ? `${(repo.stars / 1000).toFixed(1)}k`
+                  : repo.stars}
+              </span>
+            )}
+          </div>
         </div>
       </Link>
     </li>
