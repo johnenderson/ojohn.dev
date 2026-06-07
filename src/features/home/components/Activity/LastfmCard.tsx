@@ -201,7 +201,7 @@ export const LastfmCard = () => {
                 </h2>
                 <DiscIcon />
               </div>
-              {lastfm?.nowPlaying && <LiveBadge />}
+              {lastfm?.nowPlaying ? <LiveBadge /> : null}
             </div>
 
             {loading && (

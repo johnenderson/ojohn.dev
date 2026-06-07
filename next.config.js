@@ -3,6 +3,13 @@ const path = require('node:path');
 /** @type {import('next').NextConfig} */
 module.exports = {
   reactStrictMode: true,
+  experimental: {
+    optimizePackageImports: [
+      '@fortawesome/free-solid-svg-icons',
+      '@fortawesome/free-brands-svg-icons',
+      '@radix-ui/react-tooltip',
+    ],
+  },
   turbopack: {
     root: __dirname,
     rules: {
