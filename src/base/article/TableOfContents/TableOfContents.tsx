@@ -122,7 +122,7 @@ export const TableOfContents = ({
 
         {/* Moving active indicator bar — same as doce.sh */}
         <span
-          className="absolute left-0 h-7 w-px bg-site-primary transition-all duration-300 ease-elastic"
+          className="absolute left-0 h-7 w-px bg-site-primary transition-[top] duration-300 ease-elastic"
           style={{ top: `${Math.max(0, activeIdx) * ITEM_HEIGHT}px` }}
         />
       </div>

@@ -417,6 +417,12 @@ html {
   -ms-text-size-adjust: 100%;
 }
 
+button,
+a,
+[role='button'] {
+  touch-action: manipulation;
+}
+
 body {
   background: var(--site-background);
   color: var(--site-foreground);

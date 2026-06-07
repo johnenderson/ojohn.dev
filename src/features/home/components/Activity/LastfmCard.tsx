@@ -26,6 +26,7 @@ const MusicIcon = ({ size = 18 }: { size?: number }) => (
     strokeLinecap="round"
     strokeLinejoin="round"
     strokeWidth="2"
+    aria-hidden="true"
   >
     <path d="M9 18V5l12-2v13" />
     <circle cx="6" cy="18" r="3" />
@@ -44,6 +45,7 @@ const DiscIcon = () => (
     strokeLinecap="round"
     strokeLinejoin="round"
     strokeWidth="2"
+    aria-hidden="true"
   >
     <circle cx="12" cy="12" r="10" />
     <circle cx="12" cy="12" r="2" />

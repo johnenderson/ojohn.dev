@@ -93,7 +93,7 @@ type SocialIconsProps = {
 export const SocialIcons: FC<SocialIconsProps> = ({ className = '' }) => (
   <div className={`flex items-center gap-0 ${className}`}>
     {socials.map(({ href, label, external, rotate, icon }) => {
-      const cls = `p-1.5 text-site-foreground hover:text-site-primary-hover transition-all duration-200 ease-elastic hover:scale-115 no-underline ${rotate}`;
+      const cls = `p-1.5 text-site-foreground hover:text-site-primary-hover transition-[color,transform] duration-200 ease-elastic hover:scale-115 no-underline ${rotate}`;
       return external ? (
         <a
           key={href}
