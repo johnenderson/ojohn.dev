@@ -1,5 +1,5 @@
 import Image from 'next/image';
-import type { ReactNode } from 'react';
+import type { CSSProperties, ReactNode } from 'react';
 
 import { PageWrapper } from '../components/PageWrapper';
 import type { Metadata } from 'next';
@@ -178,18 +178,26 @@ const UsesSection = ({
   id,
   title,
   children,
+  delay = 0,
 }: {
   id: string;
   title: string;
   children: ReactNode;
+  delay?: number;
 }) => (
   <section
     aria-labelledby={id}
-    className="flex w-full flex-col gap-6 md:flex-row md:gap-12"
+    className="site-fade-in flex w-full flex-col gap-6 md:flex-row md:gap-12"
+    style={
+      {
+        '--fade-in-delay': `${delay}ms`,
+        '--fade-in-duration': '500ms',
+      } as CSSProperties
+    }
   >
     <h2
       id={id}
-      className="m-0 flex h-fit w-36 shrink-0 text-sm font-medium text-site-body-muted"
+      className="m-0 flex h-fit w-36 shrink-0 flex-col gap-1 text-xs font-semibold uppercase tracking-widest text-site-body-muted before:mb-1 before:block before:h-px before:w-6 before:bg-site-primary before:content-['']"
     >
       {title}
     </h2>
@@ -200,19 +208,29 @@ const UsesSection = ({
 const ProductsGrid = ({ items }: { items: Product[] }) => (
   <ul className="m-0 grid w-full list-none grid-cols-1 gap-x-12 gap-y-8 p-0 sm:grid-cols-2 lg:grid-cols-3">
     {items.map((item) => (
-      <li key={`${item.label}-${item.product}`} className="flex flex-col">
+      <li key={`${item.label}-${item.product}`} className="flex flex-col gap-1">
         {item.label ? (
-          <p className="m-0 flex shrink-0 text-xs font-medium uppercase text-site-body-muted">
+          <p className="m-0 text-xs font-medium uppercase tracking-wide text-site-body-muted">
             {item.label}
           </p>
         ) : null}
-        <p className="m-0 leading-5 text-site-foreground" translate="no">
+        <p
+          className="m-0 font-medium leading-5 text-site-foreground"
+          translate="no"
+        >
           {item.product}
         </p>
         {item.detail ? (
-          <p className="mt-1 mb-0 text-sm leading-5 text-site-body-muted">
-            {item.detail}
-          </p>
+          <div className="flex flex-wrap gap-1">
+            {item.detail.split(', ').map((spec) => (
+              <span
+                key={spec}
+                className="rounded border border-site-border-subtle px-1.5 py-0.5 text-xs text-site-body-muted"
+              >
+                {spec}
+              </span>
+            ))}
+          </div>
         ) : null}
       </li>
     ))}
@@ -220,22 +238,30 @@ const ProductsGrid = ({ items }: { items: Product[] }) => (
 );
 
 const AppsGrid = ({ items }: { items: App[] }) => (
-  <ul className="m-0 grid w-full list-none grid-cols-2 gap-x-8 gap-y-8 p-0 sm:grid-cols-3 lg:grid-cols-6">
+  <ul className="m-0 grid w-full list-none grid-cols-3 gap-x-6 gap-y-8 p-0 sm:grid-cols-4 lg:grid-cols-6">
     {items.map((item) => (
-      <li key={item.name} className="flex flex-col items-center text-center">
-        <Image
-          src={item.iconSrc}
-          alt={item.name}
-          width={56}
-          height={56}
-          className="mb-2 size-14 rounded-md object-cover"
-        />
-        <p className="m-0 leading-5 text-site-foreground" translate="no">
-          {item.name}
-        </p>
-        <p className="m-0 flex shrink-0 text-xs text-site-body-muted">
-          {item.label}
-        </p>
+      <li
+        key={item.name}
+        className="flex flex-col items-center gap-2 text-center"
+      >
+        <div className="rounded-xl border border-site-border-subtle bg-site-card p-2 transition-[transform,box-shadow] duration-300 hover:-translate-y-1 hover:shadow-[0_8px_24px_rgba(0,0,0,0.18)]">
+          <Image
+            src={item.iconSrc}
+            alt={item.name}
+            width={72}
+            height={72}
+            className="size-[72px] rounded-lg object-cover"
+          />
+        </div>
+        <div className="flex flex-col gap-0.5">
+          <p
+            className="m-0 text-sm font-medium leading-5 text-site-foreground"
+            translate="no"
+          >
+            {item.name}
+          </p>
+          <p className="m-0 text-xs text-site-body-muted">{item.label}</p>
+        </div>
       </li>
     ))}
   </ul>
@@ -254,25 +280,25 @@ export default function UsesPage() {
 
             <Divider />
 
-            <UsesSection id="work-pc-title" title="Trabalho">
+            <UsesSection id="work-pc-title" title="Trabalho" delay={0}>
               <ProductsGrid items={workPc} />
             </UsesSection>
 
             <Divider />
 
-            <UsesSection id="desktop-title" title="Desktop">
+            <UsesSection id="desktop-title" title="Desktop" delay={80}>
               <ProductsGrid items={desktop} />
             </UsesSection>
 
             <Divider />
 
-            <UsesSection id="desk-title" title="Mesa">
+            <UsesSection id="desk-title" title="Mesa" delay={160}>
               <ProductsGrid items={desk} />
             </UsesSection>
 
             <Divider />
 
-            <UsesSection id="audio-title" title="Áudio">
+            <UsesSection id="audio-title" title="Áudio" delay={240}>
               <ProductsGrid items={audio} />
             </UsesSection>
 
@@ -281,13 +307,14 @@ export default function UsesPage() {
             <UsesSection
               id="development-software-title"
               title="Desenvolvimento"
+              delay={320}
             >
               <AppsGrid items={developmentSoftware} />
             </UsesSection>
 
             <Divider />
 
-            <UsesSection id="general-software-title" title="Geral">
+            <UsesSection id="general-software-title" title="Geral" delay={400}>
               <AppsGrid items={generalSoftware} />
             </UsesSection>
           </div>
