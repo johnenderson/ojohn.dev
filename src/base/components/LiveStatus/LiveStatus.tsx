@@ -25,12 +25,16 @@ export const LiveStatus: FC = () => {
     revalidateOnFocus: false,
   });
 
-  if (!data?.status || !data?.type) return null;
-
-  const dotColor = DOT_COLORS[data.type];
+  const active = Boolean(data?.status && data?.type);
+  const dotColor =
+    active && data?.type ? DOT_COLORS[data.type] : 'bg-site-body-muted';
 
   return (
-    <span className="inline-flex items-center gap-1.5 text-xs text-site-body-muted">
+    <span
+      className={`inline-flex items-center gap-1.5 text-xs text-site-body-muted transition-opacity duration-500 ${
+        active ? 'opacity-100' : 'invisible opacity-0'
+      }`}
+    >
       <span className="relative flex size-2 shrink-0" aria-hidden="true">
         <span
           className={`absolute inline-flex size-full animate-ping rounded-full opacity-60 ${dotColor}`}
@@ -39,7 +43,7 @@ export const LiveStatus: FC = () => {
           className={`relative inline-flex size-2 rounded-full ${dotColor}`}
         />
       </span>
-      {data.status}
+      {data?.status}
     </span>
   );
 };

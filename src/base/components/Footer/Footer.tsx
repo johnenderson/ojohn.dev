@@ -83,20 +83,34 @@ const ScrollToTop: FC = () => {
 export const Footer: FC = () => (
   <>
     <footer className="mt-12 mb-6 border-t border-site-border pt-6 mx-auto max-w-5xl px-6 lg:px-0">
-      <div className="flex items-center justify-between gap-4">
-        {/* Left: copyright */}
-        <div className="text-sm text-site-body-muted shrink-0">
-          <p className="m-0">
-            &copy; {new Date().getFullYear()} {AUTHOR_NAME}
-          </p>
-          <p className="m-0">Website licenciado sob a MIT.</p>
+      {/* Mobile: icons centered on top, meta row below */}
+      <div className="flex flex-col items-center gap-3 md:hidden">
+        <SocialIcons />
+        <div className="flex w-full items-center justify-between gap-2">
+          <div className="text-sm text-site-body-muted">
+            <p className="m-0">
+              &copy; {new Date().getFullYear()} {AUTHOR_NAME}
+            </p>
+            <p className="m-0">Website licenciado sob a MIT.</p>
+          </div>
+          <LiveStatus />
+        </div>
+      </div>
+
+      {/* Desktop: 3-column with equal-width sides so icons stay truly centered */}
+      <div className="hidden md:flex items-center">
+        <div className="flex flex-1 justify-start">
+          <div className="text-sm text-site-body-muted">
+            <p className="m-0">
+              &copy; {new Date().getFullYear()} {AUTHOR_NAME}
+            </p>
+            <p className="m-0">Website licenciado sob a MIT.</p>
+          </div>
         </div>
 
-        {/* Center: social icons */}
         <SocialIcons />
 
-        {/* Right: live status */}
-        <div className="shrink-0 min-w-0">
+        <div className="flex flex-1 justify-end">
           <LiveStatus />
         </div>
       </div>
