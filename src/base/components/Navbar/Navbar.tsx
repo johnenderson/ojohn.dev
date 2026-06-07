@@ -7,6 +7,7 @@ import { useEffect, useState } from 'react';
 import {
   faHeadphones,
   faNewspaper,
+  faScrewdriverWrench,
   faUser,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -16,9 +17,10 @@ import { PreferencesPanel } from './PreferencesPanel';
 import { SITE_NAME } from '@/lib/site';
 
 const navLinks = [
-  { href: '/writings', label: 'Blog', icon: faNewspaper },
-  { href: '/now', label: 'Agora', icon: faHeadphones },
   { href: '/me', label: 'Sobre mim', icon: faUser },
+  { href: '/now', label: 'Agora', icon: faHeadphones },
+  { href: '/uses', label: 'Uso', icon: faScrewdriverWrench },
+  { href: '/writings', label: 'Blog', icon: faNewspaper },
 ];
 
 const MenuIcon = () => (

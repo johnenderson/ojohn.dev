@@ -155,3 +155,83 @@ em destaque (maior lacuna do site hoje), 3) ❤️ O que tenho curtido (mais
 2. 📺 YouTube / Podcast integration
 3. 📬 Newsletter
 4. 🔍 Full-text Search
+
+## Pagina de Uso
+
+Inspiracao: `/uses` do `doce.sh`.
+
+Estrutura visual sugerida:
+
+- Secoes separadas por `<hr />`, com titulo curto a esquerda e conteudo em grid.
+- Hardware sem imagem em lista tecnica compacta.
+- Apps com icone, nome e uma legenda curta.
+
+### Computadores
+
+#### PC de trabalho
+
+- **Notebook:** Lenovo ThinkPad E14 Gen 6
+
+#### PC gamer / desktop
+
+- **CPU:** AMD Ryzen 7 5700X 8-Core Processor
+- **GPU:** INNO3D GeForce RTX 3050 Twin X2 OC, LHR, 8 GB GDDR6
+- **RAM:** 16 GB DDR4
+- **Sistema:** Windows 11 Pro
+- **Placa-mae:** MSI MPG B550 Gaming Plus, chipset B550, AMD AM4, ATX, DDR4
+- **Fonte:** Cooler Master G600 600W, 80 Plus Gold, PFC ativo
+- **Cooler:** Cooler Master MasterLiquid ML240L V2, 240mm
+- **Armazenamento:** Asgard AN4 NVMe SSD PCIe 4.0, M.2 2280
+- **Gabinete:** Montech Sky Two, ARGB, Mid Tower, vidro temperado, ATX, black, com 4 fans
+
+### Perifericos
+
+- **Monitor:** AOC Viper 27", Full HD, 165 Hz, 1 ms, IPS, HDMI/DisplayPort, FreeSync
+- **Teclado:** Logitech G PRO TKL, layout US, RGB LIGHTSYNC, switches GX Blue Clicky
+- **Mouse:** Logitech G403 HERO, LIGHTSYNC, 6 botoes programaveis, sensor HERO 25K
+
+### Audio
+
+- **Headset:** Logitech G733 sem fio, 7.1 Dolby Surround, Blue VO!CE, RGB LIGHTSYNC
+- **Fone de ouvido:** AirPods
+- **Microfone:** definir modelo
+
+### Software
+
+#### Desenvolvimento
+
+- **Editor:** Visual Studio Code
+- **IDE:** IntelliJ IDEA para Java e Kotlin
+- **Terminal:** Warp
+- **Versionamento:** Git + GitHub Desktop
+
+#### Dia a dia & Produtividade
+
+- **Navegador principal:** Brave
+- **Navegador secundario:** Google Chrome
+- **Comunicacao:** Discord
+- **Musica:** Spotify
+- **Senhas:** Bitwarden
+- **Anotacoes:** Obsidian e Notion
+- **Testes de API:** Bruno
+- **IA / coding agents:** Codex e Claude Code
+
+### TODO
+
+- [ ] Ir atras do icone oficial do Google Chrome.
+- [ ] Ir atras do icone oficial do Brave.
+- [ ] Ir atras dos icones de Codex e Claude Code.
+- [ ] Ir atras do icone do Notion.
+- [ ] Ir atras do icone do Bruno.
+- [ ] Decidir se Chrome entra como navegador secundario ou se fica so Brave.
+- [ ] Adicionar Notion junto de Obsidian na secao de anotacoes.
+- [ ] Criar uma secao separada para IA / coding agents.
+- [ ] Criar uma secao separada para ferramentas de API, com Bruno.
+
+### Ideias de implementacao
+
+- Criar arrays `WORK_PC`, `GAMING_PC`, `PERIPHERALS`, `AUDIO`, `DEVELOPMENT_SOFTWARE` e `GENERAL_SOFTWARE`.
+- Criar um componente `ProductsGrid` para hardware/perifericos.
+- Criar um componente `AppsGrid` para softwares.
+- Usar imagens locais em `public/uses/*` para icones de software.
+- Comecar sem hero enquanto nao houver uma foto real boa do setup.

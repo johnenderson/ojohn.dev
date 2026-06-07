@@ -32,6 +32,12 @@ const pages = {
     description: 'Sou um músico enferrujado, que continua amando a música.',
     badge: 'Last.fm',
   },
+  uses: {
+    eyebrow: 'Uso',
+    title: 'Meu setup',
+    description: 'Maquinas, perifericos e ferramentas do meu dia a dia.',
+    badge: SITE_NAME,
+  },
 } as const;
 
 export async function GET(
