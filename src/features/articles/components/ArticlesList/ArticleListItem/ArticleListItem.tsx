@@ -71,7 +71,7 @@ export const ArticleListItem: FC<PostPropType> = ({
                 <span>{minutes} min de leitura</span>
               </div>
 
-              <p className="mb-0 mt-2 max-w-2xl text-sm leading-6 text-site-body">
+              <p className="mb-0 mt-1.5 line-clamp-2 text-xs leading-5 text-site-body-muted">
                 {description}
               </p>
 
