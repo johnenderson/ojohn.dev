@@ -1,5 +1,6 @@
 import { FC, PropsWithChildren } from 'react';
 
+import { ArticleIcon } from '@/base/article/ArticleIcon/ArticleIcon';
 import { ArticleNavigation } from '@/base/article/ArticleNavigation';
 import { CodeCopyButtons } from '@/base/article/CodeCopyButtons';
 import { CoverImage } from '@/base/article/CoverImage';
@@ -44,21 +45,20 @@ export const Layout: FC<PropsWithChildren<LayoutPropTypes>> = ({
     <Navbar />
     <AnimationLayout>
       <div className="content article-content">
-        <div className="flex w-full flex-col gap-12 py-12">
-          <div className="flex w-full gap-12 pt-12 md:pb-12">
-            <main className="flex w-full min-w-0 max-w-2xl flex-1 flex-col gap-12">
+        <div className="flex w-full flex-col py-8 md:py-10">
+          <div className="flex w-full items-start justify-between gap-8 pt-8 md:pb-4 xl:gap-10">
+            <main
+              id="main"
+              className="flex w-full min-w-0 max-w-[44rem] flex-1 flex-col gap-12"
+            >
               <article
                 className="post"
                 itemScope
                 itemType="https://schema.org/BlogPosting"
               >
-                <header className="mb-10">
-                  <div className="flex items-start gap-4">
-                    {icon ? (
-                      <span className="mt-1 flex size-10 shrink-0 items-center justify-center rounded-full border border-site-border bg-site-primary-soft text-2xl leading-none text-site-primary">
-                        {icon}
-                      </span>
-                    ) : null}
+                <header className="mb-12 border-b border-site-border-subtle pb-8">
+                  <div className="flex items-start gap-3 sm:gap-4">
+                    {icon ? <ArticleIcon icon={icon} size="lg" /> : null}
                     <div className="flex min-w-0 flex-col gap-3">
                       <Title text={title} />
                       <Meta

@@ -1,5 +1,6 @@
 import { FC } from 'react';
 
+import { ArticleIcon } from '@/base/article/ArticleIcon/ArticleIcon';
 import { Card } from '@/base/components/Card';
 
 function formatDate(raw: string): string {
@@ -58,11 +59,7 @@ export const ArticleListItem: FC<PostPropType> = ({
           className="article-card-glass group p-4 focus-visible:outline-none sm:p-5"
         >
           <div className="article-card-content flex items-start gap-4">
-            {icon ? (
-              <span className="mt-1 shrink-0 text-xl leading-none text-site-primary">
-                {icon}
-              </span>
-            ) : null}
+            {icon ? <ArticleIcon icon={icon} size="sm" /> : null}
 
             <div className="min-w-0 flex-1">
               <h3 className="m-0 text-lg font-bold leading-snug text-site-foreground transition-colors group-hover:text-site-primary-hover group-focus-visible:text-site-primary-hover">
@@ -95,11 +92,7 @@ export const ArticleListItem: FC<PostPropType> = ({
       >
         <div className="article-card-content">
           <div className="flex items-start gap-2">
-            {icon ? (
-              <span className="mt-1 shrink-0 text-base leading-none text-site-primary">
-                {icon}
-              </span>
-            ) : null}
+            {icon ? <ArticleIcon icon={icon} size="sm" /> : null}
             <h3 className="m-0 text-lg font-bold leading-snug text-site-foreground transition-colors group-hover:text-site-primary-hover group-focus-visible:text-site-primary-hover">
               {title}
             </h3>
