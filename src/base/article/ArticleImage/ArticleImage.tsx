@@ -1,5 +1,4 @@
-import Image from 'next/image';
-
+import { ZoomableImage } from './ZoomableImage';
 import { getImageMeta } from '@/lib/image';
 
 type ArticleImageProps = {
@@ -50,7 +49,7 @@ export async function ArticleImage({
 
   return (
     <figure className="article-image">
-      <Image
+      <ZoomableImage
         src={src}
         width={width}
         height={height}
@@ -58,9 +57,6 @@ export async function ArticleImage({
         priority={priority}
         placeholder={meta.blurDataURL ? 'blur' : 'empty'}
         blurDataURL={meta.blurDataURL}
-        sizes="(max-width: 768px) 100vw, 672px"
-        className="rounded-md border border-site-border-subtle"
-        style={{ width: '100%', height: 'auto' }}
       />
       {caption || authorName ? (
         <figcaption>

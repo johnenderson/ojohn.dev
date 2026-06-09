@@ -42,8 +42,8 @@ export async function GET() {
     if (!article) continue;
     feed.addItem({
       title: article.title,
-      id: `${SITE_URL}/${article.slug}`,
-      link: `${SITE_URL}/${article.slug}`,
+      id: `${SITE_URL}/blog/${article.slug}`,
+      link: `${SITE_URL}/blog/${article.slug}`,
       description: article.description ?? '',
       date: parseArticleDate(article.date),
       author: [AUTHOR],

@@ -9,7 +9,7 @@ import { SITE_URL } from '@/lib/site';
 export default function sitemap(): MetadataRoute.Sitemap {
   const now = new Date();
   const articles = getArticlesList().map((article) => ({
-    url: `${SITE_URL}/${article.slug}`,
+    url: `${SITE_URL}/blog/${article.slug}`,
     lastModified: parseArticleDate(article.date),
     changeFrequency: 'monthly' as const,
     priority: 0.8,
@@ -23,7 +23,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 1,
     },
     {
-      url: `${SITE_URL}/writings`,
+      url: `${SITE_URL}/blog`,
       lastModified: now,
       changeFrequency: 'weekly',
       priority: 0.8,

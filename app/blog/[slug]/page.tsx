@@ -32,7 +32,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 
   const articleMetadata = getArticleMetadata(slug);
-  const articleUrl = `${SITE_URL}/${slug}`;
+  const articleUrl = `${SITE_URL}/blog/${slug}`;
   const articleImageUrl = `${SITE_URL}/og/${slug}`;
   const publishedTime = parseArticleDate(articleMetadata.date).toISOString();
 
@@ -79,7 +79,7 @@ export default async function Page({ params }: Readonly<Props>) {
   const { content, minutes } = getArticleContent(slug);
   const articleMetadata = getArticleMetadata(slug);
   const navigation = getArticleNavigation(slug);
-  const articleUrl = `${SITE_URL}/${slug}`;
+  const articleUrl = `${SITE_URL}/blog/${slug}`;
   const articleImageUrl = `${SITE_URL}/og/${slug}`;
   const publishedTime = parseArticleDate(articleMetadata.date).toISOString();
 

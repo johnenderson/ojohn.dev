@@ -146,7 +146,7 @@ em destaque (maior lacuna do site hoje), 3) ❤️ O que tenho curtido (mais
 1. 🟢 Live Status Widget
 2. 📅 Timeline visual de carreira
 3. 📊 Performance Dashboard público
-4. 📈 Article Analytics + sorting em `/writings`
+4. 📈 Article Analytics + sorting em `/blog`
 5. 💬 Giscus (comentários)
 
 ### Fase 3 — Alto esforço / diferencial máximo (6+ semanas)

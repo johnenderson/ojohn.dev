@@ -16,7 +16,7 @@ const NavigationCard = ({
   eyebrow: string;
 }) => (
   <Card
-    href={`/${article.slug}`}
+    href={`/blog/${article.slug}`}
     interactive
     className="article-card-glass group p-4 focus-visible:outline-none"
   >
@@ -46,6 +46,22 @@ export const ArticleNavigation: FC<ArticleNavigationProps> = ({
 }) => {
   const hasRelatedArticles = Boolean(navigation.newer || navigation.older);
 
+  if (!hasRelatedArticles) {
+    return (
+      <nav
+        aria-label="Navegação entre artigos"
+        className="mt-8 border-t border-site-border-subtle pt-4"
+      >
+        <Link
+          href="/blog"
+          className="inline-flex text-sm font-medium text-site-body-muted no-underline transition-colors hover:text-site-primary-hover focus-visible:text-site-primary-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-site-primary"
+        >
+          Voltar para o Blog
+        </Link>
+      </nav>
+    );
+  }
+
   return (
     <nav
       aria-label="Navegação entre artigos"
@@ -56,22 +72,20 @@ export const ArticleNavigation: FC<ArticleNavigationProps> = ({
           Continue lendo
         </p>
         <Link
-          href="/writings"
+          href="/blog"
           className="text-sm font-medium text-site-body-muted no-underline transition-colors hover:text-site-primary-hover focus-visible:text-site-primary-hover focus-visible:outline-none"
         >
           Voltar para o Blog
         </Link>
       </div>
-      {hasRelatedArticles ? (
-        <div className="grid gap-3 sm:grid-cols-2">
-          {navigation.newer ? (
-            <NavigationCard article={navigation.newer} eyebrow="Mais recente" />
-          ) : null}
-          {navigation.older ? (
-            <NavigationCard article={navigation.older} eyebrow="Anterior" />
-          ) : null}
-        </div>
-      ) : null}
+      <div className="grid gap-3 sm:grid-cols-2">
+        {navigation.newer ? (
+          <NavigationCard article={navigation.newer} eyebrow="Mais recente" />
+        ) : null}
+        {navigation.older ? (
+          <NavigationCard article={navigation.older} eyebrow="Anterior" />
+        ) : null}
+      </div>
     </nav>
   );
 };

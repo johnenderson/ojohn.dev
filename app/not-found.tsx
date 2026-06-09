@@ -103,7 +103,7 @@ export default function NotFound() {
                 description="Comece de novo a partir do início do site."
               />
               <NotFoundCard
-                href="/writings"
+                href="/blog"
                 icon={<BlogIcon />}
                 eyebrow="Blog"
                 title="Ver os artigos"

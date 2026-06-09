@@ -7,7 +7,7 @@ import { SITE_NAME, SITE_URL } from '@/lib/site';
 
 const BLOG_TITLE = 'Blog';
 const BLOG_DESCRIPTION = 'Guias, notas e textos pessoais por John Enderson';
-const BLOG_URL = `${SITE_URL}/writings`;
+const BLOG_URL = `${SITE_URL}/blog`;
 const BLOG_OG_IMAGE = `${SITE_URL}/og/site/blog`;
 
 export const metadata: Metadata = {
@@ -41,12 +41,7 @@ export default function Page() {
             title="Artigos"
             subtitle="Guias, tutoriais e notas pessoais."
           />
-          <ArticlesList
-            grouped
-            header={false}
-            itemVariant="compact"
-            showTags={false}
-          />
+          <ArticlesList grouped header={false} itemVariant="compact" />
         </div>
       </main>
     </PageWrapper>

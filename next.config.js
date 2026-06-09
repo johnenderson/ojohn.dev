@@ -53,6 +53,16 @@ module.exports = {
   async redirects() {
     return [
       {
+        source: '/writings',
+        destination: '/blog',
+        permanent: true,
+      },
+      {
+        source: '/writings/:slug',
+        destination: '/blog/:slug',
+        permanent: true,
+      },
+      {
         source: '/github',
         destination: 'https://github.com/johnenderson',
         permanent: false,

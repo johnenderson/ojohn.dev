@@ -58,7 +58,7 @@ export default async function OgPreviewPage({ params }: Readonly<Props>) {
 
             <div className="flex flex-wrap items-center gap-3 text-sm">
               <Link
-                href={`/${slug}`}
+                href={`/blog/${slug}`}
                 className="font-medium text-site-body-muted no-underline transition-colors hover:text-site-primary-hover"
               >
                 Abrir artigo

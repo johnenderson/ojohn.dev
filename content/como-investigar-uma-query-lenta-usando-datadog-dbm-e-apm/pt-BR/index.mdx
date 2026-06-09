@@ -1,0 +1,195 @@
+---
+title: "Como investigar uma query lenta usando Datadog DBM e APM"
+description: "Uma investigação prática usando Datadog Database Monitoring e APM para sair de uma rota lenta até a query, o plano de execução e o impacto real na aplicação."
+date: "2026-06-08"
+tags: ["datadog", "database", "observability", "performance"]
+---
+
+Quando falamos de performance em banco de dados, é comum pensar primeiro em joins complexos, falta de índice ou uma query gigantesca perdida em algum ponto do sistema.
+
+Mas, na prática, problemas caros também aparecem em funcionalidades aparentemente simples.
+
+Durante um laboratório de Database Monitoring (DBM) do Datadog, investiguei um cenário assim: um widget exibia os itens mais pedidos de uma aplicação e, para manter esse ranking atualizado, uma query era executada a cada poucos segundos contra o PostgreSQL.
+
+A ideia era simples: buscar os 10 itens mais vendidos.
+
+O efeito colateral não era tão simples. A consulta começou a gerar carga desproporcional no banco e afetar uma rota da aplicação. O objetivo da investigação era entender onde estava o custo, qual parte do plano de execução explicava a lentidão e como conectar isso ao impacto percebido no APM.
+
+## O primeiro sinal no DBM
+
+O ponto de partida foi a aba **Query Metrics** do Database Monitoring.
+
+Essa visão não mostra apenas uma execução isolada. Ela agrupa queries normalizadas e exibe métricas agregadas ao longo do tempo, como duração total, duração média, número de execuções, linhas processadas e atividade de blocos.
+
+Ao ordenar as queries por **Total Duration** e comparar com **Average Rows**, uma consulta começou a se destacar.
+
+<Image
+  src="/como-investigar-uma-query-lenta-usando-datadog-dbm-e-apm/normalized-query.png"
+  alt="Tela de Query Metrics do Datadog mostrando uma query SELECT destacada por duração total"
+  caption="Query Metrics ajuda a encontrar quais queries normalizadas estão consumindo mais tempo no banco."
+/>
+
+Esse tipo de ordenação é útil porque uma query não precisa ser a mais lenta individualmente para ser um problema. Se ela roda muitas vezes, com custo moderado, pode consumir mais tempo total do que uma query rara e extremamente lenta.
+
+Nesse caso, a query suspeita buscava dados de itens e itens em pré-venda:
+
+```sql
+SELECT
+  id,
+  description,
+  order_count,
+  last_hour,
+  image_url,
+  ? AS is_preorder
+FROM items
+WHERE order_count::int > ?
+
+UNION
+
+SELECT
+  id,
+  description,
+  order_count,
+  last_hour,
+  image_url,
+  is_preorder
+FROM preorder_items
+WHERE order_count::int > ?
+```
+
+O formato já mostra um detalhe importante: os valores concretos foram substituídos por `?`.
+
+## Por que a query aparece normalizada
+
+O Datadog normaliza queries para agrupar execuções equivalentes que mudam apenas nos parâmetros.
+
+Em vez de tratar cada variação de `order_count > 10`, `order_count > 50` ou `order_count > 100` como uma query diferente, o DBM agrupa tudo no mesmo padrão. Isso reduz ruído, evita expor valores sensíveis e permite acompanhar tendência de performance ao longo do tempo.
+
+Ao abrir o painel da query normalizada, fica mais fácil enxergar o comportamento da consulta em várias dimensões: duração média, duração total, quantidade de execuções, samples coletados e hosts envolvidos.
+
+<Image
+  src="/como-investigar-uma-query-lenta-usando-datadog-dbm-e-apm/normalized-query-1.png"
+  alt="Painel de uma query normalizada no Datadog com gráficos de performance e tags da consulta"
+  caption="O painel da query normalizada concentra métricas históricas, samples e atalhos para Explain Plans."
+/>
+
+Essa visão já respondia uma parte da investigação: a query era frequente, tinha duração relevante e merecia uma análise mais detalhada.
+
+Mas ela ainda não explicava o motivo do custo.
+
+## O plano de execução contou a história
+
+Depois de identificar a query, o próximo passo foi olhar o **Explain Plan**.
+
+O plano de execução mostra a estratégia escolhida pelo PostgreSQL para responder à consulta. Cada nó representa uma operação: `Seq Scan`, `Sort`, `Append`, `Unique`, `Join`, agregações e assim por diante.
+
+No mapa visual do DBM, uma operação se destacou imediatamente: o `Sort`.
+
+<Image
+  src="/como-investigar-uma-query-lenta-usando-datadog-dbm-e-apm/explain-plans.png"
+  alt="Explain Plan Map View mostrando a operação Sort como responsável por 75% do custo da query"
+  caption="O Explain Plan mostrou que a etapa de Sort concentrava a maior parte do custo da query."
+/>
+
+O plano indicava que a query fazia leituras sequenciais nas tabelas `items` e `preorder_items`, combinava os resultados e depois executava uma ordenação cara. O `Sort` aparecia com aproximadamente **75% do custo estimado**.
+
+Esse é o tipo de sinal que muda a investigação.
+
+Antes do plano, a query era apenas uma consulta lenta. Depois do plano, ela passou a ter uma hipótese concreta: o gargalo estava menos em "buscar linhas" de forma genérica e mais na ordenação dos resultados combinados.
+
+## Dados históricos evitam chute
+
+Um detalhe importante do DBM é que ele não mostra apenas o estado atual do banco.
+
+Na aba **Metrics**, o Datadog mantém séries temporais da query normalizada. Isso permite responder perguntas que costumam aparecer durante incidentes:
+
+- essa query sempre teve esse comportamento?
+- o custo aumentou depois de um deploy?
+- a frequência subiu por causa de uma nova funcionalidade?
+- uma otimização realmente reduziu duração ou apenas mudou o sintoma?
+
+Sem histórico, a investigação depende muito de intuição e de snapshots do momento. Com histórico, dá para comparar antes e depois, entender tendência e priorizar o que realmente impacta o sistema.
+
+## Query Samples mostram execuções reais
+
+Até aqui, a análise estava baseada em métricas agregadas da query normalizada.
+
+Isso é ótimo para encontrar padrões, mas nem sempre basta. Em algum momento, precisamos olhar para execuções reais.
+
+É aí que entram os **Query Samples**.
+
+<Image
+  src="/como-investigar-uma-query-lenta-usando-datadog-dbm-e-apm/query-sample.png"
+  alt="Tela de Query Samples do Datadog listando execuções individuais da query com duração e wait event group"
+  caption="Query Samples mostram execuções individuais, com duração, host, wait event group e outros atributos."
+/>
+
+Nos samples, é possível ver execuções específicas, duração, host, usuário, wait event group e, quando disponível, o plano associado. Isso ajuda a separar dois cenários diferentes:
+
+- uma query consistentemente cara;
+- uma query geralmente aceitável, mas com outliers muito ruins.
+
+Nesse caso, alguns samples reforçavam que a consulta tinha custo alto para uma operação executada com frequência. Para uma query que alimenta uma funcionalidade chamada repetidamente, esse acúmulo é perigoso.
+
+## Conectando a query ao APM
+
+A parte mais útil da investigação foi conectar o DBM ao APM.
+
+Um sample de query pode ser associado ao trace da requisição que disparou aquela execução. Isso tira a análise do banco de dados de um vácuo e coloca a query dentro do caminho real da aplicação.
+
+No trace, a query aparecia dentro de uma requisição:
+
+```http
+GET /get-item
+```
+
+<Image
+  src="/como-investigar-uma-query-lenta-usando-datadog-dbm-e-apm/trace_tab.png"
+  alt="Trace do APM mostrando a rota GET /get-item e uma chamada postgres.query dentro do flame graph"
+  caption="O Trace mostra qual rota disparou a query e quanto tempo ela consumiu dentro da requisição."
+/>
+
+O trace mostrava uma requisição total de aproximadamente **1,06s**. Dentro dela, a chamada ao PostgreSQL consumia uma parcela relevante do tempo total.
+
+O recorte abaixo deixa isso mais explícito:
+
+<Image
+  src="/como-investigar-uma-query-lenta-usando-datadog-dbm-e-apm/percent_total_time.png"
+  alt="Detalhe do trace indicando uma query PostgreSQL consumindo cerca de 25% do tempo total da requisição"
+  caption="A query PostgreSQL apareceu consumindo cerca de 25% do tempo total da requisição."
+/>
+
+Essa correlação é onde DBM e APM ficam especialmente fortes juntos.
+
+O DBM mostra que a query é cara. O Explain Plan aponta onde está o custo. O APM mostra quem chama essa query e qual experiência da aplicação paga essa conta.
+
+## O que a investigação revelou
+
+No fim, a história ficou bem mais clara:
+
+- uma funcionalidade aparentemente simples executava a query com alta frequência;
+- a query aparecia entre as mais relevantes em Query Metrics;
+- o plano de execução apontava o `Sort` como principal custo;
+- os samples mostravam execuções reais com duração significativa;
+- o APM conectava a query à rota `GET /get-item`;
+- a chamada ao PostgreSQL consumia cerca de 25% do tempo total da requisição.
+
+Esse conjunto de sinais é muito mais útil do que simplesmente dizer "o banco está lento".
+
+Ele aponta para uma hipótese de otimização concreta: reduzir o custo da ordenação, revisar a estratégia da query, avaliar índices, materialização, cache ou até repensar a frequência com que esse ranking precisa ser recalculado.
+
+## Fechando
+
+O Datadog Database Monitoring não substitui conhecimento de banco de dados, mas melhora muito a qualidade da investigação.
+
+Ele ajuda a sair de uma pergunta ampla:
+
+> Por que essa rota está lenta?
+
+E chegar em algo mais específico:
+
+> Essa rota chama uma query frequente, a query tem custo alto, o plano mostra um Sort dominante e essa chamada representa uma parte relevante do tempo total da requisição.
+
+Para times que trabalham com sistemas distribuídos, essa conexão entre aplicação, banco e infraestrutura reduz bastante o tempo até a causa raiz.
+
+E uma query executada milhares de vezes por dia não precisa ser terrível para causar problemas. Ela só precisa ser lenta o suficiente.
