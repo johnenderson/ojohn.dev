@@ -1279,12 +1279,12 @@ html.light .content pre code {
   background: color-mix(in srgb, var(--site-code) 86%, transparent);
   border: 1px solid var(--site-border-subtle);
   border-radius: 6px;
-  color: var(--site-body);
+  color: var(--site-body-muted);
   cursor: pointer;
   display: inline-flex;
   justify-content: center;
   line-height: 0;
-  opacity: 0;
+  opacity: 0.55;
   padding: 0.4rem;
   position: absolute;
   right: 0.75rem;
@@ -1299,10 +1299,17 @@ html.light .content pre code {
   width: 16px;
 }
 
+/* Always visible but subtle; full opacity on hover/focus (and always on touch). */
 .content pre:hover .code-copy-button,
 .content pre:focus-within .code-copy-button,
 .code-copy-button:focus-visible {
   opacity: 1;
+}
+
+@media (hover: none) {
+  .code-copy-button {
+    opacity: 1;
+  }
 }
 
 .code-copy-button:hover,
