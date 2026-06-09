@@ -17,7 +17,7 @@ import { getImageMeta } from '@/lib/image';
 import { AUTHOR_NAME, SITE_NAME, SITE_URL } from '@/lib/site';
 
 type Props = {
-  params: Promise<{ slug: string }>;
+  params: Promise<{ slug: string[] }>;
 };
 
 export async function generateStaticParams() {
@@ -25,7 +25,7 @@ export async function generateStaticParams() {
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { slug } = await params;
+  const slug = (await params).slug.join('/');
 
   if (!hasArticleMetadata(slug)) {
     return {};
@@ -70,7 +70,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function Page({ params }: Readonly<Props>) {
-  const { slug } = await params;
+  const slug = (await params).slug.join('/');
 
   if (!hasArticleContent(slug) || !hasArticleMetadata(slug)) {
     notFound();

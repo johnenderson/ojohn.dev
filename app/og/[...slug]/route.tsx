@@ -23,9 +23,9 @@ const formatDate = (raw: string) =>
 
 export async function GET(
   _request: Request,
-  { params }: { params: Promise<{ slug: string }> },
+  { params }: { params: Promise<{ slug: string[] }> },
 ) {
-  const { slug } = await params;
+  const slug = (await params).slug.join('/');
 
   if (!hasArticleMetadata(slug)) {
     return new Response('Not found', { status: 404 });

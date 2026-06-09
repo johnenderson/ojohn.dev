@@ -11,7 +11,7 @@ import {
 import { SITE_URL } from '@/lib/site';
 
 type Props = {
-  params: Promise<{ slug: string }>;
+  params: Promise<{ slug: string[] }>;
 };
 
 export default async function OgPreviewPage({ params }: Readonly<Props>) {
@@ -21,7 +21,7 @@ export default async function OgPreviewPage({ params }: Readonly<Props>) {
     notFound();
   }
 
-  const { slug } = await params;
+  const slug = (await params).slug.join('/');
 
   if (!hasArticleMetadata(slug)) {
     notFound();

@@ -1,4 +1,4 @@
-import { access, readdir, writeFile } from 'node:fs/promises';
+import { readdir, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -9,15 +9,6 @@ const outputPath = path.join(
   'src/features/articles/lib/article-content.generated.ts',
 );
 const outputDir = path.dirname(outputPath);
-
-async function exists(filePath) {
-  try {
-    await access(filePath);
-    return true;
-  } catch {
-    return false;
-  }
-}
 
 function toImportPath(filePath) {
   const relativePath = path
@@ -46,23 +37,32 @@ function toObjectKey(value) {
 }
 
 async function collectArticles() {
-  const slugDirs = await readdir(contentDir, { withFileTypes: true });
+  const topicDirs = await readdir(contentDir, { withFileTypes: true });
   const articles = [];
 
-  for (const slugDir of slugDirs) {
-    if (!slugDir.isDirectory()) continue;
+  for (const topicDir of topicDirs) {
+    if (!topicDir.isDirectory()) continue;
 
-    const slug = slugDir.name;
-    const slugPath = path.join(contentDir, slug);
-    const localeDirs = await readdir(slugPath, { withFileTypes: true });
+    const topic = topicDir.name;
+    const topicPath = path.join(contentDir, topic);
+    const localeDirs = await readdir(topicPath, { withFileTypes: true });
 
     for (const localeDir of localeDirs) {
       if (!localeDir.isDirectory()) continue;
 
       const locale = localeDir.name;
-      const filePath = path.join(slugPath, locale, 'index.mdx');
+      const localePath = path.join(topicPath, locale);
+      const articleFiles = await readdir(localePath, { withFileTypes: true });
 
-      if (await exists(filePath)) {
+      for (const articleFile of articleFiles) {
+        if (!articleFile.isFile() || !articleFile.name.endsWith('.mdx')) {
+          continue;
+        }
+
+        const articleSlug = articleFile.name.replace(/\.mdx$/, '');
+        const slug = `${topic}/${articleSlug}`;
+        const filePath = path.join(localePath, articleFile.name);
+
         articles.push({ slug, locale, filePath });
       }
     }
