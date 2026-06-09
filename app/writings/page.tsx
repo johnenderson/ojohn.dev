@@ -41,12 +41,7 @@ export default function Page() {
             title="Artigos"
             subtitle="Guias, tutoriais e notas pessoais."
           />
-          <ArticlesList
-            grouped
-            header={false}
-            itemVariant="compact"
-            showTags={false}
-          />
+          <ArticlesList grouped header={false} itemVariant="compact" />
         </div>
       </main>
     </PageWrapper>

@@ -2,6 +2,14 @@ import { FC } from 'react';
 
 import { Card } from '@/base/components/Card';
 
+function formatDate(raw: string): string {
+  if (/^\d{2}\/\d{2}\/\d{4}$/.test(raw)) return raw;
+  if (/^\d{2}-\d{2}-\d{4}$/.test(raw)) return raw.replaceAll('-', '/');
+  const match = /^(\d{4})-(\d{2})-(\d{2})/.exec(raw);
+  if (match) return `${match[3]}/${match[2]}/${match[1]}`;
+  return raw;
+}
+
 type PostPropType = {
   datetime: string;
   description: string;
@@ -13,6 +21,19 @@ type PostPropType = {
   title: string;
   variant?: 'default' | 'compact';
 };
+
+const TagList = ({ tags }: { tags: string[] }) => (
+  <ul className="mt-3 flex list-none flex-wrap gap-2 p-0">
+    {tags.slice(0, 4).map((tag) => (
+      <li
+        key={tag}
+        className="rounded border border-site-border-subtle bg-site-primary-soft px-2 py-0.5 text-xs font-medium leading-5 text-site-body transition-colors group-hover:border-site-border group-hover:text-site-foreground light:bg-white"
+      >
+        {tag}
+      </li>
+    ))}
+  </ul>
+);
 
 export const ArticleListItem: FC<PostPropType> = ({
   datetime,
@@ -26,6 +47,7 @@ export const ArticleListItem: FC<PostPropType> = ({
   variant = 'default',
 }) => {
   const isCompact = variant === 'compact';
+  const formattedDate = formatDate(datetime);
 
   if (isCompact) {
     return (
@@ -48,13 +70,15 @@ export const ArticleListItem: FC<PostPropType> = ({
               </h3>
 
               <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs font-medium text-site-body-muted">
-                <time>{datetime}</time>
+                <time dateTime={datetime}>{formattedDate}</time>
                 <span>{minutes} min de leitura</span>
               </div>
 
               <p className="mb-0 mt-2 max-w-2xl text-sm leading-6 text-site-body">
                 {description}
               </p>
+
+              {showTags && tags.length > 0 && <TagList tags={tags} />}
             </div>
           </div>
         </Card>
@@ -82,7 +106,7 @@ export const ArticleListItem: FC<PostPropType> = ({
           </div>
 
           <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs font-medium text-site-body-muted">
-            <time>{datetime}</time>
+            <time dateTime={datetime}>{formattedDate}</time>
             <span>{minutes} min de leitura</span>
           </div>
 
@@ -90,18 +114,7 @@ export const ArticleListItem: FC<PostPropType> = ({
             {description}
           </p>
 
-          {showTags && tags.length > 0 && (
-            <ul className="mt-4 flex list-none flex-wrap gap-2 p-0">
-              {tags.slice(0, 4).map((tag) => (
-                <li
-                  key={tag}
-                  className="rounded border border-site-border-subtle bg-site-primary-soft px-2 py-0.5 text-xs font-medium leading-5 text-site-body transition-colors group-hover:border-site-border group-hover:text-site-foreground light:bg-white"
-                >
-                  {tag}
-                </li>
-              ))}
-            </ul>
-          )}
+          {showTags && tags.length > 0 && <TagList tags={tags} />}
         </div>
       </Card>
     </li>
