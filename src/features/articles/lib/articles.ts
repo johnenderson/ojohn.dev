@@ -441,7 +441,7 @@ export function getArticleContent(
 export function getArticlePaths(locale: Locale = DEFAULT_ARTICLE_LOCALE) {
   return getArticleSlugs(locale).map((slug) => ({
     params: {
-      slug,
+      slug: slug.split('/'),
     },
   }));
 }

@@ -24,7 +24,9 @@ export async function GET() {
   const paths = getArticlePaths();
 
   const articles = paths
-    .map(({ params: { slug } }) => {
+    .map(({ params }) => {
+      const slug = params.slug.join('/');
+
       try {
         return { slug, ...getArticleMetadata(slug) };
       } catch {

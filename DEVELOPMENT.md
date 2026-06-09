@@ -61,7 +61,7 @@ fonts from Google Fonts.
 ```text
 .
 ├── app/                # Next.js App Router routes and providers
-│   ├── [slug]/         # Article pages generated from content
+│   ├── blog/           # Article index and pages generated from content
 │   ├── og/             # Dynamic Open Graph image routes (articles + site pages)
 │   ├── og-preview/     # Dev-only OG image preview (404 in production)
 │   ├── error-test/     # Dev-only route to preview the error boundary
@@ -82,14 +82,14 @@ fonts from Google Fonts.
 
 ## Adding Content
 
-Each article lives in one or more locale folders:
+Each article lives inside a topic and locale folder:
 
 ```text
-content/<slug>/
+content/<topic>/
 ├── en/
-│   └── index.mdx
+│   └── article-slug.mdx
 └── pt-BR/
-    └── index.mdx
+    └── slug-do-artigo.mdx
 ```
 
 Example article:
@@ -177,7 +177,7 @@ also listed under `disallow` in `app/robots.ts` for consistency.
 
 | Route                | Purpose                                                                                                                    |
 | -------------------- | -------------------------------------------------------------------------------------------------------------------------- |
-| `/og-preview/<slug>` | Renders the dynamic Open Graph image for an article inside an HTML page, with links to open the article and the raw image. |
+| `/og-preview/<path>` | Renders the dynamic Open Graph image for an article inside an HTML page, with links to open the article and the raw image. |
 | `/error-test`        | Throws on render so you can preview the `app/error.tsx` error boundary UI.                                                 |
 
 Notes:

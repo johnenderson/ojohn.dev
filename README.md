@@ -13,13 +13,13 @@ preferences, and reading controls.
 
 ## Routes
 
-| Route          | Description                                     |
-| -------------- | ----------------------------------------------- |
-| `/`            | Home page                                       |
-| `/blog`        | Article index                                   |
-| `/blog/[slug]` | Article page generated from `content/<slug>/en` |
-| `/me`          | About page                                      |
-| `/rss.xml`     | RSS feed                                        |
+| Route             | Description                                                          |
+| ----------------- | -------------------------------------------------------------------- |
+| `/`               | Home page                                                            |
+| `/blog`           | Article index                                                        |
+| `/blog/[...slug]` | Article page generated from `content/<topic>/<locale>/<article>.mdx` |
+| `/me`             | About page                                                           |
+| `/rss.xml`        | RSS feed                                                             |
 
 ## Development
 
