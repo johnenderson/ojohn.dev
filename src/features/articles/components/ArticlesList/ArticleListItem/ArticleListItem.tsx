@@ -58,8 +58,8 @@ export const ArticleListItem: FC<PostPropType> = ({
           interactive
           className="article-card-glass group p-4 focus-visible:outline-none sm:p-5"
         >
-          <div className="article-card-content flex items-start gap-4">
-            {icon ? <ArticleIcon icon={icon} size="sm" /> : null}
+          <div className="article-card-content flex items-center gap-4">
+            {icon ? <ArticleIcon icon={icon} size="card" /> : null}
 
             <div className="min-w-0 flex-1">
               <h3 className="m-0 text-lg font-bold leading-snug text-site-foreground transition-colors group-hover:text-site-primary-hover group-focus-visible:text-site-primary-hover">
