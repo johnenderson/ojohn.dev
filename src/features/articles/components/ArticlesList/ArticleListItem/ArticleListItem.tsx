@@ -1,6 +1,7 @@
 import { FC } from 'react';
 
 import { ArticleIcon } from '@/base/article/ArticleIcon/ArticleIcon';
+import { CalendarIcon, ClockIcon } from '@/base/article/icons';
 import { Card } from '@/base/components/Card';
 
 function formatDate(raw: string): string {
@@ -22,6 +23,28 @@ type PostPropType = {
   title: string;
   variant?: 'default' | 'compact';
 };
+
+const MetaLine = ({
+  datetime,
+  formattedDate,
+  minutes,
+}: {
+  datetime: string;
+  formattedDate: string;
+  minutes: number;
+}) => (
+  <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs font-medium text-site-body-muted">
+    <span className="flex items-center gap-1.5">
+      <CalendarIcon />
+      <time dateTime={datetime}>{formattedDate}</time>
+    </span>
+    <span className="flex items-center gap-1.5">
+      <span className="text-site-border">•</span>
+      <ClockIcon />
+      <span>{minutes} min de leitura</span>
+    </span>
+  </div>
+);
 
 const TagList = ({ tags }: { tags: string[] }) => (
   <ul className="mt-3 flex list-none flex-wrap gap-2 p-0">
@@ -66,10 +89,11 @@ export const ArticleListItem: FC<PostPropType> = ({
                 {title}
               </h3>
 
-              <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs font-medium text-site-body-muted">
-                <time dateTime={datetime}>{formattedDate}</time>
-                <span>{minutes} min de leitura</span>
-              </div>
+              <MetaLine
+                datetime={datetime}
+                formattedDate={formattedDate}
+                minutes={minutes}
+              />
 
               <p className="mb-0 mt-1.5 line-clamp-2 text-xs leading-5 text-site-body-muted">
                 {description}
@@ -98,10 +122,11 @@ export const ArticleListItem: FC<PostPropType> = ({
             </h3>
           </div>
 
-          <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs font-medium text-site-body-muted">
-            <time dateTime={datetime}>{formattedDate}</time>
-            <span>{minutes} min de leitura</span>
-          </div>
+          <MetaLine
+            datetime={datetime}
+            formattedDate={formattedDate}
+            minutes={minutes}
+          />
 
           <p className="mb-0 mt-2 max-w-2xl text-sm leading-6 text-site-body">
             {description}
