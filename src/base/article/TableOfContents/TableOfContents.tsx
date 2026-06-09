@@ -1,9 +1,8 @@
 'use client';
 
-import { useEffect, useLayoutEffect, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 
 const NAVBAR_OFFSET = 96;
-const ITEM_HEIGHT = 36; // h-8 (32px) + gap-1 (4px)
 
 type Heading = {
   id: string;
@@ -20,6 +19,8 @@ export const TableOfContents = ({
 }: TableOfContentsProps) => {
   const [headings, setHeadings] = useState<Heading[]>([]);
   const [activeId, setActiveId] = useState<string>('');
+  const [indicatorTop, setIndicatorTop] = useState(0);
+  const listRef = useRef<HTMLDivElement>(null);
 
   useLayoutEffect(() => {
     const elements = Array.from(
@@ -60,9 +61,20 @@ export const TableOfContents = ({
     return () => window.removeEventListener('scroll', onScroll);
   }, [headings]);
 
-  if (headings.length === 0) return null;
+  // Update indicator position after activeId changes and DOM has settled
+  useEffect(() => {
+    if (!listRef.current) return;
+    const activeIdx = headings.findIndex((h) => h.id === activeId);
+    if (activeIdx < 0) return;
+    const linkEl = listRef.current.querySelectorAll('a')[activeIdx] as
+      | HTMLElement
+      | undefined;
+    if (linkEl)
+      setIndicatorTop(linkEl.offsetTop + linkEl.offsetHeight / 2 - 14);
+  }, [activeId, headings]);
 
-  const activeIdx = headings.findIndex((h) => h.id === activeId);
+  if (headings.length < 2) return null;
+
   const links = headings.map((heading) => (
     <a
       key={heading.id}
@@ -86,12 +98,12 @@ export const TableOfContents = ({
         }
         setActiveId(heading.id);
       }}
-      className={`flex h-8 items-center truncate text-base font-semibold no-underline transition-colors duration-200 ${
+      className={`flex min-h-8 items-start py-1 rounded-sm pr-2 text-xs leading-snug no-underline transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-site-primary ${
         heading.level === 3 ? 'pl-6' : 'pl-3'
       } ${
         activeId === heading.id
-          ? 'text-site-primary'
-          : 'text-site-body hover:text-site-primary-hover'
+          ? 'text-site-primary font-medium'
+          : 'text-site-body-muted font-normal hover:text-site-foreground'
       }`}
     >
       {heading.text}
@@ -111,19 +123,22 @@ export const TableOfContents = ({
 
   return (
     <aside
-      className="sticky hidden h-fit w-full max-w-[18rem] shrink-0 flex-col gap-3 border-l border-site-border-subtle py-1 pl-5 lg:flex"
-      style={{ top: '8rem' }}
+      className="sticky hidden h-fit w-full max-w-[13rem] xl:max-w-[16rem] shrink-0 flex-col gap-3 rounded-md border border-site-border-subtle bg-site-background/35 p-4 lg:flex"
+      style={{ top: '7rem' }}
     >
-      <p className="m-0 text-base font-semibold text-site-foreground">
+      <p className="m-0 text-sm font-semibold text-site-foreground">
         Nesse artigo
       </p>
-      <div className="relative flex flex-col gap-1">
+      <div
+        ref={listRef}
+        className="relative flex flex-col gap-0.5 border-l border-site-border-subtle"
+      >
         {links}
 
-        {/* Moving active indicator bar — same as doce.sh */}
+        {/* Moving active indicator bar */}
         <span
-          className="absolute left-0 h-7 w-px bg-site-primary transition-[top] duration-300 ease-elastic"
-          style={{ top: `${Math.max(0, activeIdx) * ITEM_HEIGHT}px` }}
+          className="absolute left-0 h-4 w-px bg-site-primary transition-[top] duration-300 ease-elastic"
+          style={{ top: `${indicatorTop}px` }}
         />
       </div>
     </aside>

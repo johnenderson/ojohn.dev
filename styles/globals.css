@@ -709,6 +709,8 @@ article.post > ol li {
 article.post > p {
   margin-top: 1.25rem;
   margin-bottom: 1.25rem;
+  text-align: justify;
+  hyphens: auto;
   text-wrap: pretty;
 }
 
