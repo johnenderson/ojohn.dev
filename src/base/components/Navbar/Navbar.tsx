@@ -20,7 +20,7 @@ const navLinks = [
   { href: '/me', label: 'Sobre mim', icon: faUser },
   { href: '/now', label: 'Agora', icon: faHeadphones },
   { href: '/uses', label: 'Uso', icon: faScrewdriverWrench },
-  { href: '/writings', label: 'Blog', icon: faNewspaper },
+  { href: '/blog', label: 'Blog', icon: faNewspaper },
 ];
 
 const MenuIcon = () => (

@@ -117,7 +117,7 @@ export const ArticlesList: FC<ArticlesListProps> = ({
                     datetime={article.date}
                     description={article.description}
                     icon={article.icon}
-                    link={`/${article.slug}`}
+                    link={`/blog/${article.slug}`}
                     minutes={article.minutes}
                     showTags={showTags}
                     tags={article.tags}
@@ -137,7 +137,7 @@ export const ArticlesList: FC<ArticlesListProps> = ({
               datetime={article.date}
               description={article.description}
               icon={article.icon}
-              link={`/${article.slug}`}
+              link={`/blog/${article.slug}`}
               minutes={article.minutes}
               showTags={showTags}
               tags={article.tags}
@@ -151,7 +151,7 @@ export const ArticlesList: FC<ArticlesListProps> = ({
       {showVerTodos && (
         <div className="mt-4 flex justify-end">
           <Link
-            href="/writings"
+            href="/blog"
             passHref
             className="text-sm font-medium text-site-body-muted no-underline transition-colors hover:text-site-primary-hover"
           >

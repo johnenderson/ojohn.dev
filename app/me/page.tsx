@@ -292,7 +292,7 @@ export default async function Page() {
             <p className="text-site-body-muted text-sm m-0">
               Você também pode ler meus{' '}
               <Link
-                href="/writings"
+                href="/blog"
                 className="text-site-foreground hover:text-site-primary-hover transition-colors"
               >
                 artigos
