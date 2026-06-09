@@ -1,9 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import { useCallback, useEffect, useState } from 'react';
-
-import { createPortal } from 'react-dom';
+import { useEffect, useRef, useState } from 'react';
 
 type ZoomableImageProps = {
   src: string;
@@ -25,26 +23,24 @@ export const ZoomableImage = ({
   blurDataURL,
 }: ZoomableImageProps) => {
   const [open, setOpen] = useState(false);
+  const dialogRef = useRef<HTMLDialogElement>(null);
 
-  const close = useCallback(() => setOpen(false), []);
-
+  // Promote the dialog to the top layer when it mounts, and lock body scroll.
   useEffect(() => {
     if (!open) return;
 
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') close();
-    };
-    document.addEventListener('keydown', onKey);
+    const dialog = dialogRef.current;
+    if (dialog && !dialog.open) dialog.showModal();
 
-    // Lock body scroll while the lightbox is open
     const prevOverflow = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
 
     return () => {
-      document.removeEventListener('keydown', onKey);
       document.body.style.overflow = prevOverflow;
     };
-  }, [open, close]);
+  }, [open]);
+
+  const requestClose = () => dialogRef.current?.close();
 
   return (
     <>
@@ -68,52 +64,50 @@ export const ZoomableImage = ({
         />
       </button>
 
-      {open && typeof document !== 'undefined'
-        ? createPortal(
-            <div
-              role="dialog"
-              aria-modal="true"
-              aria-label={alt || 'Imagem ampliada'}
-              onClick={close}
-              style={{ position: 'fixed', inset: 0, zIndex: 9999 }}
-              className="motion-safe:animate-[fadeIn_200ms_ease-out] flex cursor-zoom-out items-center justify-center bg-black/85 p-4 backdrop-blur-sm sm:p-8"
+      {open ? (
+        <dialog
+          ref={dialogRef}
+          aria-label={alt || 'Imagem ampliada'}
+          onClose={() => setOpen(false)}
+          onClick={(e) => {
+            // Close when the backdrop (the dialog element itself) is clicked.
+            if (e.target === dialogRef.current) requestClose();
+          }}
+          className="zoom-dialog motion-safe:animate-[zoomIn_250ms_cubic-bezier(0.22,1,0.36,1)]"
+        >
+          <button
+            type="button"
+            onClick={requestClose}
+            aria-label="Fechar"
+            className="fixed right-4 top-4 flex size-10 items-center justify-center rounded-full bg-white/10 text-white transition-colors hover:bg-white/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
             >
-              <button
-                type="button"
-                onClick={close}
-                aria-label="Fechar"
-                className="absolute right-4 top-4 flex size-10 items-center justify-center rounded-full bg-white/10 text-white transition-colors hover:bg-white/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="20"
-                  height="20"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  aria-hidden="true"
-                >
-                  <line x1="18" y1="6" x2="6" y2="18" />
-                  <line x1="6" y1="6" x2="18" y2="18" />
-                </svg>
-              </button>
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
+          </button>
 
-              <Image
-                src={src}
-                width={width}
-                height={height}
-                alt={alt}
-                onClick={(e) => e.stopPropagation()}
-                className="motion-safe:animate-[zoomIn_250ms_cubic-bezier(0.22,1,0.36,1)] h-auto max-h-[90vh] w-auto max-w-full rounded-lg object-contain shadow-2xl"
-                style={{ width: 'auto', height: 'auto' }}
-              />
-            </div>,
-            document.body,
-          )
-        : null}
+          <Image
+            src={src}
+            width={width}
+            height={height}
+            alt={alt}
+            className="block h-auto max-h-[90vh] w-auto max-w-[92vw] rounded-lg object-contain shadow-2xl"
+            style={{ width: 'auto', height: 'auto' }}
+          />
+        </dialog>
+      ) : null}
     </>
   );
 };

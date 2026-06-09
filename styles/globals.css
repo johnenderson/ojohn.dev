@@ -205,6 +205,40 @@ html.light {
   }
 }
 
+@keyframes backdropFadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+/* Image lightbox — native <dialog> rendered in the top layer. */
+.zoom-dialog {
+  margin: auto;
+  max-width: 92vw;
+  max-height: 92vh;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  overflow: visible;
+  cursor: zoom-out;
+}
+
+.zoom-dialog::backdrop {
+  background: rgba(0, 0, 0, 0.85);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .zoom-dialog::backdrop {
+    -webkit-backdrop-filter: blur(4px);
+    backdrop-filter: blur(4px);
+    animation: backdropFadeIn 200ms ease-out;
+  }
+}
+
 @media (prefers-reduced-motion: no-preference) {
   .site-fade-in {
     animation-delay: var(--fade-in-delay, 0ms);
