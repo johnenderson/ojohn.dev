@@ -75,7 +75,8 @@ export const ZoomableImage = ({
               aria-modal="true"
               aria-label={alt || 'Imagem ampliada'}
               onClick={close}
-              className="motion-safe:animate-[fadeIn_200ms_ease-out] fixed inset-0 z-[9999] flex cursor-zoom-out items-center justify-center bg-black/85 p-4 backdrop-blur-sm sm:p-8"
+              style={{ position: 'fixed', inset: 0, zIndex: 9999 }}
+              className="motion-safe:animate-[fadeIn_200ms_ease-out] flex cursor-zoom-out items-center justify-center bg-black/85 p-4 backdrop-blur-sm sm:p-8"
             >
               <button
                 type="button"
