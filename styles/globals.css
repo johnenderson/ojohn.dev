@@ -719,32 +719,43 @@ article h3:hover .heading-anchor,
   width: 100%;
 }
 
-article.post > p,
-article.post > ul li,
-article.post > ol li {
+/*
+ * Markdown content typography. Selectors use descendant + :not(header *)
+ * instead of the direct-child combinator because SmoothRender wraps each
+ * top-level block in a <div>, so `article.post > p` would never match.
+ * The :not(header *) guard keeps the header's tag list untouched.
+ */
+article.post p:not(header *),
+article.post li:not(header *) {
   color: var(--site-body);
   font-weight: 400;
   font-size: 1.0625rem;
   line-height: 1.8;
 }
 
-article.post > p {
+article.post p:not(header *) {
   margin-top: 1.25rem;
   margin-bottom: 1.25rem;
-  text-align: justify;
-  hyphens: auto;
+  text-align: left;
   text-wrap: pretty;
 }
 
-article.post > ul,
-article.post > ol {
+/* Justify only on wider columns — on narrow mobile it creates whitespace rivers */
+@media (min-width: 640px) {
+  article.post p:not(header *) {
+    text-align: justify;
+    hyphens: auto;
+  }
+}
+
+article.post ul:not(header *),
+article.post ol:not(header *) {
   margin-top: 1rem;
   margin-bottom: 1.25rem;
   padding-left: 1.5rem;
 }
 
-article.post > ul li,
-article.post > ol li {
+article.post li:not(header *) {
   margin-top: 0.35rem;
   margin-bottom: 0.35rem;
   padding-left: 0.25rem;
