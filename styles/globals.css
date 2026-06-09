@@ -789,8 +789,16 @@ article.post p:not(header *) {
   }
 }
 
-article.post ul:not(header *),
+/* Restore list markers removed by Tailwind's preflight reset. */
+article.post ul:not(header *) {
+  list-style: disc outside;
+  margin-top: 1rem;
+  margin-bottom: 1.25rem;
+  padding-left: 1.5rem;
+}
+
 article.post ol:not(header *) {
+  list-style: decimal outside;
   margin-top: 1rem;
   margin-bottom: 1.25rem;
   padding-left: 1.5rem;
@@ -800,6 +808,10 @@ article.post li:not(header *) {
   margin-top: 0.35rem;
   margin-bottom: 0.35rem;
   padding-left: 0.25rem;
+}
+
+article.post li:not(header *)::marker {
+  color: var(--site-primary);
 }
 
 article img {
