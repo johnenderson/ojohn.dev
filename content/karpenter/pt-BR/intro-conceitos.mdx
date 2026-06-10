@@ -1,0 +1,145 @@
+---
+title: "Karpenter: NodeClass, NodePool e NodeClaim sem sopa de letrinhas"
+description: "Uma introdução aos principais recursos do Karpenter e como eles se conectam para provisionar nós no Kubernetes."
+date: "2026-06-09"
+icon: "/karpenter/icon.webp"
+tags: ["karpenter", "kubernetes", "eks", "aws", "autoscaling"]
+coverImage:
+  src: "/karpenter/cover.webp"
+  width: 1200
+  height: 630
+  alt: "Pods pendentes provisionados pelo Karpenter em novos nós, com os recursos NodeClass, NodePool e NodeClaim"
+---
+
+A ideia deste artigo não é cobrir todas as formas de usar o Karpenter em produção.
+
+Não vou entrar, por enquanto, em como provisionar um cluster EKS sem Managed Node Groups, nem em estratégias avançadas de uso de instâncias Spot com resiliência — já há artigos demais sobre esses temas. O objetivo aqui é mais modesto: organizar os conceitos principais para entender as conversas sobre Karpenter sem se perder na sopa de letrinhas.
+
+Escrever esses conceitos me ajuda a estudar e consolidar o que cada recurso faz. Se você também está começando a olhar para Karpenter ou caiu de paraquedas em um equipe que trabalha com sistemas distribuídos, este artigo pode servir como um mapa inicial.
+
+Os conceitos principais são:
+
+- [NodeClass](https://karpenter.sh/docs/concepts/nodeclasses/)
+- [NodePool](https://karpenter.sh/docs/concepts/nodepools/)
+- [NodeClaim](https://karpenter.sh/docs/concepts/nodeclaims/)
+- [Scheduling](https://karpenter.sh/docs/concepts/scheduling/)
+- [Disruption](https://karpenter.sh/docs/concepts/disruption/)
+
+Eles aparecem bastante quando times de plataforma, infraestrutura ou SRE falam sobre provisionamento de nós em Kubernetes.
+
+## O papel do Karpenter
+
+O Karpenter é um provisionador de nós para Kubernetes.
+
+Na prática, ele observa pods que não conseguiram ser agendados por falta de capacidade no cluster e tenta criar nós adequados para rodar esses pods. Em vez de trabalhar apenas com grupos fixos de nós, ele toma decisões mais diretas com base na necessidade real dos workloads.
+
+Isso muda um pouco o modelo mental.
+
+Com Node Groups tradicionais, geralmente pensamos primeiro nos **grupos de máquinas disponíveis** e depois tentamos encaixar os pods neles. Com Karpenter, o caminho fica mais próximo de: "quais pods precisam rodar agora e que tipo de nó atende melhor essa demanda?"
+
+Para isso funcionar, o Karpenter precisa de algumas definições. É aí que entram [**NodeClass**](https://karpenter.sh/docs/concepts/nodeclasses/), [**NodePool**](https://karpenter.sh/docs/concepts/nodepools/) e [**NodeClaim**](https://karpenter.sh/docs/concepts/nodeclaims/), que são CRDs do Karpenter.
+
+## NodeClass
+
+NodeClass é um CRD que descreve detalhes da infraestrutura que será usada para criar os nós.
+
+No caso da AWS, o recurso costuma ser uma `EC2NodeClass`. Ela concentra configurações específicas da AWS, como **subnets**, **security groups**, **AMIs**, **instance profile**, configurações de kubelet e outras opções ligadas ao ambiente onde a instância EC2 será criada.
+
+Uma forma simples de pensar é:
+
+> NodeClass responde: "com qual infraestrutura esse nó pode ser criado?"
+
+Ela não é, sozinha, a regra completa de quando criar nós ou quais pods devem rodar neles. Ela funciona mais como uma base de infraestrutura que será referenciada por um **NodePool**.
+
+Por exemplo, você pode ter uma `EC2NodeClass` apontando para subnets privadas, security groups específicos e uma AMI aprovada pelo time de plataforma, por exemplo, [Bottlerocket](https://github.com/bottlerocket-os/bottlerocket). Depois, diferentes NodePools podem reutilizar essa mesma NodeClass com regras diferentes de provisionamento.
+
+## NodePool
+
+NodePool define as regras de provisionamento dos nós.
+
+É nele que configuramos restrições e preferências como tipos de instância permitidos, arquitetura, zonas, capacidade On-Demand ou Spot, limites de recursos, peso entre pools e políticas de disruption.
+
+Uma forma simples de pensar é:
+
+> NodePool responde: "quais tipos de nós o Karpenter pode criar para atender determinados pods?"
+
+O NodePool também referencia uma NodeClass. Ou seja, ele combina regras de agendamento e provisionamento com uma definição de infraestrutura.
+
+Um cluster pode ter vários NodePools. Por exemplo:
+
+- um NodePool para workloads críticos usando instâncias On-Demand;
+- um NodePool para jobs tolerantes a interrupção usando Spot;
+- um NodePool para workloads que precisam de GPU;
+- um NodePool com máquinas maiores para processamento mais pesado.
+
+Essa separação ajuda a controlar custo, disponibilidade e isolamento entre workloads. Na prática, também reduz o risco do clássico "vizinho barulhento": um workload consumindo recursos demais e afetando aplicações mais sensíveis.
+
+## NodeClaim
+
+NodeClaim representa uma solicitação concreta de capacidade.
+
+Quando o Karpenter encontra pods pendentes e decide que precisa criar um novo nó, ele cria um NodeClaim. Esse recurso descreve a capacidade que será provisionada e acompanha o ciclo de vida do nó junto ao provedor de cloud.
+
+Uma forma simples de pensar é:
+
+> NodeClaim responde: "qual nó o Karpenter está criando ou gerenciando agora?"
+
+Diferente de NodeClass e NodePool, que são recursos que normalmente definimos como configuração, o NodeClaim é criado e gerenciado pelo próprio Karpenter.
+
+Ele é útil para entender o que aconteceu durante o provisionamento. Ao investigar problemas, olhar os NodeClaims pode mostrar se o Karpenter tentou criar capacidade, qual NodePool foi usado, quais requisitos foram considerados e em que estado está o nó associado.
+
+## Scheduling
+
+Scheduling é a parte em que o Karpenter conecta a demanda dos pods com a capacidade que pode ser criada.
+
+O Kubernetes Scheduler tenta agendar os pods nos nós existentes. Quando não consegue, os pods ficam pendentes. O Karpenter observa essa situação, avalia os requisitos desses pods e procura um NodePool compatível.
+
+Nessa decisão entram fatores como:
+
+- `nodeSelector`;
+- `nodeAffinity`;
+- `taints` e `tolerations`;
+- requests de CPU e memória;
+- arquitetura;
+- zona;
+- tipo de capacidade;
+- restrições definidas no NodePool.
+
+Se houver uma combinação válida, o Karpenter cria um NodeClaim para provisionar um nó que consiga receber aqueles pods.
+
+Esse ponto é importante: o Karpenter não cria qualquer nó aleatório. Ele tenta criar capacidade compatível com o que os pods pediram e com o que os NodePools permitem.
+
+## Disruption
+
+Disruption é o conjunto de mecanismos que permite ao Karpenter **remover** ou **substituir nós**. É aqui que muita gente se perde, ou tem problemas.
+
+Isso pode acontecer por diferentes motivos. Um nó pode estar vazio, subutilizado, vencido por tempo de vida configurado ou diferente da configuração esperada depois de alguma mudança. O Karpenter pode então decidir consolidar capacidade, substituir nós ou encerrar nós que não são mais necessários.
+
+Uma forma simples de pensar é:
+
+> Disruption responde: "quando e como o Karpenter pode mexer em nós que já existem?"
+
+Esse comportamento precisa ser tratado com cuidado, porque remover um nó significa mover ou encerrar pods. Por isso entram conceitos como PodDisruptionBudget, budgets de disruption no NodePool e políticas de consolidação.
+
+A nivel de pod (aplicacao em si), é importante garantir que exista GracefulShutdown configurado, para que o Karpenter possa remover um nó sem causar impacto perceptível. A nivel de infraestrutura, é importante configurar budgets de disruption e políticas de consolidação que evitem que o Karpenter tome decisões agressivas demais.
+
+Em produção, essa é uma das partes que mais merece atenção. Um Karpenter agressivo demais pode economizar custo, mas também pode causar instabilidade se os workloads não estiverem preparados para interrupções.
+
+## Resumo mental
+
+O jeito mais simples que encontrei para memorizar é:
+
+- **NodeClass** define a infraestrutura.
+- **NodePool** define as regras para criar nós.
+- **NodeClaim** representa o nó que o Karpenter decidiu criar ou gerenciar.
+- **Scheduling** conecta pods pendentes com capacidade possível.
+- **Disruption** controla como nós existentes podem ser substituídos ou removidos.
+
+Com esse mapa, fica mais fácil acompanhar discussões sobre Karpenter. Quando alguém fala em ajustar um NodePool, provavelmente está falando de regras de provisionamento. Quando fala em NodeClass, está olhando para detalhes da AWS. Quando fala em NodeClaim, está olhando para uma decisão concreta que o Karpenter tomou.
+
+Essa separação deixa o Karpenter menos misterioso: ele observa demanda, escolhe uma regra, usa uma infraestrutura permitida e cria capacidade para o cluster.
+
+## Referências
+
+- [Documentacao oficial do Karpenter](https://karpenter.sh/)
+- [FAQ do Karpenter](https://karpenter.sh/docs/faq/)
