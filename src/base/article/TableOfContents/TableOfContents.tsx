@@ -70,7 +70,7 @@ export const TableOfContents = ({
       | HTMLElement
       | undefined;
     if (linkEl)
-      setIndicatorTop(linkEl.offsetTop + linkEl.offsetHeight / 2 - 14);
+      setIndicatorTop(linkEl.offsetTop + linkEl.offsetHeight / 2 - 10);
   }, [activeId, headings]);
 
   if (headings.length < 2) return null;
@@ -123,21 +123,18 @@ export const TableOfContents = ({
 
   return (
     <aside
-      className="sticky hidden h-fit w-full max-w-[13rem] xl:max-w-[16rem] shrink-0 flex-col gap-3 rounded-md border border-site-border-subtle bg-site-background/35 p-4 lg:flex"
+      className="sticky hidden h-fit w-full max-w-[13rem] xl:max-w-[16rem] shrink-0 flex-col gap-3 p-4 lg:flex"
       style={{ top: '7rem' }}
     >
       <p className="m-0 text-sm font-semibold text-site-foreground">
         Nesse artigo
       </p>
-      <div
-        ref={listRef}
-        className="relative flex flex-col gap-0.5 border-l border-site-border-subtle"
-      >
+      <div ref={listRef} className="relative flex flex-col gap-0.5">
         {links}
 
         {/* Moving active indicator bar */}
         <span
-          className="absolute left-0 h-4 w-px bg-site-primary transition-[top] duration-300 ease-elastic"
+          className="absolute left-0 h-5 w-0.5 rounded-full bg-site-primary transition-[top] duration-300 ease-elastic"
           style={{ top: `${indicatorTop}px` }}
         />
       </div>
