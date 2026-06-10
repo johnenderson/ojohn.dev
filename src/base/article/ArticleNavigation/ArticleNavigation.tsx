@@ -1,7 +1,6 @@
 import Link from 'next/link';
 import { FC } from 'react';
 
-import { Card } from '@/base/components/Card';
 import { ArticleNavigation as ArticleNavigationType } from '@/features/articles/lib/articles';
 
 type ArticleNavigationProps = {
@@ -12,8 +11,8 @@ type Direction = 'newer' | 'older';
 
 const Chevron = ({ direction }: { direction: Direction }) => (
   <svg
-    width="16"
-    height="16"
+    width="15"
+    height="15"
     viewBox="0 0 24 24"
     fill="none"
     stroke="currentColor"
@@ -30,7 +29,7 @@ const Chevron = ({ direction }: { direction: Direction }) => (
   </svg>
 );
 
-const NavigationCard = ({
+const NavigationLink = ({
   article,
   direction,
 }: {
@@ -40,43 +39,31 @@ const NavigationCard = ({
   const eyebrow = direction === 'newer' ? 'Mais recente' : 'Anterior';
 
   return (
-    <Card
+    <Link
       href={`/blog/${article.slug}`}
-      interactive
-      className="article-card-glass group flex h-full flex-col p-5 focus-visible:outline-none"
+      className="group -mx-3 flex items-center gap-3 rounded-lg px-3 py-2.5 no-underline transition-colors hover:bg-site-card focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-site-primary"
     >
-      <div className="article-card-content flex h-full flex-col">
-        <p className="m-0 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-[0.12em] text-site-body-muted">
-          {direction === 'older' ? (
-            <span className="transition-transform duration-200 group-hover:-translate-x-0.5">
-              <Chevron direction="older" />
-            </span>
-          ) : null}
-          {eyebrow}
-          {direction === 'newer' ? (
-            <span className="transition-transform duration-200 group-hover:translate-x-0.5">
-              <Chevron direction="newer" />
-            </span>
-          ) : null}
-        </p>
+      {direction === 'older' ? (
+        <span className="shrink-0 text-site-body-muted transition-transform duration-200 group-hover:-translate-x-0.5 group-hover:text-site-primary">
+          <Chevron direction="older" />
+        </span>
+      ) : null}
 
-        <div className="mt-3 flex items-start gap-3">
-          {article.icon ? (
-            <span className="mt-0.5 shrink-0 text-base leading-none text-site-primary">
-              {article.icon}
-            </span>
-          ) : null}
-          <div className="min-w-0">
-            <p className="m-0 text-base font-bold leading-snug text-site-foreground transition-colors group-hover:text-site-primary-hover group-focus-visible:text-site-primary-hover">
-              {article.title}
-            </p>
-            <p className="mb-0 mt-2 line-clamp-2 text-sm leading-6 text-site-body-muted">
-              {article.description}
-            </p>
-          </div>
-        </div>
-      </div>
-    </Card>
+      <span className="min-w-0 flex-1">
+        <span className="block text-[11px] font-semibold uppercase tracking-[0.12em] text-site-body-muted">
+          {eyebrow}
+        </span>
+        <span className="block truncate text-[15px] font-semibold leading-snug text-site-foreground transition-colors group-hover:text-site-primary-hover">
+          {article.title}
+        </span>
+      </span>
+
+      {direction === 'newer' ? (
+        <span className="shrink-0 text-site-body-muted transition-transform duration-200 group-hover:translate-x-0.5 group-hover:text-site-primary">
+          <Chevron direction="newer" />
+        </span>
+      ) : null}
+    </Link>
   );
 };
 
@@ -111,10 +98,10 @@ export const ArticleNavigation: FC<ArticleNavigationProps> = ({
   return (
     <nav
       aria-label="Navegação entre artigos"
-      className="mt-14 border-t border-site-border-muted pt-8"
+      className="mt-12 border-t border-site-border-subtle pt-6"
     >
-      <div className="mb-4 flex items-center justify-between gap-4">
-        <p className="m-0 text-xl font-bold text-site-foreground">
+      <div className="mb-2 flex items-center justify-between gap-4">
+        <p className="m-0 text-sm font-semibold text-site-body-muted">
           Continue lendo
         </p>
         <Link
@@ -124,11 +111,9 @@ export const ArticleNavigation: FC<ArticleNavigationProps> = ({
           Voltar para o Blog
         </Link>
       </div>
-      <div
-        className={`grid gap-3 ${related.length === 2 ? 'sm:grid-cols-2' : ''}`}
-      >
+      <div className="flex flex-col">
         {related.map(({ article, direction }) => (
-          <NavigationCard
+          <NavigationLink
             key={article.slug}
             article={article}
             direction={direction}
