@@ -48,21 +48,19 @@ export const ArticleIcon: FC<ArticleIconProps> = ({ icon, size = 'lg' }) => {
     );
   }
 
-  // Article header (lg)
+  // Article header (lg): standalone icon, no badge — same spirit as doce.sh
   return isImage ? (
-    <span className="mt-1 flex size-9 shrink-0 items-center justify-center rounded-full border border-site-border bg-site-card sm:size-10">
+    <span className="mt-0.5 shrink-0">
       <Image
         src={icon}
         alt=""
         aria-hidden="true"
-        width={24}
-        height={24}
-        className="size-6 object-contain"
+        width={44}
+        height={44}
+        className="size-10 object-contain sm:size-11"
       />
     </span>
   ) : (
-    <span className="mt-1 flex size-9 shrink-0 items-center justify-center rounded-full border border-site-border bg-site-primary-soft text-xl leading-none text-site-primary sm:size-10 sm:text-2xl">
-      {icon}
-    </span>
+    <span className="mt-0.5 shrink-0 text-4xl leading-none">{icon}</span>
   );
 };
