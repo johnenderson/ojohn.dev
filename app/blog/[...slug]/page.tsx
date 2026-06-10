@@ -116,6 +116,7 @@ export default async function Page({ params }: Readonly<Props>) {
   return (
     <Layout
       title={articleMetadata.title}
+      url={articleUrl}
       date={articleMetadata.date}
       icon={articleMetadata.icon}
       tags={articleMetadata.tags ?? []}

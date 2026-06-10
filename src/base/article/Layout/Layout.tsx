@@ -8,6 +8,7 @@ import { HeadingAnchors } from '@/base/article/HeadingAnchors';
 import { Footer } from '@/base/article/Layout/Footer';
 import { Meta } from '@/base/article/Meta';
 import { ReadingProgress } from '@/base/article/ReadingProgress';
+import { ShareMenu } from '@/base/article/ShareMenu';
 import { TableOfContents } from '@/base/article/TableOfContents/TableOfContents';
 import { Title } from '@/base/article/Title';
 import { AnimationLayout } from '@/base/components/Layout/AnimationLayout';
@@ -20,6 +21,7 @@ import {
 
 type LayoutPropTypes = {
   title: string;
+  url: string;
   date: string;
   icon?: string;
   alternativeArticle?: ArticleAlternative;
@@ -32,6 +34,7 @@ type LayoutPropTypes = {
 export const Layout: FC<PropsWithChildren<LayoutPropTypes>> = ({
   children,
   title,
+  url,
   date,
   icon,
   coverImage,
@@ -57,17 +60,20 @@ export const Layout: FC<PropsWithChildren<LayoutPropTypes>> = ({
                 itemType="https://schema.org/BlogPosting"
               >
                 <header className="mb-12 border-b border-site-border-subtle pb-8">
-                  <div className="flex items-start gap-3 sm:gap-4">
-                    {icon ? <ArticleIcon icon={icon} size="lg" /> : null}
-                    <div className="flex min-w-0 flex-col gap-3">
-                      <Title text={title} />
-                      <Meta
-                        date={date}
-                        alternativeArticle={alternativeArticle}
-                        minutes={minutes}
-                        tags={tags}
-                      />
+                  <div className="flex items-start justify-between gap-3 sm:gap-4">
+                    <div className="flex min-w-0 items-start gap-3 sm:gap-4">
+                      {icon ? <ArticleIcon icon={icon} size="lg" /> : null}
+                      <div className="flex min-w-0 flex-col gap-3">
+                        <Title text={title} />
+                        <Meta
+                          date={date}
+                          alternativeArticle={alternativeArticle}
+                          minutes={minutes}
+                          tags={tags}
+                        />
+                      </div>
                     </div>
+                    <ShareMenu url={url} title={title} />
                   </div>
                 </header>
                 <TableOfContents variant="mobile" />
@@ -87,6 +93,12 @@ export const Layout: FC<PropsWithChildren<LayoutPropTypes>> = ({
                 {children}
                 <CodeCopyButtons />
                 <HeadingAnchors />
+                <div className="mt-12 flex items-center gap-3 border-t border-site-border-subtle pt-8">
+                  <span className="text-sm font-medium text-site-body-muted">
+                    Compartilhe este artigo
+                  </span>
+                  <ShareMenu url={url} title={title} align="start" />
+                </div>
                 <ArticleNavigation navigation={navigation} />
               </article>
 
