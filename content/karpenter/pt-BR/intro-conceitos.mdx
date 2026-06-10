@@ -13,17 +13,17 @@ coverImage:
 
 A ideia deste artigo não é cobrir todas as formas de usar o Karpenter em produção.
 
-Não vou entrar, por enquanto, em como provisionar um cluster EKS sem Managed Node Groups, nem em estratégias avançadas para usar instâncias Spot com resiliência, já existem artigos demais na Web. O objetivo aqui é mais simples: organizar os conceitos principais para entender as conversas sobre Karpenter sem se perder na sopa de letrinhas.
+Não vou entrar, por enquanto, em como provisionar um cluster EKS sem Managed Node Groups, nem em estratégias avançadas de uso de instâncias Spot com resiliência — já há artigos demais sobre esses temas. O objetivo aqui é mais modesto: organizar os conceitos principais para entender as conversas sobre Karpenter sem se perder na sopa de letrinhas.
 
 Escrever esses conceitos me ajuda a estudar e consolidar o que cada recurso faz. Se você também está começando a olhar para Karpenter ou caiu de paraquedas em um equipe que trabalha com sistemas distribuídos, este artigo pode servir como um mapa inicial.
 
 Os conceitos principais são:
 
-- NodeClass
-- NodePool
-- NodeClaim
-- Scheduling
-- Disruption
+- [NodeClass](https://karpenter.sh/docs/concepts/nodeclasses/)
+- [NodePool](https://karpenter.sh/docs/concepts/nodepools/)
+- [NodeClaim](https://karpenter.sh/docs/concepts/nodeclaims/)
+- [Scheduling](https://karpenter.sh/docs/concepts/scheduling/)
+- [Disruption](https://karpenter.sh/docs/concepts/disruption/)
 
 Eles aparecem bastante quando times de plataforma, infraestrutura ou SRE falam sobre provisionamento de nós em Kubernetes.
 
