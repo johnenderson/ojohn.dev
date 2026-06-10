@@ -35,3 +35,22 @@ export const ClockIcon = () => (
     <polyline points="12 6 12 12 16 14" />
   </svg>
 );
+
+export const ShareIcon = ({ size = 18 }: { size?: number }) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="1.5"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    aria-hidden="true"
+  >
+    <path d="M5 11v8a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-8" />
+    <polyline points="8 7 12 3 16 7" />
+    <line x1="12" y1="3" x2="12" y2="15" />
+  </svg>
+);
