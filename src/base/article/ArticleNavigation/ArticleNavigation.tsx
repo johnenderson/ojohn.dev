@@ -8,45 +8,91 @@ type ArticleNavigationProps = {
   navigation: ArticleNavigationType;
 };
 
+type Direction = 'newer' | 'older';
+
+const Chevron = ({ direction }: { direction: Direction }) => (
+  <svg
+    width="16"
+    height="16"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    aria-hidden="true"
+  >
+    {direction === 'older' ? (
+      <polyline points="15 18 9 12 15 6" />
+    ) : (
+      <polyline points="9 18 15 12 9 6" />
+    )}
+  </svg>
+);
+
 const NavigationCard = ({
   article,
-  eyebrow,
+  direction,
 }: {
   article: NonNullable<ArticleNavigationType['older']>;
-  eyebrow: string;
-}) => (
-  <Card
-    href={`/blog/${article.slug}`}
-    interactive
-    className="article-card-glass group p-4 focus-visible:outline-none"
-  >
-    <div className="article-card-content flex items-start gap-3">
-      {article.icon ? (
-        <span className="mt-1 shrink-0 text-base leading-none text-site-primary">
-          {article.icon}
-        </span>
-      ) : null}
-      <div className="min-w-0">
-        <p className="m-0 text-xs font-semibold uppercase tracking-[0.12em] text-site-body-muted">
+  direction: Direction;
+}) => {
+  const eyebrow = direction === 'newer' ? 'Mais recente' : 'Anterior';
+
+  return (
+    <Card
+      href={`/blog/${article.slug}`}
+      interactive
+      className="article-card-glass group flex h-full flex-col p-5 focus-visible:outline-none"
+    >
+      <div className="article-card-content flex h-full flex-col">
+        <p className="m-0 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-[0.12em] text-site-body-muted">
+          {direction === 'older' ? (
+            <span className="transition-transform duration-200 group-hover:-translate-x-0.5">
+              <Chevron direction="older" />
+            </span>
+          ) : null}
           {eyebrow}
+          {direction === 'newer' ? (
+            <span className="transition-transform duration-200 group-hover:translate-x-0.5">
+              <Chevron direction="newer" />
+            </span>
+          ) : null}
         </p>
-        <p className="mb-0 mt-2 text-base font-bold leading-snug text-site-foreground transition-colors group-hover:text-site-primary-hover group-focus-visible:text-site-primary-hover">
-          {article.title}
-        </p>
-        <p className="mb-0 mt-2 line-clamp-2 text-sm leading-6 text-site-body">
-          {article.description}
-        </p>
+
+        <div className="mt-3 flex items-start gap-3">
+          {article.icon ? (
+            <span className="mt-0.5 shrink-0 text-base leading-none text-site-primary">
+              {article.icon}
+            </span>
+          ) : null}
+          <div className="min-w-0">
+            <p className="m-0 text-base font-bold leading-snug text-site-foreground transition-colors group-hover:text-site-primary-hover group-focus-visible:text-site-primary-hover">
+              {article.title}
+            </p>
+            <p className="mb-0 mt-2 line-clamp-2 text-sm leading-6 text-site-body-muted">
+              {article.description}
+            </p>
+          </div>
+        </div>
       </div>
-    </div>
-  </Card>
-);
+    </Card>
+  );
+};
 
 export const ArticleNavigation: FC<ArticleNavigationProps> = ({
   navigation,
 }) => {
-  const hasRelatedArticles = Boolean(navigation.newer || navigation.older);
+  const related = [
+    navigation.newer
+      ? { article: navigation.newer, direction: 'newer' as const }
+      : null,
+    navigation.older
+      ? { article: navigation.older, direction: 'older' as const }
+      : null,
+  ].filter((entry) => entry !== null);
 
-  if (!hasRelatedArticles) {
+  if (related.length === 0) {
     return (
       <nav
         aria-label="Navegação entre artigos"
@@ -78,13 +124,16 @@ export const ArticleNavigation: FC<ArticleNavigationProps> = ({
           Voltar para o Blog
         </Link>
       </div>
-      <div className="grid gap-3 sm:grid-cols-2">
-        {navigation.newer ? (
-          <NavigationCard article={navigation.newer} eyebrow="Mais recente" />
-        ) : null}
-        {navigation.older ? (
-          <NavigationCard article={navigation.older} eyebrow="Anterior" />
-        ) : null}
+      <div
+        className={`grid gap-3 ${related.length === 2 ? 'sm:grid-cols-2' : ''}`}
+      >
+        {related.map(({ article, direction }) => (
+          <NavigationCard
+            key={article.slug}
+            article={article}
+            direction={direction}
+          />
+        ))}
       </div>
     </nav>
   );
