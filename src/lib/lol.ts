@@ -7,10 +7,19 @@ const DDRAGON_BASE = 'https://ddragon.leagueoflegends.com';
 
 const CACHE_TTL_RANKED = 60 * 60 * 6; // 6h — elo muda com frequência
 const CACHE_TTL_CHAMPIONS = 60 * 60 * 24; // 24h — maestria muda menos
+// Resultado incompleto (ex.: campeão fora da versão do DDragon em cache) só vive
+// 30min, para não "grudar" 24h e se auto-corrigir no próximo carregamento.
+const CACHE_TTL_CHAMPIONS_PARTIAL = 60 * 30;
 const CACHE_TTL_VERSION = 60 * 60 * 24 * 7; // 7d — versão do patch
 
+/** Quantos campeões a grade exibe. */
+const TOP_CHAMPION_COUNT = 5;
+/** Maestrias buscadas — folga para sobrar TOP_CHAMPION_COUNT mesmo se algum
+ * championId não mapear na versão do Data Dragon em cache. */
+const MASTERY_COUNT = 12;
+
 const CACHE_KEY_RANKED = 'lol:ranked:v3';
-const CACHE_KEY_CHAMPIONS = 'lol:champions:v2';
+const CACHE_KEY_CHAMPIONS = 'lol:champions:v3'; // v3: descarta cache curto (4) gravado antes do backfill/TTL
 const CACHE_KEY_VERSION = 'lol:ddragon-version:v2';
 const CACHE_KEY_IDENTITY = 'lol:identity:v3'; // puuid + iconId — v3: invalidate after API key rotation
 const CACHE_KEY_MATCHES = 'lol:matches:v1';
@@ -258,7 +267,7 @@ const fetchTopChampionsData = async (
   debugLog('buscando maestrias e champion list');
   const [masteries, championListData] = await Promise.all([
     riotFetch<MasteryDto[]>(
-      `${RIOT_PLATFORM}/lol/champion-mastery/v4/champion-masteries/by-puuid/${puuid}/top?count=10`,
+      `${RIOT_PLATFORM}/lol/champion-mastery/v4/champion-masteries/by-puuid/${puuid}/top?count=${MASTERY_COUNT}`,
       apiKey,
     ).catch((e) => {
       debugLog('masteries error:', e);
@@ -290,10 +299,15 @@ const fetchTopChampionsData = async (
       };
     })
     .filter((c): c is LolChampion => c !== null)
-    .slice(0, 5);
+    .slice(0, TOP_CHAMPION_COUNT);
 
   if (topChampions.length > 0) {
-    await cacheSet(CACHE_KEY_CHAMPIONS, topChampions, CACHE_TTL_CHAMPIONS);
+    // Conjunto completo vive 24h; incompleto vive pouco e tenta de novo logo.
+    const ttl =
+      topChampions.length >= TOP_CHAMPION_COUNT
+        ? CACHE_TTL_CHAMPIONS
+        : CACHE_TTL_CHAMPIONS_PARTIAL;
+    await cacheSet(CACHE_KEY_CHAMPIONS, topChampions, ttl);
   }
 
   return topChampions;
