@@ -32,11 +32,9 @@ function ProjectCard({ project }: Readonly<{ project: GithubProject }>) {
         />
       </div>
 
-      {project.description && (
-        <p className="m-0 line-clamp-2 flex-1 text-xs leading-relaxed text-site-body-muted">
-          {project.description}
-        </p>
-      )}
+      <p className="m-0 line-clamp-2 flex-1 text-xs leading-relaxed text-site-body-muted">
+        {project.description ?? ''}
+      </p>
 
       {project.topics.length > 0 && (
         <div className="flex flex-wrap gap-1.5">

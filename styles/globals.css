@@ -781,14 +781,6 @@ article.post p:not(header *) {
   text-wrap: pretty;
 }
 
-/* Justify only on wider columns — on narrow mobile it creates whitespace rivers */
-@media (min-width: 640px) {
-  article.post p:not(header *) {
-    text-align: justify;
-    hyphens: auto;
-  }
-}
-
 /* Restore list markers removed by Tailwind's preflight reset. */
 article.post ul:not(header *) {
   list-style: disc outside;

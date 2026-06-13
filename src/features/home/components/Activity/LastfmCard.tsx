@@ -186,7 +186,7 @@ export const LastfmCard = () => {
 
             {!loading && featuredTrack && (
               <>
-                <div className="flex min-w-0 items-center gap-3 sm:gap-4">
+                <div className="flex min-w-0 flex-1 items-center gap-3 sm:gap-4">
                   <TrackArtwork eager track={featuredTrack} size={96} />
                   <div className="flex min-w-0 flex-col gap-0.5">
                     <Link

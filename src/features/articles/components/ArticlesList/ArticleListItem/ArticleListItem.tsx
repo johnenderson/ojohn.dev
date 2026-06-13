@@ -85,7 +85,7 @@ export const ArticleListItem: FC<PostPropType> = ({
             {icon ? <ArticleIcon icon={icon} size="card" /> : null}
 
             <div className="min-w-0 flex-1">
-              <h3 className="m-0 text-lg font-bold leading-snug text-site-foreground transition-colors group-hover:text-site-primary-hover group-focus-visible:text-site-primary-hover">
+              <h3 className="m-0 text-lg font-bold leading-snug text-site-foreground transition-colors group-hover:text-site-primary group-focus-visible:text-site-primary">
                 {title}
               </h3>
 
@@ -117,7 +117,7 @@ export const ArticleListItem: FC<PostPropType> = ({
         <div className="article-card-content">
           <div className="flex items-start gap-2">
             {icon ? <ArticleIcon icon={icon} size="sm" /> : null}
-            <h3 className="m-0 text-lg font-bold leading-snug text-site-foreground transition-colors group-hover:text-site-primary-hover group-focus-visible:text-site-primary-hover">
+            <h3 className="m-0 text-lg font-bold leading-snug text-site-foreground transition-colors group-hover:text-site-primary group-focus-visible:text-site-primary">
               {title}
             </h3>
           </div>

@@ -26,6 +26,20 @@ export const About: FC = () => (
         ✌️.
       </p>
     </div>
+    <div className="flex flex-wrap items-center gap-3">
+      <Link
+        href="/blog"
+        className="rounded-md bg-site-primary px-4 py-2 text-sm font-semibold text-site-primary-foreground no-underline transition-opacity hover:opacity-85"
+      >
+        Ler o blog
+      </Link>
+      <Link
+        href="/me"
+        className="rounded-md border border-site-border px-4 py-2 text-sm font-semibold text-site-foreground no-underline transition-colors hover:border-site-primary hover:text-site-primary"
+      >
+        Sobre mim
+      </Link>
+    </div>
     <SocialIcons />
     <Divider />
   </section>
