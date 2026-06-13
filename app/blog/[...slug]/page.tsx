@@ -37,7 +37,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const publishedTime = parseArticleDate(articleMetadata.date).toISOString();
 
   return {
-    title: articleMetadata.title,
+    title: { absolute: articleMetadata.title },
     description: articleMetadata.description,
     alternates: {
       canonical: articleUrl,
