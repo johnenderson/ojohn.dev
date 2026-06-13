@@ -78,6 +78,29 @@ export function parseArticleDate(raw: string): Date {
   return new Date(raw);
 }
 
+const ARTICLE_DATE_MONTHS = [
+  'jan',
+  'fev',
+  'mar',
+  'abr',
+  'mai',
+  'jun',
+  'jul',
+  'ago',
+  'set',
+  'out',
+  'nov',
+  'dez',
+];
+
+export function formatArticleDate(raw: string): string {
+  const date = parseArticleDate(raw);
+  if (Number.isNaN(date.getTime())) return raw;
+  return `${date.getUTCDate()} ${
+    ARTICLE_DATE_MONTHS[date.getUTCMonth()]
+  } ${date.getUTCFullYear()}`;
+}
+
 function isValidDate(date: Date) {
   return !Number.isNaN(date.getTime());
 }

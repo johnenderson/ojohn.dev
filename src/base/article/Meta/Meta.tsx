@@ -4,6 +4,7 @@ import { AlternativeArticle } from '@/base/article/AlternativeArticle';
 import { CalendarIcon, ClockIcon } from '@/base/article/icons';
 import {
   ArticleAlternative,
+  formatArticleDate,
   parseArticleDate,
 } from '@/features/articles/lib/articles';
 
@@ -13,17 +14,6 @@ type MetaPropTypes = {
   minutes: number;
   tags: string[];
 };
-
-function formatDate(raw: string): string {
-  // If already DD/MM/YYYY, return as-is
-  if (/^\d{2}\/\d{2}\/\d{4}$/.test(raw)) return raw;
-  // If already DD-MM-YYYY, convert to DD/MM/YYYY
-  if (/^\d{2}-\d{2}-\d{4}$/.test(raw)) return raw.replaceAll('-', '/');
-  // If YYYY-MM-DD, convert to DD/MM/YYYY
-  const match = /^(\d{4})-(\d{2})-(\d{2})/.exec(raw);
-  if (match) return `${match[3]}/${match[2]}/${match[1]}`;
-  return raw;
-}
 
 function formatDateTime(raw: string): string {
   const date = parseArticleDate(raw);
@@ -46,7 +36,7 @@ export const Meta: FC<MetaPropTypes> = ({
           <CalendarIcon />
           <span>
             <time dateTime={formatDateTime(date)} itemProp="datePublished">
-              {formatDate(date)}
+              {formatArticleDate(date)}
             </time>
           </span>
         </span>

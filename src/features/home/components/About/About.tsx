@@ -1,6 +1,9 @@
 import Link from 'next/link';
 import { FC } from 'react';
 
+import { faNewspaper, faUser } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+
 import { Divider } from '@/base/components/Divider';
 import { SocialIcons } from '@/base/components/SocialIcons';
 
@@ -29,14 +32,20 @@ export const About: FC = () => (
     <div className="flex flex-wrap items-center gap-3">
       <Link
         href="/blog"
-        className="rounded-md bg-site-primary px-4 py-2 text-sm font-semibold text-site-primary-foreground no-underline transition-opacity hover:opacity-85"
+        className="cta-solid inline-flex items-center gap-2 rounded-md bg-site-primary px-4 py-2 text-sm font-semibold transition-opacity hover:opacity-85"
       >
+        <FontAwesomeIcon
+          icon={faNewspaper}
+          aria-hidden="true"
+          className="text-xs"
+        />
         Ler o blog
       </Link>
       <Link
         href="/me"
-        className="rounded-md border border-site-border px-4 py-2 text-sm font-semibold text-site-foreground no-underline transition-colors hover:border-site-primary hover:text-site-primary"
+        className="cta-ghost inline-flex items-center gap-2 rounded-md border border-site-border px-4 py-2 text-sm font-semibold no-underline transition-colors hover:border-site-primary"
       >
+        <FontAwesomeIcon icon={faUser} aria-hidden="true" className="text-xs" />
         Sobre mim
       </Link>
     </div>

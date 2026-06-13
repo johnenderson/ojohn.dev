@@ -1010,6 +1010,24 @@ html.light a:hover {
   text-decoration-color: var(--site-primary-hover);
 }
 
+/*
+ * Hero CTAs. Unlayered on purpose: the global `a` rules above are unlayered
+ * and therefore beat Tailwind color utilities, so the exception must live at
+ * the same level.
+ */
+a.cta-solid,
+a.cta-solid:hover,
+html.light a.cta-solid:hover {
+  color: var(--site-primary-foreground);
+  text-decoration: none;
+}
+
+a.cta-ghost:hover,
+html.light a.cta-ghost:hover {
+  color: var(--site-primary);
+  text-decoration: none;
+}
+
 article .series ul,
 article .tags ul {
   list-style-type: none;

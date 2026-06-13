@@ -3,14 +3,7 @@ import { FC } from 'react';
 import { ArticleIcon } from '@/base/article/ArticleIcon/ArticleIcon';
 import { CalendarIcon, ClockIcon } from '@/base/article/icons';
 import { Card } from '@/base/components/Card';
-
-function formatDate(raw: string): string {
-  if (/^\d{2}\/\d{2}\/\d{4}$/.test(raw)) return raw;
-  if (/^\d{2}-\d{2}-\d{4}$/.test(raw)) return raw.replaceAll('-', '/');
-  const match = /^(\d{4})-(\d{2})-(\d{2})/.exec(raw);
-  if (match) return `${match[3]}/${match[2]}/${match[1]}`;
-  return raw;
-}
+import { formatArticleDate } from '@/features/articles/lib/articles';
 
 type PostPropType = {
   datetime: string;
@@ -71,7 +64,7 @@ export const ArticleListItem: FC<PostPropType> = ({
   variant = 'default',
 }) => {
   const isCompact = variant === 'compact';
-  const formattedDate = formatDate(datetime);
+  const formattedDate = formatArticleDate(datetime);
 
   if (isCompact) {
     return (
@@ -115,24 +108,26 @@ export const ArticleListItem: FC<PostPropType> = ({
         className="article-card-glass group p-5 focus-visible:outline-none"
       >
         <div className="article-card-content">
-          <div className="flex items-start gap-2">
+          <div className="flex items-start gap-2.5">
             {icon ? <ArticleIcon icon={icon} size="sm" /> : null}
-            <h3 className="m-0 text-lg font-bold leading-snug text-site-foreground transition-colors group-hover:text-site-primary group-focus-visible:text-site-primary">
-              {title}
-            </h3>
+            <div className="min-w-0 flex-1">
+              <h3 className="m-0 text-lg font-bold leading-snug text-site-foreground transition-colors group-hover:text-site-primary group-focus-visible:text-site-primary">
+                {title}
+              </h3>
+
+              <MetaLine
+                datetime={datetime}
+                formattedDate={formattedDate}
+                minutes={minutes}
+              />
+
+              <p className="mb-0 mt-2 max-w-2xl text-sm leading-6 text-site-body">
+                {description}
+              </p>
+
+              {showTags && tags.length > 0 && <TagList tags={tags} />}
+            </div>
           </div>
-
-          <MetaLine
-            datetime={datetime}
-            formattedDate={formattedDate}
-            minutes={minutes}
-          />
-
-          <p className="mb-0 mt-2 max-w-2xl text-sm leading-6 text-site-body">
-            {description}
-          </p>
-
-          {showTags && tags.length > 0 && <TagList tags={tags} />}
         </div>
       </Card>
     </li>
