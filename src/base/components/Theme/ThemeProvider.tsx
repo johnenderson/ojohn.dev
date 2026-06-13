@@ -39,6 +39,23 @@ const getStoredTheme = (): Theme => {
   }
 };
 
+const THEME_COLORS: Record<'light' | 'dark', string> = {
+  light: '#fffdf9',
+  dark: '#09080d',
+};
+
+// The themeColor metas from app/layout.tsx follow prefers-color-scheme, which
+// is wrong when the user forces the opposite theme — pin them to the resolved
+// theme instead.
+const applyThemeColor = (resolvedTheme: 'light' | 'dark') => {
+  const metas = globalThis.document.querySelectorAll<HTMLMetaElement>(
+    'meta[name="theme-color"]',
+  );
+  for (const meta of metas) {
+    meta.content = THEME_COLORS[resolvedTheme];
+  }
+};
+
 const applyTheme = (theme: Theme) => {
   const resolvedTheme = theme === 'system' ? getSystemTheme() : theme;
   const root = globalThis.document.documentElement;
@@ -46,6 +63,7 @@ const applyTheme = (theme: Theme) => {
   root.classList.remove('light', 'dark');
   root.classList.add(resolvedTheme);
   root.style.colorScheme = resolvedTheme;
+  applyThemeColor(resolvedTheme);
 
   return resolvedTheme;
 };

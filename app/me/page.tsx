@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import Link from 'next/link';
 import type { CSSProperties } from 'react';
 
@@ -14,7 +15,7 @@ import type { Metadata } from 'next';
 import { Card } from '@/base/components/Card';
 import { PageTitle } from '@/base/components/PageTitle';
 import { TagList } from '@/features/about/components';
-import { getGithubLanguages } from '@/lib/github';
+import { getGithubLanguages, getGithubUsername } from '@/lib/github';
 import { getLastfmTopTags } from '@/lib/lastfm';
 import { SITE_NAME, SITE_URL } from '@/lib/site';
 
@@ -86,16 +87,29 @@ export default async function Page() {
     getGithubLanguages().catch(() => []),
     getLastfmTopTags({ period: '12month' }).catch(() => []),
   ]);
+  const username = getGithubUsername();
 
   return (
     <PageWrapper>
       <main id="main">
         <div className="content">
           <div className="flex max-w-5xl flex-col items-start gap-8">
-            <PageTitle
-              title="Sobre mim"
-              subtitle="Um pouco sobre trabalho, vida e o que existe entre uma coisa e outra."
-            />
+            <div className="flex w-full flex-wrap items-center gap-5">
+              <Image
+                src={`https://github.com/${username}.png?size=192`}
+                alt="Foto de John Enderson"
+                width={96}
+                height={96}
+                unoptimized
+                className="size-20 shrink-0 rounded-full border-2 border-site-primary object-cover sm:size-24"
+              />
+              <div className="min-w-0 flex-1">
+                <PageTitle
+                  title="Sobre mim"
+                  subtitle="Um pouco sobre trabalho, vida e o que existe entre uma coisa e outra."
+                />
+              </div>
+            </div>
 
             <div className="h-px w-full bg-site-border-muted" />
 

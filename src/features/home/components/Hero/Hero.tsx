@@ -9,7 +9,12 @@ const SplitName = () => {
   const words = HERO_NAME.split(' ');
 
   if (shouldReduceMotion) {
-    return <>{HERO_NAME}</>;
+    return (
+      <>
+        {HERO_NAME}
+        <span className="text-site-primary">.</span>
+      </>
+    );
   }
 
   return (
@@ -34,6 +39,20 @@ const SplitName = () => {
               {char}
             </motion.span>
           ))}
+          {wordIndex === words.length - 1 && (
+            <motion.span
+              className="inline-block text-site-primary"
+              initial={{ opacity: 0, y: '0.72em' }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{
+                delay: 0.1 + HERO_NAME.length * 0.035,
+                duration: 0.62,
+                ease: [0.22, 1, 0.36, 1],
+              }}
+            >
+              .
+            </motion.span>
+          )}
         </span>
       ))}
     </span>

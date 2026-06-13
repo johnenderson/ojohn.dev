@@ -15,7 +15,7 @@
   --site-navbar-desktop: rgba(9, 8, 13, 0.45);
   --site-navbar-scrolled: rgba(9, 8, 13, 0.94);
   --site-primary: #5bd3c7;
-  --site-primary-hover: #f0a66d;
+  --site-primary-hover: #82e6db;
   --site-primary-foreground: #061211;
   --site-primary-soft: rgba(91, 211, 199, 0.13);
   --site-spotlight: rgba(91, 211, 199, 0.14);
@@ -781,14 +781,6 @@ article.post p:not(header *) {
   text-wrap: pretty;
 }
 
-/* Justify only on wider columns — on narrow mobile it creates whitespace rivers */
-@media (min-width: 640px) {
-  article.post p:not(header *) {
-    text-align: justify;
-    hyphens: auto;
-  }
-}
-
 /* Restore list markers removed by Tailwind's preflight reset. */
 article.post ul:not(header *) {
   list-style: disc outside;
@@ -989,33 +981,58 @@ html.light .mdx-admonition-content li {
   text-decoration-color: var(--admonition-border);
 }
 
-a,
-article a {
-  color: var(--site-foreground);
-  text-decoration-color: var(--site-border);
-  text-decoration-thickness: 1px;
-  text-decoration-skip-ink: none;
-  text-underline-offset: 4px;
-  transition: color 0.2s, text-decoration-color 0.2s;
+/*
+ * @layer base so Tailwind color utilities (and their hover: variants) win over
+ * these defaults. Unlayered, they silently forced every link to
+ * --site-foreground regardless of the utilities applied by components.
+ */
+@layer base {
+  a,
+  article a {
+    color: var(--site-foreground);
+    text-decoration-color: var(--site-border);
+    text-decoration-thickness: 1px;
+    text-decoration-skip-ink: none;
+    text-underline-offset: 4px;
+    transition: color 0.2s, text-decoration-color 0.2s;
+  }
+
+  a:hover {
+    color: var(--site-primary-hover);
+    text-decoration-color: var(--site-primary);
+  }
+
+  html.light a,
+  html.light article a {
+    color: var(--site-foreground);
+    text-decoration-color: var(--site-border);
+    text-decoration-thickness: 1px;
+    text-decoration-skip-ink: none;
+    text-underline-offset: 4px;
+  }
+
+  html.light a:hover {
+    color: var(--site-primary-hover);
+    text-decoration-color: var(--site-primary-hover);
+  }
 }
 
-a:hover {
-  color: var(--site-primary-hover);
-  text-decoration-color: var(--site-primary);
+/*
+ * Hero CTAs. Unlayered on purpose: the global `a` rules above are unlayered
+ * and therefore beat Tailwind color utilities, so the exception must live at
+ * the same level.
+ */
+a.cta-solid,
+a.cta-solid:hover,
+html.light a.cta-solid:hover {
+  color: var(--site-primary-foreground);
+  text-decoration: none;
 }
 
-html.light a,
-html.light article a {
-  color: var(--site-foreground);
-  text-decoration-color: var(--site-border);
-  text-decoration-thickness: 1px;
-  text-decoration-skip-ink: none;
-  text-underline-offset: 4px;
-}
-
-html.light a:hover {
-  color: var(--site-primary-hover);
-  text-decoration-color: var(--site-primary-hover);
+a.cta-ghost:hover,
+html.light a.cta-ghost:hover {
+  color: var(--site-primary);
+  text-decoration: none;
 }
 
 article .series ul,

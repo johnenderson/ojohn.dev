@@ -192,7 +192,7 @@ const UsesSection = ({
 }) => (
   <section
     aria-labelledby={id}
-    className="site-fade-in flex w-full flex-col gap-6 md:flex-row md:gap-12"
+    className="site-fade-in flex w-full flex-col gap-6 md:flex-row md:gap-10"
     style={
       {
         '--fade-in-delay': `${delay}ms`,
@@ -202,7 +202,7 @@ const UsesSection = ({
   >
     <h2
       id={id}
-      className="m-0 flex h-fit w-36 shrink-0 flex-col gap-1 text-xs font-semibold uppercase tracking-widest text-site-body-muted before:mb-1 before:block before:h-px before:w-6 before:bg-site-primary before:content-['']"
+      className="m-0 flex h-fit w-28 shrink-0 flex-col gap-1 text-xs font-semibold uppercase tracking-widest text-site-body-muted before:mb-1 before:block before:h-px before:w-6 before:bg-site-primary before:content-['']"
     >
       {title}
     </h2>
@@ -279,7 +279,7 @@ export default function UsesPage() {
     <PageWrapper>
       <main id="main">
         <div className="content">
-          <div className="flex max-w-5xl flex-col items-start gap-8">
+          <div className="flex max-w-5xl flex-col items-start gap-3">
             <PageTitle
               title="Uso"
               subtitle="Meu setup atual de trabalho, jogos, periféricos e ferramentas."

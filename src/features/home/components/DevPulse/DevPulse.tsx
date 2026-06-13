@@ -40,7 +40,7 @@ export async function DevPulse() {
   } = pulse;
 
   return (
-    <section id="dev-pulse" className="mt-12 md:mt-14">
+    <section id="dev-pulse" className="mt-6 md:mt-8">
       <Card interactive className="flex flex-col gap-5 p-4 sm:p-5">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <div className="flex items-center gap-2">

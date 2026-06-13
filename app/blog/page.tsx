@@ -1,8 +1,11 @@
+import Link from 'next/link';
+
 import { PageWrapper } from '../components/PageWrapper';
 import type { Metadata } from 'next';
 
 import { PageTitle } from '@/base/components/PageTitle';
 import { ArticlesList } from '@/features/articles/components/ArticlesList';
+import { getArticlesList } from '@/features/articles/lib/articles';
 import { SITE_NAME, SITE_URL } from '@/lib/site';
 
 const BLOG_TITLE = 'Blog';
@@ -32,7 +35,58 @@ export const metadata: Metadata = {
   },
 };
 
-export default function Page() {
+const getAllTags = () => {
+  const counts = new Map<string, number>();
+  for (const article of getArticlesList()) {
+    for (const tag of article.tags) {
+      counts.set(tag, (counts.get(tag) ?? 0) + 1);
+    }
+  }
+  return [...counts.entries()].sort(
+    (a, b) => b[1] - a[1] || a[0].localeCompare(b[0]),
+  );
+};
+
+const tagChipClassName = (active: boolean) =>
+  [
+    'rounded border px-2 py-0.5 text-xs font-medium leading-5 no-underline transition-colors',
+    active
+      ? 'border-site-primary bg-site-primary-soft text-site-primary'
+      : 'border-site-border-subtle text-site-body-muted hover:border-site-border hover:text-site-foreground',
+  ].join(' ');
+
+const TagFilter = ({ activeTag }: { activeTag?: string }) => {
+  const tags = getAllTags();
+  if (tags.length === 0) return null;
+
+  return (
+    <nav
+      aria-label="Filtrar artigos por tag"
+      className="mb-8 flex flex-wrap items-center gap-2"
+    >
+      <Link href="/blog" className={tagChipClassName(!activeTag)}>
+        todas
+      </Link>
+      {tags.map(([tag, count]) => (
+        <Link
+          key={tag}
+          href={`/blog?tag=${encodeURIComponent(tag)}`}
+          className={tagChipClassName(tag === activeTag)}
+        >
+          {tag} <span aria-hidden="true">·</span> {count}
+        </Link>
+      ))}
+    </nav>
+  );
+};
+
+type BlogPageProps = {
+  searchParams: Promise<{ tag?: string }>;
+};
+
+export default async function Page({ searchParams }: BlogPageProps) {
+  const { tag } = await searchParams;
+
   return (
     <PageWrapper>
       <main id="main">
@@ -41,7 +95,13 @@ export default function Page() {
             title="Artigos"
             subtitle="Guias, tutoriais e notas pessoais."
           />
-          <ArticlesList grouped header={false} itemVariant="compact" />
+          <TagFilter activeTag={tag} />
+          <ArticlesList
+            filterTag={tag}
+            grouped
+            header={false}
+            itemVariant="compact"
+          />
         </div>
       </main>
     </PageWrapper>

@@ -48,6 +48,7 @@ export type ArticleListItem = {
   date: string;
   description: string;
   icon?: string;
+  cover?: string;
   minutes: number;
   tags: string[];
 };
@@ -76,6 +77,29 @@ export function parseArticleDate(raw: string): Date {
   }
 
   return new Date(raw);
+}
+
+const ARTICLE_DATE_MONTHS = [
+  'jan',
+  'fev',
+  'mar',
+  'abr',
+  'mai',
+  'jun',
+  'jul',
+  'ago',
+  'set',
+  'out',
+  'nov',
+  'dez',
+];
+
+export function formatArticleDate(raw: string): string {
+  const date = parseArticleDate(raw);
+  if (Number.isNaN(date.getTime())) return raw;
+  return `${date.getUTCDate()} ${
+    ARTICLE_DATE_MONTHS[date.getUTCMonth()]
+  } ${date.getUTCFullYear()}`;
 }
 
 function isValidDate(date: Date) {
@@ -460,6 +484,7 @@ export const getArticlesList = cache(
           date: metadata.date,
           description: metadata.description,
           icon: metadata.icon,
+          cover: metadata.coverImage?.src,
           minutes: Math.max(1, Math.round(minutes)),
           tags: metadata.tags ?? [],
         };
