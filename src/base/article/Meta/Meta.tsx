@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { FC } from 'react';
 
 import { AlternativeArticle } from '@/base/article/AlternativeArticle';
@@ -54,11 +55,13 @@ export const Meta: FC<MetaPropTypes> = ({
     {tags.length > 0 && (
       <ul className="m-0 flex list-none flex-wrap gap-2 p-0">
         {tags.map((tag) => (
-          <li
-            key={tag}
-            className="rounded border border-site-border-subtle px-2 py-0.5 text-xs font-medium leading-5 text-site-body-muted transition-colors hover:border-site-border hover:text-site-foreground"
-          >
-            {tag}
+          <li key={tag}>
+            <Link
+              href={`/blog?tag=${encodeURIComponent(tag)}`}
+              className="block rounded border border-site-border-subtle px-2 py-0.5 text-xs font-medium leading-5 text-site-body-muted no-underline transition-colors hover:border-site-primary hover:text-site-primary"
+            >
+              {tag}
+            </Link>
           </li>
         ))}
       </ul>

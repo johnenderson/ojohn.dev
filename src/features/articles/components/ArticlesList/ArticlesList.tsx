@@ -11,6 +11,7 @@ import {
 
 type Header = 'h1' | 'h2' | false;
 type ArticlesListProps = {
+  filterTag?: string;
   grouped?: boolean;
   header?: Header;
   itemVariant?: 'default' | 'compact';
@@ -35,12 +36,15 @@ const formatArticleCount = (count: number) =>
   count === 1 ? '1 artigo' : `${count} artigos`;
 
 export const ArticlesList: FC<ArticlesListProps> = ({
+  filterTag,
   grouped = false,
   header = 'h2',
   itemVariant = 'default',
   showTags = true,
 }) => {
-  const articles = getArticlesList();
+  const articles = getArticlesList().filter(
+    (article) => !filterTag || article.tags.includes(filterTag),
+  );
   const articlesByYear = groupArticlesByYear(articles);
   const years = Object.keys(articlesByYear).sort(
     (a, b) => Number(b) - Number(a),
@@ -73,6 +77,13 @@ export const ArticlesList: FC<ArticlesListProps> = ({
     >
       {headerContent}
 
+      {articles.length === 0 && (
+        <p className="m-0 text-sm text-site-body-muted">
+          Nenhum artigo encontrado
+          {filterTag ? ` com a tag "${filterTag}"` : ''}.
+        </p>
+      )}
+
       {grouped ? (
         <div className="flex flex-col gap-10">
           {years.map((year) => (
@@ -92,6 +103,7 @@ export const ArticlesList: FC<ArticlesListProps> = ({
                 {articlesByYear[year].map((article) => (
                   <ArticleListItem
                     key={article.slug}
+                    cover={article.cover}
                     datetime={article.date}
                     description={article.description}
                     icon={article.icon}
@@ -112,6 +124,7 @@ export const ArticlesList: FC<ArticlesListProps> = ({
           {articles.map((article) => (
             <ArticleListItem
               key={article.slug}
+              cover={article.cover}
               datetime={article.date}
               description={article.description}
               icon={article.icon}

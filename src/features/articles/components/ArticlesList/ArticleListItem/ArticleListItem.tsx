@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import { FC } from 'react';
 
 import { ArticleIcon } from '@/base/article/ArticleIcon/ArticleIcon';
@@ -6,6 +7,7 @@ import { Card } from '@/base/components/Card';
 import { formatArticleDate } from '@/features/articles/lib/articles';
 
 type PostPropType = {
+  cover?: string;
   datetime: string;
   description: string;
   icon?: string;
@@ -16,6 +18,16 @@ type PostPropType = {
   title: string;
   variant?: 'default' | 'compact';
 };
+
+const CardCover = ({ cover, title }: { cover: string; title: string }) => (
+  <Image
+    src={cover}
+    alt={`Capa do artigo ${title}`}
+    width={256}
+    height={144}
+    className="hidden h-24 w-40 shrink-0 self-center rounded-md border border-site-border-subtle object-cover transition-transform duration-300 group-hover:scale-[1.03] sm:block"
+  />
+);
 
 const MetaLine = ({
   datetime,
@@ -53,6 +65,7 @@ const TagList = ({ tags }: { tags: string[] }) => (
 );
 
 export const ArticleListItem: FC<PostPropType> = ({
+  cover,
   datetime,
   description,
   icon,
@@ -94,6 +107,8 @@ export const ArticleListItem: FC<PostPropType> = ({
 
               {showTags && tags.length > 0 && <TagList tags={tags} />}
             </div>
+
+            {cover ? <CardCover cover={cover} title={title} /> : null}
           </div>
         </Card>
       </li>
@@ -127,6 +142,8 @@ export const ArticleListItem: FC<PostPropType> = ({
 
               {showTags && tags.length > 0 && <TagList tags={tags} />}
             </div>
+
+            {cover ? <CardCover cover={cover} title={title} /> : null}
           </div>
         </div>
       </Card>

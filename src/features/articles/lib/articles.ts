@@ -48,6 +48,7 @@ export type ArticleListItem = {
   date: string;
   description: string;
   icon?: string;
+  cover?: string;
   minutes: number;
   tags: string[];
 };
@@ -483,6 +484,7 @@ export const getArticlesList = cache(
           date: metadata.date,
           description: metadata.description,
           icon: metadata.icon,
+          cover: metadata.coverImage?.src,
           minutes: Math.max(1, Math.round(minutes)),
           tags: metadata.tags ?? [],
         };
