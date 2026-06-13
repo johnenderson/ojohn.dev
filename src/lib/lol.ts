@@ -19,7 +19,7 @@ const TOP_CHAMPION_COUNT = 5;
 const MASTERY_COUNT = 12;
 
 const CACHE_KEY_RANKED = 'lol:ranked:v3';
-const CACHE_KEY_CHAMPIONS = 'lol:champions:v2';
+const CACHE_KEY_CHAMPIONS = 'lol:champions:v3'; // v3: descarta cache curto (4) gravado antes do backfill/TTL
 const CACHE_KEY_VERSION = 'lol:ddragon-version:v2';
 const CACHE_KEY_IDENTITY = 'lol:identity:v3'; // puuid + iconId — v3: invalidate after API key rotation
 const CACHE_KEY_MATCHES = 'lol:matches:v1';
