@@ -13,8 +13,8 @@ const debugLog = (...args: unknown[]) => {
 const CACHE_TTL_RECENT = 60 * 60 * 24; // 24h
 // Top all-time: ranking de horas totais não muda do dia pra noite
 const CACHE_TTL_ALLTIME = 60 * 60 * 24 * 7; // 7 dias
-const CACHE_KEY_RECENT = 'steam:recently-played:v2';
-const CACHE_KEY_ALLTIME = 'steam:alltime:v2';
+const CACHE_KEY_RECENT = 'steam:recently-played:v3'; // v3: descarta listas curtas gravadas antes do backfill
+const CACHE_KEY_ALLTIME = 'steam:alltime:v3'; // v3: descarta top all-time anterior ao backfill (sem Phasmophobia etc.)
 
 /** Quantos cards a grade exibe — sempre completamos até esse número. */
 const TARGET_COUNT = 5;
