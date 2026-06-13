@@ -1,5 +1,8 @@
 import { ImageResponse } from 'next/og';
 
+import path from 'node:path';
+import sharp from 'sharp';
+
 import {
   getArticleContent,
   getArticleMetadata,
@@ -11,6 +14,30 @@ import { AUTHOR_NAME, SITE_NAME } from '@/lib/site';
 const size = {
   width: 1200,
   height: 630,
+};
+
+/**
+ * O Satori (`next/og`) não decodifica WebP nem resolve caminhos relativos, então
+ * lemos o ícone de `/public` e o rasterizamos para um PNG (2x) embutido como data
+ * URI. Retorna `null` para ícones que não são imagem (emoji) ou em caso de falha.
+ */
+const getIconDataUri = async (icon: string): Promise<string | null> => {
+  if (!icon.startsWith('/')) return null;
+
+  try {
+    const iconPath = path.join(process.cwd(), 'public', icon);
+    const png = await sharp(iconPath)
+      .resize(152, 152, {
+        fit: 'contain',
+        background: { r: 0, g: 0, b: 0, alpha: 0 },
+      })
+      .png()
+      .toBuffer();
+
+    return `data:image/png;base64,${png.toString('base64')}`;
+  } catch {
+    return null;
+  }
 };
 
 const formatDate = (raw: string) =>
@@ -45,6 +72,10 @@ export async function GET(
   if (article.title.length > 72) titleFontSize = '54px';
   else if (article.title.length > 48) titleFontSize = '62px';
   else titleFontSize = '72px';
+
+  const iconDataUri = article.icon ? await getIconDataUri(article.icon) : null;
+  const iconText =
+    article.icon && !article.icon.startsWith('/') ? article.icon : '✦';
 
   return new ImageResponse(
     (
@@ -84,7 +115,18 @@ export async function GET(
               lineHeight: 1,
             }}
           >
-            {article.icon ?? '✦'}
+            {iconDataUri ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={iconDataUri}
+                alt=""
+                width={48}
+                height={48}
+                style={{ objectFit: 'contain' }}
+              />
+            ) : (
+              iconText
+            )}
           </div>
           <div
             style={{
