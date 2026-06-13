@@ -16,6 +16,11 @@ const CACHE_TTL_ALLTIME = 60 * 60 * 24 * 7; // 7 dias
 const CACHE_KEY_RECENT = 'steam:recently-played:v2';
 const CACHE_KEY_ALLTIME = 'steam:alltime:v2';
 
+/** Quantos cards a grade exibe — sempre completamos até esse número. */
+const TARGET_COUNT = 5;
+/** Pool de all-time mantido em cache, com folga para o backfill após dedupe. */
+const ALLTIME_POOL = 12;
+
 /**
  * Apps que não são jogos de verdade e devem ser omitidos da lista.
  * Wallpaper Engine (431960), Spacewar (480 — app de teste Steam), etc.
@@ -127,7 +132,7 @@ const fetchRecentlyPlayed = async (
   return games
     .map(toSteamGame)
     .filter((game): game is SteamGame => game !== null)
-    .slice(0, 5);
+    .slice(0, TARGET_COUNT);
 };
 
 const fetchTopAllTime = async (
@@ -149,7 +154,55 @@ const fetchTopAllTime = async (
   return games
     .map(toSteamGame)
     .filter((game): game is SteamGame => game !== null)
-    .slice(0, 5);
+    .slice(0, ALLTIME_POOL);
+};
+
+/** Recentes (cache → API). Lista vazia em caso de falha. */
+const getRecentGames = async (
+  userId: string,
+  apiKey: string,
+): Promise<SteamGame[]> => {
+  const cached = await cacheGet<SteamGame[]>(CACHE_KEY_RECENT);
+  if (cached && cached.length > 0) {
+    debugLog(`cache hit (recent): ${cached.length} jogos`);
+    return cached;
+  }
+
+  try {
+    const recent = await fetchRecentlyPlayed(userId, apiKey);
+    debugLog(`api recent: ${recent.length} jogos`);
+    if (recent.length > 0) {
+      await cacheSet(CACHE_KEY_RECENT, recent, CACHE_TTL_RECENT);
+    }
+    return recent;
+  } catch (err) {
+    debugLog('erro ao buscar recentes:', err);
+    return [];
+  }
+};
+
+/** Mais jogados de todos os tempos (cache → API). Lista vazia em caso de falha. */
+const getAllTimeGames = async (
+  userId: string,
+  apiKey: string,
+): Promise<SteamGame[]> => {
+  const cached = await cacheGet<SteamGame[]>(CACHE_KEY_ALLTIME);
+  if (cached && cached.length > 0) {
+    debugLog(`cache hit (alltime): ${cached.length} jogos`);
+    return cached;
+  }
+
+  try {
+    const alltime = await fetchTopAllTime(userId, apiKey);
+    debugLog(`api alltime: ${alltime.length} jogos`);
+    if (alltime.length > 0) {
+      await cacheSet(CACHE_KEY_ALLTIME, alltime, CACHE_TTL_ALLTIME);
+    }
+    return alltime;
+  } catch (err) {
+    debugLog('erro ao buscar all-time:', err);
+    return [];
+  }
 };
 
 export const getSteamGames = async (): Promise<SteamResult> => {
@@ -161,40 +214,23 @@ export const getSteamGames = async (): Promise<SteamResult> => {
     return { games: [], source: 'recent' };
   }
 
-  // --- Tenta jogos recentes (cache + API) ---
-  const cachedRecent = await cacheGet<SteamGame[]>(CACHE_KEY_RECENT);
-  if (cachedRecent && cachedRecent.length > 0) {
-    debugLog(`cache hit (recent): ${cachedRecent.length} jogos`);
-    return { games: cachedRecent, source: 'recent' };
+  const recent = await getRecentGames(userId, apiKey);
+  if (recent.length >= TARGET_COUNT) {
+    return { games: recent.slice(0, TARGET_COUNT), source: 'recent' };
   }
 
-  try {
-    const recent = await fetchRecentlyPlayed(userId, apiKey);
-    debugLog(`api recent: ${recent.length} jogos`);
-    if (recent.length > 0) {
-      await cacheSet(CACHE_KEY_RECENT, recent, CACHE_TTL_RECENT);
-      return { games: recent, source: 'recent' };
-    }
-  } catch (err) {
-    debugLog('erro ao buscar recentes:', err);
-  }
+  // Menos recentes que o alvo: completa com os mais jogados de todos os tempos
+  // (sem repetir os que já estão na lista) para a grade nunca ficar incompleta.
+  const alltime = await getAllTimeGames(userId, apiKey);
+  const seen = new Set(recent.map((game) => game.appid));
+  const backfill = alltime.filter((game) => !seen.has(game.appid));
+  const games = [...recent, ...backfill].slice(0, TARGET_COUNT);
 
-  // --- Fallback: mais jogados de todos os tempos ---
-  const cachedAlltime = await cacheGet<SteamGame[]>(CACHE_KEY_ALLTIME);
-  if (cachedAlltime && cachedAlltime.length > 0) {
-    debugLog(`cache hit (alltime): ${cachedAlltime.length} jogos`);
-    return { games: cachedAlltime, source: 'alltime' };
-  }
+  debugLog(
+    `final: ${recent.length} recentes + ${
+      games.length - recent.length
+    } backfill`,
+  );
 
-  try {
-    const alltime = await fetchTopAllTime(userId, apiKey);
-    debugLog(`api alltime: ${alltime.length} jogos`);
-    if (alltime.length > 0) {
-      await cacheSet(CACHE_KEY_ALLTIME, alltime, CACHE_TTL_ALLTIME);
-    }
-    return { games: alltime, source: 'alltime' };
-  } catch (err) {
-    debugLog('erro ao buscar all-time:', err);
-    return { games: [], source: 'alltime' };
-  }
+  return { games, source: recent.length > 0 ? 'recent' : 'alltime' };
 };
