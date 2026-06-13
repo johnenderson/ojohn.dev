@@ -207,7 +207,21 @@ export async function GET(
             <span>•</span>
             <span>{minutes} min de leitura</span>
           </div>
-          <span style={{ color: '#f0a66d' }}>Blog</span>
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              border: '1px solid rgba(240, 166, 109, 0.55)',
+              borderRadius: '999px',
+              background: 'rgba(240, 166, 109, 0.14)',
+              color: '#f0a66d',
+              fontSize: '22px',
+              fontWeight: 800,
+              padding: '10px 22px',
+            }}
+          >
+            Ler artigo →
+          </div>
         </div>
       </div>
     ),
