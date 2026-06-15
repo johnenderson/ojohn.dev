@@ -69,10 +69,6 @@ export const ZoomableImage = ({
           ref={dialogRef}
           aria-label={alt || 'Imagem ampliada'}
           onClose={() => setOpen(false)}
-          onClick={(e) => {
-            // Close when the backdrop (the dialog element itself) is clicked.
-            if (e.target === dialogRef.current) requestClose();
-          }}
           className="zoom-dialog motion-safe:animate-[zoomIn_250ms_cubic-bezier(0.22,1,0.36,1)]"
         >
           <button
