@@ -27,7 +27,7 @@ export function LolLiveGame({ game }: Readonly<LolLiveGameProps>) {
         <div className="flex flex-wrap items-center gap-2">
           <span className="inline-flex items-center gap-1.5 text-sm font-bold text-site-primary">
             <span className="size-2 animate-pulse rounded-full bg-site-primary" />
-            Em jogo agora
+            <span>Em jogo agora</span>
           </span>
           <span className="text-xs text-site-body-muted">{game.gameMode}</span>
         </div>

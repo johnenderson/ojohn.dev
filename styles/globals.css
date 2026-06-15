@@ -224,7 +224,6 @@ html.light {
   border: 0;
   background: transparent;
   overflow: visible;
-  cursor: zoom-out;
 }
 
 .zoom-dialog::backdrop {

@@ -31,7 +31,7 @@ const groupConsecutiveByRepo = (items: GithubFeedItem[]) => {
   const groups: GithubFeedItem[][] = [];
   for (const item of items) {
     const lastGroup = groups.at(-1);
-    if (lastGroup && lastGroup[0].repo === item.repo) {
+    if (lastGroup?.[0].repo === item.repo) {
       lastGroup.push(item);
     } else {
       groups.push([item]);
