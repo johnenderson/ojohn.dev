@@ -55,6 +55,8 @@ export const incrementLikes = async (id: string): Promise<number> => {
 //   1. Janela deslizante (30/60s por IP) — contém floods/abuso de volume.
 //   2. enableProtection — bloqueia IPs maliciosos da Auto IP Deny List do
 //      Upstash (30+ listas de abuso open-source, atualizada diariamente).
+// analytics: registra permitidos/bloqueados no Ratelimit Dashboard
+// (console.upstash.com/ratelimit). Exige await pending para sincronizar.
 // As chaves rl:likes:* SÃO efêmeras (geridas pela lib), ao contrário das de
 // like. ephemeralCache bloqueia em memória um IP já barrado, sem ir ao Redis.
 // fail-open: erro/ausência de Redis não bloqueia o fluxo de likes.
@@ -72,6 +74,7 @@ const getRateLimiter = (): Ratelimit | null => {
     prefix: 'rl:likes',
     ephemeralCache: new Map(),
     enableProtection: true,
+    analytics: true,
   });
   return _ratelimit;
 };
