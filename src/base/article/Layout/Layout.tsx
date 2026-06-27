@@ -6,6 +6,7 @@ import { CodeCopyButtons } from '@/base/article/CodeCopyButtons';
 import { CoverImage } from '@/base/article/CoverImage';
 import { HeadingAnchors } from '@/base/article/HeadingAnchors';
 import { Footer } from '@/base/article/Layout/Footer';
+import { Likes } from '@/base/article/Likes';
 import { Meta } from '@/base/article/Meta';
 import { ReadingProgress } from '@/base/article/ReadingProgress';
 import { ShareMenu } from '@/base/article/ShareMenu';
@@ -23,6 +24,7 @@ type LayoutPropTypes = {
   title: string;
   url: string;
   date: string;
+  likesId: string;
   icon?: string;
   alternativeArticle?: ArticleAlternative;
   coverImage?: ArticleCoverImage;
@@ -36,6 +38,7 @@ export const Layout: FC<PropsWithChildren<LayoutPropTypes>> = ({
   title,
   url,
   date,
+  likesId,
   icon,
   coverImage,
   alternativeArticle,
@@ -93,11 +96,14 @@ export const Layout: FC<PropsWithChildren<LayoutPropTypes>> = ({
                 {children}
                 <CodeCopyButtons />
                 <HeadingAnchors />
-                <div className="mt-12 flex items-center gap-3 border-t border-site-border-subtle pt-8">
-                  <span className="text-sm font-medium text-site-body-muted">
-                    Compartilhe este artigo
-                  </span>
-                  <ShareMenu url={url} title={title} align="start" />
+                <div className="mt-12 flex flex-wrap items-center justify-between gap-3 border-t border-site-border-subtle pt-8">
+                  <Likes likesId={likesId} />
+                  <div className="flex items-center gap-3">
+                    <span className="text-sm font-medium text-site-body-muted">
+                      Compartilhe este artigo
+                    </span>
+                    <ShareMenu url={url} title={title} align="start" />
+                  </div>
                 </div>
                 <ArticleNavigation navigation={navigation} />
               </article>

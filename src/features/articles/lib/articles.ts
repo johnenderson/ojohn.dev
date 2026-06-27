@@ -36,6 +36,11 @@ export type ArticleMetadata = {
   title: string;
   description: string;
   date: string;
+  /**
+   * Chave permanente do contador de likes (ver docs/article-likes.md).
+   * Imutável: nunca mude depois de publicar, ou a contagem reseta.
+   */
+  likesId: string;
   icon?: string;
   tags?: string[];
   coverImage?: ArticleCoverImage;
@@ -242,10 +247,18 @@ function parseArticleMetadata(
     );
   }
 
+  const likesId = stringValue(value, 'likesId', context);
+  if (!/^[A-Za-z0-9_-]{1,64}$/.test(likesId)) {
+    throw new TypeError(
+      `Invalid article metadata for ${context}: likesId must match [A-Za-z0-9_-]{1,64}.`,
+    );
+  }
+
   const metadata = {
     title: stringValue(value, 'title', context),
     description: stringValue(value, 'description', context),
     date,
+    likesId,
     icon: optionalStringValue(value, 'icon'),
     tags: parseTags(value.tags, context),
     coverImage:

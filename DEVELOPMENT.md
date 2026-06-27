@@ -34,6 +34,8 @@ render — the app keeps working.
 | `GITHUB_TOKEN`          | yes\*    | "Pulso de dev" card (GitHub contributions)          |
 | `GITHUB_USERNAME`       | optional | GitHub user (defaults to `johnenderson`)            |
 | `GITHUB_DEBUG`          | optional | `true` to log GitHub fetch diagnostics              |
+| `UPSTASH_REDIS_REST_URL`   | optional | Cache (`/now`) + article likes (see `docs/article-likes.md`) |
+| `UPSTASH_REDIS_REST_TOKEN` | optional | Cache (`/now`) + article likes                      |
 
 \* Required only for that specific widget. A classic `GITHUB_TOKEN` with the
 `read:user` scope is enough for public contributions. The GitHub card only ever
