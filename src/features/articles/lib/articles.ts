@@ -7,7 +7,7 @@ import {
   getArticleSlugs,
   getArticleSource,
 } from '@/features/articles/lib/article-content';
-import { Language } from '@/lib/languages';
+import { Language, Languages } from '@/lib/languages';
 import { Locale } from '@/types/Locale';
 
 const DEFAULT_ARTICLE_LOCALE: Locale = Language.PT_BR;
@@ -36,6 +36,11 @@ export type ArticleMetadata = {
   title: string;
   description: string;
   date: string;
+  /**
+   * Chave permanente do contador de likes (ver docs/article-likes.md).
+   * Imutável: nunca mude depois de publicar, ou a contagem reseta.
+   */
+  likesId: string;
   icon?: string;
   tags?: string[];
   coverImage?: ArticleCoverImage;
@@ -242,10 +247,18 @@ function parseArticleMetadata(
     );
   }
 
+  const likesId = stringValue(value, 'likesId', context);
+  if (!/^[A-Za-z0-9_-]{1,64}$/.test(likesId)) {
+    throw new TypeError(
+      `Invalid article metadata for ${context}: likesId must match [A-Za-z0-9_-]{1,64}.`,
+    );
+  }
+
   const metadata = {
     title: stringValue(value, 'title', context),
     description: stringValue(value, 'description', context),
     date,
+    likesId,
     icon: optionalStringValue(value, 'icon'),
     tags: parseTags(value.tags, context),
     coverImage:
@@ -460,6 +473,30 @@ export function getArticleContent(
     content,
     minutes: Math.max(1, Math.round(minutes)),
   };
+}
+
+let _likesIds: Set<string> | null = null;
+
+/**
+ * Conjunto de likesId de todos os artigos publicados (todos os locales). A API
+ * de likes usa isto como whitelist: bloqueia a criação de chaves arbitrárias no
+ * Redis para ids que não correspondem a um artigo real. Memoizado — o conteúdo
+ * é estático (gerado no build).
+ */
+export function getArticleLikesIds(): Set<string> {
+  if (_likesIds) return _likesIds;
+
+  const ids = new Set<string>();
+  for (const locale of Languages) {
+    for (const slug of getArticleSlugs(locale)) {
+      if (hasArticleMetadata(slug, locale)) {
+        ids.add(getArticleMetadata(slug, locale).likesId);
+      }
+    }
+  }
+
+  _likesIds = ids;
+  return ids;
 }
 
 export function getArticlePaths(locale: Locale = DEFAULT_ARTICLE_LOCALE) {

@@ -118,6 +118,7 @@ export default async function Page({ params }: Readonly<Props>) {
       title={articleMetadata.title}
       url={articleUrl}
       date={articleMetadata.date}
+      likesId={articleMetadata.likesId}
       icon={articleMetadata.icon}
       tags={articleMetadata.tags ?? []}
       alternativeArticle={articleMetadata.alternativeArticle}
