@@ -7,7 +7,7 @@ import {
   getArticleSlugs,
   getArticleSource,
 } from '@/features/articles/lib/article-content';
-import { Language } from '@/lib/languages';
+import { Language, Languages } from '@/lib/languages';
 import { Locale } from '@/types/Locale';
 
 const DEFAULT_ARTICLE_LOCALE: Locale = Language.PT_BR;
@@ -473,6 +473,30 @@ export function getArticleContent(
     content,
     minutes: Math.max(1, Math.round(minutes)),
   };
+}
+
+let _likesIds: Set<string> | null = null;
+
+/**
+ * Conjunto de likesId de todos os artigos publicados (todos os locales). A API
+ * de likes usa isto como whitelist: bloqueia a criação de chaves arbitrárias no
+ * Redis para ids que não correspondem a um artigo real. Memoizado — o conteúdo
+ * é estático (gerado no build).
+ */
+export function getArticleLikesIds(): Set<string> {
+  if (_likesIds) return _likesIds;
+
+  const ids = new Set<string>();
+  for (const locale of Languages) {
+    for (const slug of getArticleSlugs(locale)) {
+      if (hasArticleMetadata(slug, locale)) {
+        ids.add(getArticleMetadata(slug, locale).likesId);
+      }
+    }
+  }
+
+  _likesIds = ids;
+  return ids;
 }
 
 export function getArticlePaths(locale: Locale = DEFAULT_ARTICLE_LOCALE) {

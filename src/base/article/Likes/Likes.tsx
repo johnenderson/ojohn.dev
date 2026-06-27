@@ -87,7 +87,12 @@ export const Likes: FC<{ likesId: string }> = ({ likesId }) => {
     void mutate(
       async () => {
         const res = await fetch(endpoint, { method: 'POST' });
-        return res.json();
+        const json: LikesResponse = await res
+          .json()
+          .catch(() => ({ count: null }));
+        // 429 / erro / desabilitado: não esconde o widget — mantém o otimista.
+        if (typeof json.count !== 'number') return { count: count + 1 };
+        return json;
       },
       {
         optimisticData: { count: count + 1 },

@@ -1,6 +1,12 @@
 import { NextResponse } from 'next/server';
 
-import { getLikes, incrementLikes, isRedisConfigured } from '@/lib/redis';
+import { getArticleLikesIds } from '@/features/articles/lib/articles';
+import {
+  checkLikesRateLimit,
+  getLikes,
+  incrementLikes,
+  isRedisConfigured,
+} from '@/lib/redis';
 
 export const dynamic = 'force-dynamic';
 
@@ -8,17 +14,24 @@ type Params = { params: Promise<{ id: string }> };
 
 const noStore = { headers: { 'Cache-Control': 'no-store' } };
 
-// Mesma forma aceita no frontmatter (likesId). Limita o namespace de chaves
-// que um POST pode criar no Redis.
 const ID_PATTERN = /^[A-Za-z0-9_-]{1,64}$/;
 
-const isValidId = (id: string) => ID_PATTERN.test(id);
+// Whitelist: só aceitamos ids que correspondem a um artigo real. Bloqueia a
+// criação de chaves arbitrárias no Redis (storage/cota) por ids inventados.
+const isKnownArticle = (id: string) =>
+  ID_PATTERN.test(id) && getArticleLikesIds().has(id);
+
+const getClientIp = (request: Request): string => {
+  const forwarded = request.headers.get('x-forwarded-for');
+  if (forwarded) return forwarded.split(',')[0].trim();
+  return request.headers.get('x-real-ip') ?? 'unknown';
+};
 
 export async function GET(_request: Request, { params }: Params) {
   const { id } = await params;
 
-  if (!isValidId(id)) {
-    return NextResponse.json({ count: null }, { ...noStore, status: 400 });
+  if (!isKnownArticle(id)) {
+    return NextResponse.json({ count: null }, { ...noStore, status: 404 });
   }
 
   // Likes desativado (sem Redis) — count null faz o widget não renderizar.
@@ -30,15 +43,23 @@ export async function GET(_request: Request, { params }: Params) {
   return NextResponse.json({ count }, noStore);
 }
 
-export async function POST(_request: Request, { params }: Params) {
+export async function POST(request: Request, { params }: Params) {
   const { id } = await params;
 
-  if (!isValidId(id)) {
-    return NextResponse.json({ count: null }, { ...noStore, status: 400 });
+  if (!isKnownArticle(id)) {
+    return NextResponse.json({ count: null }, { ...noStore, status: 404 });
   }
 
   if (!isRedisConfigured()) {
     return NextResponse.json({ count: null }, noStore);
+  }
+
+  const allowed = await checkLikesRateLimit(getClientIp(request));
+  if (!allowed) {
+    return NextResponse.json(
+      { count: null, error: 'rate_limited' },
+      { ...noStore, status: 429 },
+    );
   }
 
   const count = await incrementLikes(id);
