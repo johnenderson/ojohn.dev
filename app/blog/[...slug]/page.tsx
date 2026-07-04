@@ -129,7 +129,7 @@ export default async function Page({ params }: Readonly<Props>) {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
-          __html: JSON.stringify(jsonLd).replaceAll('<', String.raw`<`),
+          __html: JSON.stringify(jsonLd).replaceAll('<', '\\u003c'),
         }}
       />
       <MDXServer source={content} />
