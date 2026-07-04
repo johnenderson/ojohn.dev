@@ -380,8 +380,12 @@ const QUEUE_LABELS: Record<number, string> = {
   440: 'Ranked Flex',
   400: 'Normal',
   450: 'ARAM',
+  480: 'Swiftplay',
+  490: 'Quickplay',
+  720: 'ARAM Clash',
   900: 'URF',
   1020: 'One for All',
+  2400: 'ARAM: Desordem', // "ARAM: Mayhem" no queues.json oficial
 };
 
 type MatchDto = {
