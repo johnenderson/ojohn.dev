@@ -55,6 +55,27 @@ export const metadata: Metadata = {
   },
 };
 
+// Aplica o tema salvo ANTES do primeiro paint (parser-blocking), evitando o
+// flash de tema escuro para quem usa tema claro. Espelha a resolução do
+// ThemeProvider: 'light' | 'dark' | 'system' (via prefers-color-scheme), com
+// 'dark' como padrão. O ThemeProvider assume o controle após a hidratação.
+const themeInitScript = `(function () {
+  try {
+    var stored = localStorage.getItem('theme');
+    var resolved =
+      stored === 'light' || stored === 'dark'
+        ? stored
+        : stored === 'system' &&
+          matchMedia('(prefers-color-scheme: light)').matches
+        ? 'light'
+        : 'dark';
+    document.documentElement.classList.add(resolved);
+    document.documentElement.style.colorScheme = resolved;
+  } catch (e) {
+    document.documentElement.classList.add('dark');
+  }
+})();`;
+
 export const viewport: Viewport = {
   themeColor: [
     { media: '(prefers-color-scheme: light)', color: '#fffdf9' },
@@ -74,6 +95,7 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <body>
+        <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
         <a
           href="#main"
           className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[9999] focus:rounded focus:bg-site-card focus:px-4 focus:py-2 focus:text-sm focus:font-medium focus:text-site-foreground focus:outline-none focus:ring-2 focus:ring-site-primary"
