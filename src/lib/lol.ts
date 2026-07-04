@@ -100,6 +100,28 @@ const riotFetch = async <T>(url: string, apiKey: string): Promise<T | null> => {
     throw err;
   }
 
+  return handleRiotResponse<T>(response, url);
+};
+
+// Data Dragon/CDN é público — nunca envie a API key para ele.
+const ddragonFetch = async <T>(url: string): Promise<T | null> => {
+  debugLog('GET', url);
+
+  let response: Response;
+  try {
+    response = await fetch(url, { cache: 'no-store' });
+  } catch (err) {
+    debugLog('fetch network error:', String(err));
+    throw err;
+  }
+
+  return handleRiotResponse<T>(response, url);
+};
+
+const handleRiotResponse = async <T>(
+  response: Response,
+  url: string,
+): Promise<T | null> => {
   debugLog(`response status: ${response.status}`);
 
   if (response.status === 404) {
@@ -145,14 +167,13 @@ type ChampionListData = {
   data: Record<string, { key: string; id: string; name: string }>;
 };
 
-const getDDragonVersion = async (apiKey: string): Promise<string> => {
+const getDDragonVersion = async (): Promise<string> => {
   const cached = await cacheGet<string>(CACHE_KEY_VERSION);
   if (cached) return cached;
 
   // Versão mais recente do patch
-  const versions = await riotFetch<string[]>(
+  const versions = await ddragonFetch<string[]>(
     `${DDRAGON_BASE}/api/versions.json`,
-    apiKey,
   );
   const version = versions?.[0] ?? '15.1.1';
   await cacheSet(CACHE_KEY_VERSION, version, CACHE_TTL_VERSION);
@@ -273,9 +294,8 @@ const fetchTopChampionsData = async (
       debugLog('masteries error:', e);
       return null;
     }),
-    riotFetch<ChampionListData>(
+    ddragonFetch<ChampionListData>(
       `${DDRAGON_BASE}/cdn/${version}/data/pt_BR/champion.json`,
-      apiKey,
     ).catch(() => null),
   ]);
 
@@ -333,7 +353,7 @@ const loadLolProfile = async (): Promise<LolProfile | null> => {
   const identity = await resolveIdentity(apiKey, gameName, tagLine);
   if (!identity) return null;
 
-  const version = await getDDragonVersion(apiKey);
+  const version = await getDDragonVersion();
   const profileIconUrl = `${DDRAGON_BASE}/cdn/${version}/img/profileicon/${identity.profileIconId}.png`;
   const summonerName = identity.summonerName;
 
@@ -385,6 +405,7 @@ type MatchDto = {
 type SpectatorDto = {
   gameId: number;
   gameMode: string;
+  gameQueueConfigId?: number;
   gameLength: number;
   participants: { puuid: string; championId: number }[];
 };
@@ -406,7 +427,7 @@ const loadLolMatches = async (): Promise<LolMatch[]> => {
   const identity = await resolveIdentity(apiKey, gameName, tagLine);
   if (!identity) return [];
 
-  const version = await getDDragonVersion(apiKey);
+  const version = await getDDragonVersion();
 
   const matchIds = await riotFetch<string[]>(
     `${RIOT_REGIONAL}/lol/match/v5/matches/by-puuid/${identity.puuid}/ids?count=5`,
@@ -464,7 +485,7 @@ const loadLolLiveGame = async (): Promise<LolLiveGame | null> => {
   const identity = await resolveIdentity(apiKey, gameName, tagLine);
   if (!identity) return null;
 
-  const version = await getDDragonVersion(apiKey);
+  const version = await getDDragonVersion();
 
   const game = await riotFetch<SpectatorDto>(
     `${RIOT_PLATFORM}/lol/spectator/v5/active-games/by-summoner/${identity.puuid}`,
@@ -476,9 +497,8 @@ const loadLolLiveGame = async (): Promise<LolLiveGame | null> => {
   if (!participant) return null;
 
   // Map championId → name via Data Dragon
-  const championList = await riotFetch<ChampionListData>(
+  const championList = await ddragonFetch<ChampionListData>(
     `${DDRAGON_BASE}/cdn/${version}/data/pt_BR/champion.json`,
-    apiKey,
   ).catch(() => null);
 
   const champ = championList
@@ -494,7 +514,10 @@ const loadLolLiveGame = async (): Promise<LolLiveGame | null> => {
   return {
     championId: championName,
     championIconUrl: `${DDRAGON_BASE}/cdn/${version}/img/champion/${championName}.png`,
-    gameMode: QUEUE_LABELS[game.gameMode as unknown as number] ?? game.gameMode,
+    gameMode:
+      game.gameQueueConfigId != null
+        ? QUEUE_LABELS[game.gameQueueConfigId] ?? game.gameMode
+        : game.gameMode,
     gameLengthSeconds: game.gameLength,
   };
 };
