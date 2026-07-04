@@ -16,11 +16,11 @@
     "eslint:fix": "eslint --cache --fix",
     "pretypecheck": "yarn content:sync",
     "typecheck": "tsc",
-    "prepare": "husky install",
-    "update:webperf": "cd packages/scripts && yarn build:repo-content"
+    "prepare": "husky install"
   },
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^7.2.0",
+    "@shikijs/rehype": "^4.1.0",
     "@fortawesome/free-brands-svg-icons": "^7.2.0",
     "@fortawesome/free-solid-svg-icons": "^7.2.0",
     "@fortawesome/react-fontawesome": "^3.3.1",
@@ -32,17 +32,19 @@
     "lightningcss-linux-x64-gnu": "^1.32.0",
     "motion": "^12.40.0",
     "next": "^16.2.6",
+    "next-mdx-remote": "^6.0.0",
     "react": "^19",
     "react-dom": "^19",
     "react-intersection-observer": "^8.33.1",
     "react-katex": "^3.1.0",
+    "react-tweet-embed": "^2.0.0",
     "reading-time": "^1.5.0",
     "rehype-slug": "^6.0.0",
+    "remark-gfm": "^4.0.1",
     "sharp": "^0.34.5",
     "swr": "^2.4.1"
   },
   "devDependencies": {
-    "@shikijs/rehype": "^4.1.0",
     "@tailwindcss/postcss": "^4.3.0",
     "@trivago/prettier-plugin-sort-imports": "^4.1.1",
     "@types/node": "^22.15.0",
@@ -55,11 +57,8 @@
     "eslint-plugin-unused-imports": "^4",
     "husky": ">=6",
     "lint-staged": ">=10",
-    "next-mdx-remote": "^6.0.0",
     "postcss": "^8.5.15",
     "prettier": "^2.4.1",
-    "react-tweet-embed": "^2.0.0",
-    "remark-gfm": "^4.0.1",
     "shadcn": "^4.8.0",
     "tailwindcss": "^4.3.0",
     "typescript": "^5.8.3"
