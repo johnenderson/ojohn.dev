@@ -50,41 +50,81 @@ export const incrementLikes = async (id: string): Promise<number> => {
   }
 };
 
-// Rate limit + proteção de tráfego dos likes — biblioteca oficial
+// --- Reações por seção ------------------------------------------------------
+// Assim como os likes, as reações são DURÁVEIS: um hash por artigo, sem TTL.
+// Campo do hash: `<headingSlug>:<reactionId>` (slug nunca contém ':').
+
+const REACTIONS_PREFIX = 'reactions:';
+
+/**
+ * Lê todas as reações de um artigo como o hash cru
+ * (`{ "<slug>:<reactionId>": count }`). Vazio se inexistente ou sem Redis.
+ */
+export const getReactionFields = async (
+  id: string,
+): Promise<Record<string, number>> => {
+  const redis = getRedis();
+  if (!redis) return {};
+  try {
+    return (
+      (await redis.hgetall<Record<string, number>>(
+        `${REACTIONS_PREFIX}${id}`,
+      )) ?? {}
+    );
+  } catch {
+    return {};
+  }
+};
+
+/** Incrementa atômico (HINCRBY) uma reação e retorna o novo total do campo. */
+export const incrementReaction = async (
+  id: string,
+  field: string,
+): Promise<number> => {
+  const redis = getRedis();
+  if (!redis) return 0;
+  try {
+    return await redis.hincrby(`${REACTIONS_PREFIX}${id}`, field, 1);
+  } catch {
+    return 0;
+  }
+};
+
+// Rate limit + proteção de tráfego (likes e reações) — biblioteca oficial
 // @upstash/ratelimit. Combina dois mecanismos automáticos (sem monitoramento):
-//   1. Janela deslizante (30/60s por IP) — contém floods/abuso de volume.
+//   1. Janela deslizante por IP — contém floods/abuso de volume.
 //   2. enableProtection — bloqueia IPs maliciosos da Auto IP Deny List do
 //      Upstash (30+ listas de abuso open-source, atualizada diariamente).
 // analytics: registra permitidos/bloqueados no Ratelimit Dashboard
 // (console.upstash.com/ratelimit). Exige await pending para sincronizar.
-// As chaves rl:likes:* SÃO efêmeras (geridas pela lib), ao contrário das de
-// like. ephemeralCache bloqueia em memória um IP já barrado, sem ir ao Redis.
-// fail-open: erro/ausência de Redis não bloqueia o fluxo de likes.
-let _ratelimit: Ratelimit | null = null;
+// As chaves rl:* SÃO efêmeras (geridas pela lib), ao contrário das de
+// like/reação. ephemeralCache bloqueia em memória um IP já barrado, sem ir
+// ao Redis. fail-open: erro/ausência de Redis não bloqueia o fluxo.
+const _limiters = new Map<string, Ratelimit>();
 
-const getRateLimiter = (): Ratelimit | null => {
-  if (_ratelimit) return _ratelimit;
+const getRateLimiter = (prefix: string, tokens: number): Ratelimit | null => {
+  const existing = _limiters.get(prefix);
+  if (existing) return existing;
 
   const redis = getRedis();
   if (!redis) return null;
 
-  _ratelimit = new Ratelimit({
+  const limiter = new Ratelimit({
     redis,
-    limiter: Ratelimit.slidingWindow(30, '60 s'),
-    prefix: 'rl:likes',
+    limiter: Ratelimit.slidingWindow(tokens, '60 s'),
+    prefix,
     ephemeralCache: new Map(),
     enableProtection: true,
     analytics: true,
   });
-  return _ratelimit;
+  _limiters.set(prefix, limiter);
+  return limiter;
 };
 
-/**
- * True se o IP está liberado. Bloqueia (false) quando estoura a janela
- * deslizante OU quando o IP está na Auto IP Deny List do Upstash.
- */
-export const checkLikesRateLimit = async (ip: string): Promise<boolean> => {
-  const limiter = getRateLimiter();
+const checkRateLimit = async (
+  limiter: Ratelimit | null,
+  ip: string,
+): Promise<boolean> => {
   if (!limiter) return true;
   try {
     // O 1º arg (identifier) conta o rate por IP; o { ip } é checado contra a
@@ -96,6 +136,20 @@ export const checkLikesRateLimit = async (ip: string): Promise<boolean> => {
     return true;
   }
 };
+
+/**
+ * True se o IP está liberado. Bloqueia (false) quando estoura a janela
+ * deslizante OU quando o IP está na Auto IP Deny List do Upstash.
+ */
+export const checkLikesRateLimit = (ip: string): Promise<boolean> =>
+  checkRateLimit(getRateLimiter('rl:likes', 30), ip);
+
+/**
+ * Rate limit das reações — janela maior que a dos likes porque um leitor
+ * legítimo pode reagir a várias seções (3 emojis × N seções) em sequência.
+ */
+export const checkReactionsRateLimit = (ip: string): Promise<boolean> =>
+  checkRateLimit(getRateLimiter('rl:reactions', 60), ip);
 
 /** Lê um valor cacheado. Retorna null se inexistente ou se o Redis não estiver configurado. */
 export const cacheGet = async <T>(key: string): Promise<T | null> => {
