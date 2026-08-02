@@ -13,7 +13,6 @@ import {
   faFaceSmile,
   faGraduationCap,
   faHandshake,
-  faHeadphones,
   faIdCard,
   faPenNib,
   faUser,
@@ -30,17 +29,13 @@ import {
 import { Card } from '@/base/components/Card';
 import { PageTitle } from '@/base/components/PageTitle';
 import { SectionHeader } from '@/base/components/SectionHeader';
-import { TagList } from '@/features/about/components';
-import { getGithubLanguages, getGithubUsername } from '@/lib/github';
-import { getLastfmTopTags } from '@/lib/lastfm';
+import { getGithubUsername } from '@/lib/github';
 import { SITE_NAME, SITE_URL } from '@/lib/site';
 
 const ABOUT_TITLE = 'Sobre mim';
 const ABOUT_DESCRIPTION = 'Sobre John Enderson';
 const ABOUT_URL = `${SITE_URL}/me`;
 const ABOUT_OG_IMAGE = `${SITE_URL}/og/site/me`;
-
-export const revalidate = 3600;
 
 export const metadata: Metadata = {
   title: ABOUT_TITLE,
@@ -95,8 +90,6 @@ const tldrCards = [
     description: '2020 - 2025',
   },
 ];
-
-const musicTagColors = ['#ec4899', '#f0a66d', '#5bd3c7', '#8b5cf6', '#facc15'];
 
 // Seed fixa: sempre a mesma foto, mesma rotação de hover em toda renderização.
 const PHOTO_HOVER_SEED = 2;
@@ -170,11 +163,7 @@ const InlineLink = ({ href, children }: { href: string; children: string }) => (
   </Link>
 );
 
-export default async function Page() {
-  const [languages, musicTags] = await Promise.all([
-    getGithubLanguages().catch(() => []),
-    getLastfmTopTags({ period: '12month' }).catch(() => []),
-  ]);
+export default function Page() {
   const username = getGithubUsername();
 
   return (
@@ -431,75 +420,6 @@ export default async function Page() {
                 items={dislikes}
               />
             </div>
-
-            {languages.length > 0 ? (
-              <>
-                <div className="h-px w-full bg-site-border-muted" />
-
-                <section aria-labelledby="stacks-title" className="w-full">
-                  <SectionHeader
-                    icon={
-                      <FontAwesomeIcon
-                        icon={faCode}
-                        aria-hidden="true"
-                        className="size-4"
-                      />
-                    }
-                    id="stacks-title"
-                    title="Stacks que eu codo"
-                    subtitle="As linguagens que mais aparecem nos meus repositórios públicos."
-                  />
-                  <TagList
-                    items={languages.map((language) => ({
-                      label: language.name,
-                      color: language.color,
-                      meta: `${language.percentage}%`,
-                    }))}
-                  />
-                </section>
-              </>
-            ) : null}
-
-            {musicTags.length > 0 ? (
-              <>
-                <div className="h-px w-full bg-site-border-muted" />
-
-                <section aria-labelledby="listening-title" className="w-full">
-                  <SectionHeader
-                    icon={
-                      <FontAwesomeIcon
-                        icon={faHeadphones}
-                        aria-hidden="true"
-                        className="size-4"
-                      />
-                    }
-                    id="listening-title"
-                    title="O que ando ouvindo"
-                    subtitle="Os gêneros e tags que dominam o que tenho ouvido no Last.fm."
-                  />
-                  <TagList
-                    variant="neutral"
-                    items={musicTags.map((tag, index) => ({
-                      label: tag.name,
-                      color: musicTagColors[index % musicTagColors.length],
-                    }))}
-                  />
-                </section>
-              </>
-            ) : null}
-
-            <div className="h-px w-full bg-site-border-muted" />
-
-            <p className="text-site-body-muted text-sm m-0">
-              Você também pode ler meus{' '}
-              <Link
-                href="/blog"
-                className="text-site-foreground hover:text-site-primary-hover transition-colors"
-              >
-                artigos
-              </Link>
-              .
-            </p>
           </div>
         </div>
       </main>
