@@ -330,6 +330,65 @@ html.light {
   z-index: 1;
 }
 
+/*
+ * Selo do ícone dos cabeçalhos de seção. A cor vem de `--section-icon-accent`
+ * para que contextos como `.preference-card` possam recolorir o selo apenas
+ * pela cascata, sem precisar de prop no componente.
+ */
+.section-icon {
+  --section-icon-accent: var(--site-primary);
+  background: color-mix(in srgb, var(--section-icon-accent) 13%, transparent);
+  border-color: var(--section-icon-accent);
+  color: var(--section-icon-accent);
+}
+
+/*
+ * Cards de "gosto / não gosto". Os tons reaproveitam os acentos das
+ * admonitions (tip e danger), que já têm valores para os dois temas.
+ */
+.preference-card {
+  background: radial-gradient(
+      circle at 14% 0%,
+      color-mix(
+        in srgb,
+        var(--preference-accent, var(--site-primary)) 12%,
+        transparent
+      ),
+      transparent 48%
+    ),
+    var(--site-card);
+  border-color: color-mix(
+    in srgb,
+    var(--preference-accent, var(--site-primary)) 36%,
+    var(--site-border-muted)
+  );
+}
+
+/* O tom fica no wrapper: a variável desce por herança até o card e a lista. */
+[data-preference-tone='positive'] {
+  --preference-accent: #79d9a5;
+}
+
+[data-preference-tone='negative'] {
+  --preference-accent: #ff7b7b;
+}
+
+html.light [data-preference-tone='positive'] {
+  --preference-accent: #147d43;
+}
+
+html.light [data-preference-tone='negative'] {
+  --preference-accent: #bd2b2b;
+}
+
+.preference-card .section-icon {
+  --section-icon-accent: var(--preference-accent, var(--site-primary));
+}
+
+.preference-card-marker {
+  color: var(--preference-accent, var(--site-primary));
+}
+
 .tldr-card {
   --tldr-accent: var(--site-primary);
   background: radial-gradient(
@@ -491,7 +550,7 @@ body {
   background: var(--site-background);
   color: var(--site-foreground);
   font-size: 16px;
-  font-family: var(--font-geist-sans), 'Geist', sans-serif;
+  font-family: var(--font-sans), 'IBM Plex Sans', sans-serif;
   font-weight: 400;
   line-height: 1.725;
   width: 100%;
@@ -1318,7 +1377,7 @@ html.light .content pre code {
   border-radius: 8px 8px 0 0;
   color: var(--code-muted);
   display: flex;
-  font-family: var(--font-geist-sans), 'Geist', sans-serif;
+  font-family: var(--font-sans), 'IBM Plex Sans', sans-serif;
   gap: 0.75rem;
   inset: 0 0 auto 0;
   min-height: 2.9rem;

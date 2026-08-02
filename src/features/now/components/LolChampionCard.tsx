@@ -1,12 +1,11 @@
 import Image from 'next/image';
 
+import { CardTooltip } from './CardTooltip';
 import {
   CARD_HOVER_SMALL,
   CARD_INNER_RING,
   hoverRotation,
-} from '../card-animation';
-
-import { CardTooltip } from './CardTooltip';
+} from '@/base/card-animation';
 import { LolChampion } from '@/lib/lol';
 
 const formatMastery = (points: number): string => {

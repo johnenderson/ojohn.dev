@@ -1,12 +1,11 @@
 import Image from 'next/image';
 
+import { CardTooltip } from './CardTooltip';
 import {
   CARD_HOVER_SMALL,
   CARD_INNER_RING,
   hoverRotation,
-} from '../card-animation';
-
-import { CardTooltip } from './CardTooltip';
+} from '@/base/card-animation';
 import { ArtistFallback } from '@/features/now/components/MusicFallback';
 import { LastfmArtist } from '@/types/Lastfm';
 
