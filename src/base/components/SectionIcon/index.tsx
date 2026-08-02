@@ -1,0 +1,1 @@
+export { SectionIcon } from './SectionIcon';

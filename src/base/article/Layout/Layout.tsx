@@ -9,6 +9,7 @@ import { Footer } from '@/base/article/Layout/Footer';
 import { Likes } from '@/base/article/Likes';
 import { Meta } from '@/base/article/Meta';
 import { ReadingProgress } from '@/base/article/ReadingProgress';
+import { SectionReactions } from '@/base/article/SectionReactions';
 import { ShareMenu } from '@/base/article/ShareMenu';
 import { TableOfContents } from '@/base/article/TableOfContents/TableOfContents';
 import { Title } from '@/base/article/Title';
@@ -96,6 +97,7 @@ export const Layout: FC<PropsWithChildren<LayoutPropTypes>> = ({
                 {children}
                 <CodeCopyButtons />
                 <HeadingAnchors />
+                <SectionReactions likesId={likesId} />
                 <div className="mt-12 flex flex-wrap items-center justify-between gap-3 border-t border-site-border-subtle pt-8">
                   <Likes likesId={likesId} />
                   <div className="flex items-center gap-3">

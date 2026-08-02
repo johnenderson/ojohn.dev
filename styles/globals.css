@@ -490,7 +490,7 @@ a,
 body {
   background: var(--site-background);
   color: var(--site-foreground);
-  font-size: 17px;
+  font-size: 16px;
   font-family: var(--font-geist-sans), 'Geist', sans-serif;
   font-weight: 400;
   line-height: 1.725;
@@ -765,12 +765,17 @@ article h3:hover .heading-anchor,
  * top-level block in a <div>, so `article.post > p` would never match.
  * The :not(header *) guard keeps the header's tag list untouched.
  */
+/*
+ * `em` (não `rem`) de propósito: o tamanho herda de `.content`, que lê
+ * `--prose-font-size`. Com `rem` o texto ficava preso ao root e o seletor de
+ * tamanho de fonte das preferências não tinha efeito nos artigos.
+ */
 article.post p:not(header *),
 article.post li:not(header *) {
   color: var(--site-body);
   font-weight: 400;
-  font-size: 1.0625rem;
-  line-height: 1.8;
+  font-size: 1em;
+  line-height: 1.75;
 }
 
 article.post p:not(header *) {
@@ -1202,7 +1207,7 @@ p.no-margin-top {
   width: 100%;
   max-width: 1024px; /* matches navbar and footer max-w-5xl */
   flex: 1;
-  font-size: var(--prose-font-size, 17px);
+  font-size: var(--prose-font-size, 16px);
   padding-left: 1.5rem;
   padding-right: 1.5rem;
   padding-top: calc(4rem + 1.75rem); /* fixed navbar height + spacing */

@@ -13,6 +13,10 @@ import type { Metadata } from 'next';
 
 import { PageTitle } from '@/base/components/PageTitle';
 import {
+  SECTION_ACTION_CLASS,
+  SectionHeader,
+} from '@/base/components/SectionHeader';
+import {
   ActivityFeed,
   ArtistCard,
   CodingRhythm,
@@ -25,7 +29,6 @@ import {
   LolRankedCard,
   RadarCard,
   RecentTrack,
-  SectionIcon,
   StarredRepos,
 } from '@/features/now/components';
 import { getGithubDev, getGithubStarred } from '@/lib/github';
@@ -85,7 +88,7 @@ const HeadphonesIcon = () => (
   <svg
     aria-hidden="true"
     viewBox="0 0 24 24"
-    className="size-7"
+    className="size-4"
     fill="none"
     stroke="currentColor"
     strokeLinecap="round"
@@ -152,8 +155,8 @@ export default async function NowPage() {
       lastPlayed: null,
       tracks: [],
     })),
-    getLastfmTopArtists({ period: '7day' }).catch(() => []),
-    getLastfmTopTracks({ period: '7day' }).catch(() => []),
+    getLastfmTopArtists({ period: '1month' }).catch(() => []),
+    getLastfmTopTracks({ period: '1month' }).catch(() => []),
     getGithubDev().catch(() => null),
     getSteamGames().catch(() => ({ games: [], source: 'recent' as const })),
     getLolProfile().catch(() => null),
@@ -181,22 +184,18 @@ export default async function NowPage() {
             aria-labelledby="radar-title"
             className="border-b border-site-border-subtle pb-16"
           >
-            <header className="mb-10 flex max-w-3xl items-start gap-3 lg:gap-6 xl:-ml-[4.5rem]">
-              <SectionIcon>
-                <FontAwesomeIcon icon={faBullseye} className="size-6" />
-              </SectionIcon>
-              <div>
-                <h2
-                  id="radar-title"
-                  className="m-0 text-3xl font-bold leading-none text-site-foreground sm:text-4xl"
-                >
-                  Radar atual
-                </h2>
-                <p className="mb-0 mt-3 text-base font-semibold leading-snug text-site-body-muted">
-                  {RADAR_DESCRIPTION}
-                </p>
-              </div>
-            </header>
+            <SectionHeader
+              icon={
+                <FontAwesomeIcon
+                  icon={faBullseye}
+                  aria-hidden="true"
+                  className="size-4"
+                />
+              }
+              id="radar-title"
+              title="Radar atual"
+              subtitle={RADAR_DESCRIPTION}
+            />
 
             <div className="grid gap-4 md:grid-cols-2">
               <RadarCard
@@ -227,22 +226,18 @@ export default async function NowPage() {
               aria-labelledby="code-title"
               className="border-b border-site-border-subtle py-16"
             >
-              <header className="mb-10 flex max-w-3xl items-start gap-3 lg:gap-6 xl:-ml-[4.5rem]">
-                <SectionIcon>
-                  <FontAwesomeIcon icon={faCode} className="size-6" />
-                </SectionIcon>
-                <div>
-                  <h2
-                    id="code-title"
-                    className="m-0 text-3xl font-bold leading-none text-site-foreground sm:text-4xl"
-                  >
-                    Código
-                  </h2>
-                  <p className="mb-0 mt-3 text-base font-semibold leading-snug text-site-body-muted">
-                    {CODE_DESCRIPTION}
-                  </p>
-                </div>
-              </header>
+              <SectionHeader
+                icon={
+                  <FontAwesomeIcon
+                    icon={faCode}
+                    aria-hidden="true"
+                    className="size-4"
+                  />
+                }
+                id="code-title"
+                title="Código"
+                subtitle={CODE_DESCRIPTION}
+              />
 
               <div className="flex flex-col gap-4">
                 <div className="grid gap-4 lg:grid-cols-2">
@@ -260,19 +255,17 @@ export default async function NowPage() {
               aria-labelledby="starred-title"
               className="border-b border-site-border-subtle py-16"
             >
-              <header className="mb-10 flex max-w-3xl items-start gap-3 lg:gap-6 xl:-ml-[4.5rem]">
-                <SectionIcon>
-                  <FontAwesomeIcon icon={faCode} className="size-6" />
-                </SectionIcon>
-                <div>
-                  <h2
-                    id="starred-title"
-                    className="m-0 text-3xl font-bold leading-none text-site-foreground sm:text-4xl"
-                  >
-                    Código
-                  </h2>
-                </div>
-              </header>
+              <SectionHeader
+                icon={
+                  <FontAwesomeIcon
+                    icon={faCode}
+                    aria-hidden="true"
+                    className="size-4"
+                  />
+                }
+                id="starred-title"
+                title="Código"
+              />
               <StarredRepos repos={starred} />
             </section>
           )}
@@ -281,36 +274,34 @@ export default async function NowPage() {
             aria-labelledby="listening-title"
             className="border-b border-site-border-subtle py-16"
           >
-            <header className="mb-10 flex max-w-3xl items-start gap-3 lg:gap-6 xl:-ml-[4.5rem]">
-              <SectionIcon>
-                <HeadphonesIcon />
-              </SectionIcon>
-              <div>
-                <h2
-                  id="listening-title"
-                  className="m-0 text-3xl font-bold leading-none text-site-foreground sm:text-4xl"
+            <SectionHeader
+              icon={<HeadphonesIcon />}
+              id="listening-title"
+              title="No repeat do mês"
+              subtitle={LISTENING_DESCRIPTION}
+              action={
+                <Link
+                  href="https://www.last.fm/user/johnenderson"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={SECTION_ACTION_CLASS}
                 >
-                  No repeat da semana
-                </h2>
-                <p className="mb-0 mt-3 text-base font-semibold leading-snug text-site-body-muted">
-                  {LISTENING_DESCRIPTION}
-                </p>
-              </div>
-            </header>
+                  Ver no Last.fm →
+                </Link>
+              }
+            />
 
             <div className="grid gap-12 lg:grid-cols-[1fr_32rem]">
               <section
-                aria-labelledby="weekly-tracks-title"
+                aria-labelledby="monthly-tracks-title"
                 className="flex h-full flex-col"
               >
-                <div className="mb-5 flex flex-wrap items-end justify-between gap-3">
-                  <h2
-                    id="weekly-tracks-title"
-                    className="m-0 text-xl font-bold text-site-foreground sm:text-2xl"
-                  >
-                    Trilha da semana
-                  </h2>
-                </div>
+                <h3
+                  id="monthly-tracks-title"
+                  className="m-0 mb-5 text-lg font-bold text-site-foreground"
+                >
+                  Trilha do mês
+                </h3>
 
                 {featuredTrack ? (
                   <div className="mb-5 max-w-md">
@@ -318,14 +309,12 @@ export default async function NowPage() {
                   </div>
                 ) : null}
 
-                <div className="mb-3 flex flex-wrap items-end justify-between gap-3">
-                  <h3
-                    id="recent-tracks-title"
-                    className="m-0 text-lg font-bold text-site-foreground sm:text-xl"
-                  >
-                    Mais recentes
-                  </h3>
-                </div>
+                <h4
+                  id="recent-tracks-title"
+                  className="m-0 mb-3 text-sm font-bold uppercase tracking-[0.08em] text-site-body-muted"
+                >
+                  Mais recentes
+                </h4>
                 {recentTrackList.length > 0 ? (
                   <ul className="m-0 flex max-w-md flex-1 list-none flex-col justify-between gap-2 p-0">
                     {recentTrackList.slice(0, 4).map((track, index) => (
@@ -348,14 +337,12 @@ export default async function NowPage() {
               </section>
 
               <section aria-labelledby="top-artists-title">
-                <div className="mb-5 flex flex-wrap items-end justify-between gap-3">
-                  <h2
-                    id="top-artists-title"
-                    className="m-0 text-xl font-bold text-site-foreground sm:text-2xl"
-                  >
-                    Companhia da semana
-                  </h2>
-                </div>
+                <h3
+                  id="top-artists-title"
+                  className="m-0 mb-5 text-lg font-bold text-site-foreground"
+                >
+                  Companhia do mês
+                </h3>
                 {artists.length > 0 ? (
                   <>
                     <div className="grid grid-cols-3 gap-3">
@@ -367,34 +354,19 @@ export default async function NowPage() {
                         />
                       ))}
                     </div>
-                    <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
-                      <p className="m-0 inline-flex items-center gap-1.5 rounded-full border border-site-border-subtle px-2.5 py-1 text-xs font-medium text-site-body-muted">
-                        <FontAwesomeIcon
-                          icon={faSpotify}
-                          aria-label="Spotify"
-                          role="img"
-                          className="text-sm text-[#1DB954]"
-                        />
-                        Imagens via Spotify
-                      </p>
-                      <Link
-                        href="https://www.last.fm/user/johnenderson"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-2 border-b border-site-primary pb-0.5 text-sm font-bold text-site-primary no-underline transition-colors hover:border-site-primary-hover hover:text-site-primary-hover"
-                      >
-                        Ver no Last.fm
-                        <FontAwesomeIcon
-                          icon={faArrowRight}
-                          aria-hidden="true"
-                          className="text-xs"
-                        />
-                      </Link>
-                    </div>
+                    <p className="m-0 mt-3 inline-flex items-center gap-1.5 rounded-full border border-site-border-subtle px-2.5 py-1 text-xs font-medium text-site-body-muted">
+                      <FontAwesomeIcon
+                        icon={faSpotify}
+                        aria-label="Spotify"
+                        role="img"
+                        className="text-sm text-[#1DB954]"
+                      />
+                      Imagens via Spotify
+                    </p>
                   </>
                 ) : (
                   <p className="m-0 text-site-body-muted">
-                    Sem artistas da semana para mostrar.
+                    Sem artistas do mês para mostrar.
                   </p>
                 )}
               </section>
@@ -402,22 +374,18 @@ export default async function NowPage() {
           </section>
 
           <section aria-labelledby="playing-title" className="pt-16">
-            <header className="mb-10 flex max-w-3xl items-start gap-3 lg:gap-6 xl:-ml-[4.5rem]">
-              <SectionIcon>
-                <FontAwesomeIcon icon={faGamepad} className="size-6" />
-              </SectionIcon>
-              <div>
-                <h2
-                  id="playing-title"
-                  className="m-0 text-3xl font-bold leading-none text-site-foreground sm:text-4xl"
-                >
-                  Provável recaída
-                </h2>
-                <p className="mb-0 mt-3 max-w-2xl text-base font-semibold leading-relaxed text-site-body-muted">
-                  {PLAYING_DESCRIPTION}
-                </p>
-              </div>
-            </header>
+            <SectionHeader
+              icon={
+                <FontAwesomeIcon
+                  icon={faGamepad}
+                  aria-hidden="true"
+                  className="size-4"
+                />
+              }
+              id="playing-title"
+              title="Provável recaída"
+              subtitle={PLAYING_DESCRIPTION}
+            />
 
             {/* League of Legends — mencionado na descrição, vem primeiro */}
             {lol && (
@@ -428,11 +396,11 @@ export default async function NowPage() {
                 <header className="mb-6 max-w-3xl">
                   <h3
                     id="lol-title"
-                    className="m-0 text-xl font-bold leading-tight text-site-foreground"
+                    className="m-0 text-lg font-bold leading-tight text-site-foreground"
                   >
                     League of Legends
                   </h3>
-                  <p className="mb-0 mt-2 text-base font-semibold leading-snug text-site-body-muted">
+                  <p className="mb-0 mt-2 text-base leading-snug text-site-body-muted">
                     Ranked Solo/Duo e os campeões com mais maestria.
                   </p>
                 </header>
@@ -444,7 +412,7 @@ export default async function NowPage() {
 
                   {lol.topChampions.length > 0 && (
                     <div>
-                      <h4 className="mb-4 text-base font-bold text-site-foreground">
+                      <h4 className="m-0 mb-3 text-sm font-bold uppercase tracking-[0.08em] text-site-body-muted">
                         Top campeões
                       </h4>
                       <div className="grid grid-cols-5 gap-3 lg:gap-6">
@@ -492,7 +460,7 @@ export default async function NowPage() {
                 }
               >
                 {lol && (
-                  <h3 className="mb-5 text-xl font-bold text-site-foreground">
+                  <h3 className="mb-5 text-lg font-bold text-site-foreground">
                     No Steam
                   </h3>
                 )}

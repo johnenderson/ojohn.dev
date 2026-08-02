@@ -15,6 +15,21 @@
         "PATH=/home/john/.nvm/versions/node/v22.15.0/bin:/usr/local/bin:/usr/bin:/bin yarn dev"
       ],
       "port": 3000
+    },
+    {
+      "name": "prod",
+      "runtimeExecutable": "wsl.exe",
+      "runtimeArgs": [
+        "-d",
+        "Ubuntu",
+        "--cd",
+        "/home/john/Code/johnenderson.dev",
+        "--",
+        "bash",
+        "-c",
+        "PATH=/home/john/.nvm/versions/node/v22.15.0/bin:/usr/local/bin:/usr/bin:/bin yarn start"
+      ],
+      "port": 3000
     }
   ]
 }

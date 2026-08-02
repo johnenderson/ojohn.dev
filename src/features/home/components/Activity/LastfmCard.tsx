@@ -7,6 +7,10 @@ import { CSSProperties, ReactNode, useState } from 'react';
 import useSWR from 'swr';
 
 import { Card } from '@/base/components/Card';
+import {
+  SECTION_ACTION_CLASS,
+  SectionHeader,
+} from '@/base/components/SectionHeader';
 import { LastfmStats, LastfmTrack } from '@/types/Lastfm';
 
 type LastfmNowPlayingResponse = {
@@ -167,14 +171,28 @@ export const LastfmCard = () => {
       id="activity"
       className="mt-12 border-t border-site-border-subtle pt-12 md:mt-14 md:pt-14"
     >
+      <SectionHeader
+        icon={<MusicIcon size={16} />}
+        title="Música"
+        action={
+          <Link
+            href="https://www.last.fm/user/johnenderson"
+            target="_blank"
+            rel="noopener noreferrer"
+            className={SECTION_ACTION_CLASS}
+          >
+            Ver no Last.fm →
+          </Link>
+        }
+      />
       <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
         <FadeIn className="col-span-1 md:col-span-2" duration={500}>
           <Card interactive className="flex h-full flex-col gap-4 p-4 sm:p-5">
             <div className="flex flex-wrap items-center justify-between gap-2">
               <div className="flex items-center gap-2">
-                <h2 className="m-0 text-base font-semibold text-site-foreground">
+                <h3 className="m-0 text-base font-semibold text-site-foreground">
                   {title}
-                </h2>
+                </h3>
                 <DiscIcon />
               </div>
               {lastfm?.nowPlaying ? <LiveBadge /> : null}
@@ -233,9 +251,9 @@ export const LastfmCard = () => {
             className="flex h-full min-h-36 flex-col gap-4 p-4 sm:p-5"
           >
             <div className="flex items-center gap-2">
-              <h2 className="m-0 text-base font-semibold text-site-foreground">
+              <h3 className="m-0 text-base font-semibold text-site-foreground">
                 Últimas faixas
-              </h2>
+              </h3>
               <MusicIcon />
             </div>
 

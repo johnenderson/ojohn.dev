@@ -73,7 +73,7 @@ export const FeaturedTrack = ({ track }: { track: LastfmTrack }) => {
         ) : null}
         {track.playcount ? (
           <p className="mb-0 mt-2 text-xs font-bold leading-tight text-site-primary">
-            {track.playcount} plays na semana
+            {track.playcount} plays no mês
           </p>
         ) : null}
         {track.imageSource === 'spotify' ? (

@@ -8,12 +8,16 @@ import {
   faCode,
   faGraduationCap,
   faHandshake,
+  faHeadphones,
+  faIdCard,
+  faUser,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import type { Metadata } from 'next';
 
 import { Card } from '@/base/components/Card';
 import { PageTitle } from '@/base/components/PageTitle';
+import { SectionHeader } from '@/base/components/SectionHeader';
 import { TagList } from '@/features/about/components';
 import { getGithubLanguages, getGithubUsername } from '@/lib/github';
 import { getLastfmTopTags } from '@/lib/lastfm';
@@ -113,16 +117,18 @@ export default async function Page() {
 
             <div className="h-px w-full bg-site-border-muted" />
 
-            <section
-              aria-labelledby="tldr-title"
-              className="flex w-full flex-col gap-6"
-            >
-              <h2
+            <section aria-labelledby="tldr-title" className="w-full">
+              <SectionHeader
+                icon={
+                  <FontAwesomeIcon
+                    icon={faIdCard}
+                    aria-hidden="true"
+                    className="size-4"
+                  />
+                }
                 id="tldr-title"
-                className="m-0 text-2xl font-bold text-site-foreground"
-              >
-                Em poucas palavras
-              </h2>
+                title="Em poucas palavras"
+              />
 
               <ul className="m-0 grid w-full list-none grid-cols-1 gap-3 p-0 sm:grid-cols-2 lg:grid-cols-4">
                 {tldrCards.map((card) => (
@@ -167,14 +173,19 @@ export default async function Page() {
 
             <section
               aria-labelledby="personally-title"
-              className="flex w-full max-w-3xl flex-col gap-6"
+              className="w-full max-w-3xl"
             >
-              <h2
+              <SectionHeader
+                icon={
+                  <FontAwesomeIcon
+                    icon={faUser}
+                    aria-hidden="true"
+                    className="size-4"
+                  />
+                }
                 id="personally-title"
-                className="m-0 text-2xl font-bold text-site-foreground"
-              >
-                Pessoalmente
-              </h2>
+                title="Pessoalmente"
+              />
 
               <div className="flex flex-col gap-5 text-site-body-muted leading-relaxed">
                 <p className="m-0">Oi, eu sou o John!</p>
@@ -250,18 +261,20 @@ export default async function Page() {
 
                 <section
                   aria-labelledby="stacks-title"
-                  className="flex w-full max-w-3xl flex-col gap-4"
+                  className="w-full max-w-3xl"
                 >
-                  <h2
+                  <SectionHeader
+                    icon={
+                      <FontAwesomeIcon
+                        icon={faCode}
+                        aria-hidden="true"
+                        className="size-4"
+                      />
+                    }
                     id="stacks-title"
-                    className="m-0 text-2xl font-bold text-site-foreground"
-                  >
-                    Stacks que eu codo
-                  </h2>
-                  <p className="m-0 text-sm text-site-body-muted">
-                    As linguagens que mais aparecem nos meus repositórios
-                    públicos.
-                  </p>
+                    title="Stacks que eu codo"
+                    subtitle="As linguagens que mais aparecem nos meus repositórios públicos."
+                  />
                   <TagList
                     items={languages.map((language) => ({
                       label: language.name,
@@ -279,17 +292,20 @@ export default async function Page() {
 
                 <section
                   aria-labelledby="listening-title"
-                  className="flex w-full max-w-3xl flex-col gap-4"
+                  className="w-full max-w-3xl"
                 >
-                  <h2
+                  <SectionHeader
+                    icon={
+                      <FontAwesomeIcon
+                        icon={faHeadphones}
+                        aria-hidden="true"
+                        className="size-4"
+                      />
+                    }
                     id="listening-title"
-                    className="m-0 text-2xl font-bold text-site-foreground"
-                  >
-                    O que ando curtindo
-                  </h2>
-                  <p className="m-0 text-sm text-site-body-muted">
-                    Os gêneros e tags que dominam o que tenho ouvido no Last.fm.
-                  </p>
+                    title="O que ando curtindo"
+                    subtitle="Os gêneros e tags que dominam o que tenho ouvido no Last.fm."
+                  />
                   <TagList
                     variant="neutral"
                     items={musicTags.map((tag, index) => ({

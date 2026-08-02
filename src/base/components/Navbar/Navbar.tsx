@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 import {
+  faEnvelope,
   faHeadphones,
   faNewspaper,
   faScrewdriverWrench,
@@ -16,11 +17,13 @@ import { LanguageSelector } from './LanguageSelector';
 import { PreferencesPanel } from './PreferencesPanel';
 import { SITE_NAME } from '@/lib/site';
 
+// `disabled` marca itens ainda sem página: aparecem no menu, mas não navegam.
 const navLinks = [
+  { href: '/blog', label: 'Blog', icon: faNewspaper },
   { href: '/me', label: 'Sobre mim', icon: faUser },
   { href: '/now', label: 'Agora', icon: faHeadphones },
   { href: '/uses', label: 'Uso', icon: faScrewdriverWrench },
-  { href: '/blog', label: 'Blog', icon: faNewspaper },
+  { href: '/contact', label: 'Contato', icon: faEnvelope, disabled: true },
 ];
 
 const MenuIcon = () => (
@@ -84,7 +87,20 @@ export const Navbar = () => {
 
           <div className="-mr-3 ml-auto hidden h-full items-center md:flex">
             <nav className="flex items-center h-full">
-              {navLinks.map(({ href, label }) => {
+              {navLinks.map(({ href, label, disabled }) => {
+                if (disabled) {
+                  return (
+                    <span
+                      key={href}
+                      title="Em breve"
+                      aria-disabled="true"
+                      className="flex h-full cursor-default select-none items-center px-3 font-normal text-site-body-muted opacity-60"
+                    >
+                      {label}
+                    </span>
+                  );
+                }
+
                 const isActive =
                   href === '/' ? pathname === '/' : pathname.startsWith(href);
                 return (
@@ -139,7 +155,28 @@ export const Navbar = () => {
           <div className="mx-auto mt-1 h-1.5 w-24 shrink-0 rounded-full bg-site-primary-soft" />
 
           <nav className="flex w-full flex-col">
-            {navLinks.map(({ href, label, icon }) => {
+            {navLinks.map(({ href, label, icon, disabled }) => {
+              if (disabled) {
+                return (
+                  <span
+                    key={href}
+                    aria-disabled="true"
+                    className="flex min-h-12 w-full cursor-default select-none items-center justify-start gap-3 rounded px-3 text-left font-normal text-site-body-muted opacity-60"
+                  >
+                    <FontAwesomeIcon
+                      icon={icon}
+                      className="size-5 text-site-body-muted"
+                    />
+                    <span>
+                      {label}{' '}
+                      <span className="text-xs text-site-body-muted">
+                        · em breve
+                      </span>
+                    </span>
+                  </span>
+                );
+              }
+
               const isActive =
                 href === '/' ? pathname === '/' : pathname.startsWith(href);
 

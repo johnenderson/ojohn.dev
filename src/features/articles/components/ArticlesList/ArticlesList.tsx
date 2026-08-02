@@ -1,7 +1,14 @@
 import Link from 'next/link';
 import { FC } from 'react';
 
+import { faNewspaper } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+
 import { ArticleListItem } from './ArticleListItem';
+import {
+  SECTION_ACTION_CLASS,
+  SectionHeader,
+} from '@/base/components/SectionHeader';
 import { Title } from '@/base/components/Title';
 import {
   ArticleListItem as ArticleListItemType,
@@ -56,15 +63,23 @@ export const ArticlesList: FC<ArticlesListProps> = ({
       header === 'h1' ? (
         <Title text="artigos" />
       ) : (
-        <div className="mb-4">
-          <h2 className="m-0 text-2xl font-bold tracking-normal text-site-foreground sm:text-3xl">
-            Artigos recentes
-          </h2>
-        </div>
+        <SectionHeader
+          icon={
+            <FontAwesomeIcon
+              icon={faNewspaper}
+              aria-hidden="true"
+              className="size-4"
+            />
+          }
+          title="Artigos recentes"
+          action={
+            <Link href="/blog" className={SECTION_ACTION_CLASS}>
+              Ver todos →
+            </Link>
+          }
+        />
       );
   }
-
-  const showVerTodos = header === 'h2';
 
   return (
     <section
@@ -91,7 +106,7 @@ export const ArticlesList: FC<ArticlesListProps> = ({
               <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
                 <h2
                   id={`articles-${year}`}
-                  className="m-0 text-3xl font-bold leading-none text-site-foreground"
+                  className="m-0 text-2xl font-bold leading-none text-site-foreground"
                 >
                   {year}
                 </h2>
@@ -137,18 +152,6 @@ export const ArticlesList: FC<ArticlesListProps> = ({
             />
           ))}
         </ul>
-      )}
-
-      {showVerTodos && (
-        <div className="mt-4 flex justify-end">
-          <Link
-            href="/blog"
-            passHref
-            className="text-sm font-medium text-site-body-muted no-underline transition-colors hover:text-site-primary-hover"
-          >
-            Ver todos →
-          </Link>
-        </div>
       )}
     </section>
   );

@@ -1,6 +1,7 @@
 import type { ImageProps } from 'next/image';
 import { cache } from 'react';
 
+import GithubSlugger from 'github-slugger';
 import readingTime from 'reading-time';
 
 import {
@@ -497,6 +498,75 @@ export function getArticleLikesIds(): Set<string> {
 
   _likesIds = ids;
   return ids;
+}
+
+// Um heading em MDX: `#` a `######` seguidos de espaço e texto.
+const HEADING_PATTERN = /^(#{1,6})\s+(.+?)\s*$/;
+// Link markdown inline: mantemos só o texto ao gerar o slug.
+const MD_LINK_PATTERN = /\[([^\]]*)\]\([^)]*\)/g;
+// Marcadores inline que o render remove antes do rehype-slug slugificar.
+const MD_INLINE_MARKS_PATTERN = /[`*_~]/g;
+
+/**
+ * Extrai os slugs dos h2 de um MDX, replicando os ids que o rehype-slug
+ * (github-slugger) gera no DOM. Todos os níveis de heading passam pelo
+ * slugger na ordem do documento para a contagem de duplicatas (`-1`, `-2`…)
+ * bater com a do render. Ignora linhas dentro de code fences (um comentário
+ * `## foo` num bloco de código não é seção).
+ */
+function extractSectionSlugs(content: string): string[] {
+  const slugger = new GithubSlugger();
+  const slugs: string[] = [];
+  let insideFence = false;
+
+  for (const line of content.split(/\r?\n/)) {
+    if (line.trimStart().startsWith('```')) {
+      insideFence = !insideFence;
+      continue;
+    }
+    if (insideFence) continue;
+
+    const match = HEADING_PATTERN.exec(line);
+    if (!match) continue;
+
+    const text = match[2]
+      .replace(MD_LINK_PATTERN, '$1')
+      .replace(MD_INLINE_MARKS_PATTERN, '');
+    const slug = slugger.slug(text);
+
+    // Só h2 recebe reações — são as seções do artigo.
+    if (match[1].length === 2 && slug) slugs.push(slug);
+  }
+
+  return slugs;
+}
+
+let _sectionSlugs: Map<string, Set<string>> | null = null;
+
+/**
+ * Slugs das seções (h2) de cada artigo publicado, indexados por likesId e
+ * somando todos os locales. A API de reações usa isto como whitelist: só
+ * aceita reações em seções que existem de verdade, bloqueando a criação de
+ * campos arbitrários no Redis. Memoizado — o conteúdo é estático (build).
+ */
+export function getArticleSectionSlugs(likesId: string): Set<string> {
+  if (!_sectionSlugs) {
+    _sectionSlugs = new Map();
+    for (const locale of Languages) {
+      for (const slug of getArticleSlugs(locale)) {
+        if (!hasArticleMetadata(slug, locale)) continue;
+
+        const { content, metadata } = readArticleFile(slug, locale);
+        const existing = _sectionSlugs.get(metadata.likesId) ?? new Set();
+        for (const sectionSlug of extractSectionSlugs(content)) {
+          existing.add(sectionSlug);
+        }
+        _sectionSlugs.set(metadata.likesId, existing);
+      }
+    }
+  }
+
+  return _sectionSlugs.get(likesId) ?? new Set();
 }
 
 export function getArticlePaths(locale: Locale = DEFAULT_ARTICLE_LOCALE) {

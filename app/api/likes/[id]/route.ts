@@ -7,6 +7,7 @@ import {
   incrementLikes,
   isRedisConfigured,
 } from '@/lib/redis';
+import { getClientIp } from '@/lib/request';
 
 export const dynamic = 'force-dynamic';
 
@@ -20,12 +21,6 @@ const ID_PATTERN = /^[A-Za-z0-9_-]{1,64}$/;
 // criação de chaves arbitrárias no Redis (storage/cota) por ids inventados.
 const isKnownArticle = (id: string) =>
   ID_PATTERN.test(id) && getArticleLikesIds().has(id);
-
-const getClientIp = (request: Request): string => {
-  const forwarded = request.headers.get('x-forwarded-for');
-  if (forwarded) return forwarded.split(',')[0].trim();
-  return request.headers.get('x-real-ip') ?? 'unknown';
-};
 
 export async function GET(_request: Request, { params }: Params) {
   const { id } = await params;
