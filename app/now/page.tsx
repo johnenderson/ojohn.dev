@@ -23,10 +23,7 @@ import {
   FeaturedTrack,
   GameCard,
   LanguageStack,
-  LolChampionCard,
   LolLiveGame,
-  LolMatchHistory,
-  LolRankedCard,
   RadarCard,
   RecentTrack,
   StarredRepos,
@@ -37,7 +34,7 @@ import {
   getLastfmTopArtists,
   getLastfmTopTracks,
 } from '@/lib/lastfm';
-import { getLolLiveGame, getLolMatches, getLolProfile } from '@/lib/lol';
+import { getLolLiveGame } from '@/lib/lol';
 import { SITE_NAME, SITE_URL } from '@/lib/site';
 import { getSteamGames } from '@/lib/steam';
 import { LastfmTrack } from '@/types/Lastfm';
@@ -52,11 +49,10 @@ const CODE_DESCRIPTION =
 const LISTENING_DESCRIPTION =
   'Sou um músico enferrujado, que continua amando música. Aqui ficam alguns rastros do que grudou no ouvido.';
 const PLAYING_DESCRIPTION =
-  'Às vezes eu sumo em algum jogo por uns dias. No momento, se eu aparecer online, provavelmente é League of Legends só para passar tempo.';
+  'Às vezes eu sumo em algum jogo por uns dias. Aqui ficam os que andei jogando mais.';
 const MATHEUS_FIDELIS_BLOG_URL = 'https://fidelissauro.dev/';
 const STEAM_PROFILE_URL =
   'https://steamcommunity.com/profiles/76561198796212584/';
-const LOL_PROFILE_URL = 'https://www.op.gg/summoners/br/';
 const NOW_URL = `${SITE_URL}/now`;
 const NOW_OG_IMAGE = `${SITE_URL}/og/site/now`;
 
@@ -139,31 +135,20 @@ const getUniqueTracks = (tracks: LastfmTrack[]) => {
 };
 
 export default async function NowPage() {
-  const [
-    lastfm,
-    artists,
-    topTracks,
-    dev,
-    steam,
-    lol,
-    starred,
-    lolMatches,
-    lolLiveGame,
-  ] = await Promise.all([
-    getLastfmRecentStats().catch(() => ({
-      nowPlaying: null,
-      lastPlayed: null,
-      tracks: [],
-    })),
-    getLastfmTopArtists({ period: '1month' }).catch(() => []),
-    getLastfmTopTracks({ period: '1month' }).catch(() => []),
-    getGithubDev().catch(() => null),
-    getSteamGames().catch(() => ({ games: [], source: 'recent' as const })),
-    getLolProfile().catch(() => null),
-    getGithubStarred().catch(() => []),
-    getLolMatches().catch(() => []),
-    getLolLiveGame().catch(() => null),
-  ]);
+  const [lastfm, artists, topTracks, dev, steam, starred, lolLiveGame] =
+    await Promise.all([
+      getLastfmRecentStats().catch(() => ({
+        nowPlaying: null,
+        lastPlayed: null,
+        tracks: [],
+      })),
+      getLastfmTopArtists({ period: '1month' }).catch(() => []),
+      getLastfmTopTracks({ period: '1month' }).catch(() => []),
+      getGithubDev().catch(() => null),
+      getSteamGames().catch(() => ({ games: [], source: 'recent' as const })),
+      getGithubStarred().catch(() => []),
+      getLolLiveGame().catch(() => null),
+    ]);
 
   const hasDevData = Boolean(
     dev && (dev.rhythm || dev.languages.length > 0 || dev.activity.length > 0),
@@ -387,112 +372,40 @@ export default async function NowPage() {
               subtitle={PLAYING_DESCRIPTION}
             />
 
-            {/* League of Legends — mencionado na descrição, vem primeiro */}
-            {lol && (
-              <div
-                aria-labelledby="lol-title"
-                className={steam.games.length > 0 ? 'mb-12' : ''}
-              >
-                <header className="mb-6 max-w-3xl">
-                  <h3
-                    id="lol-title"
-                    className="m-0 text-lg font-bold leading-tight text-site-foreground"
-                  >
-                    League of Legends
-                  </h3>
-                  <p className="mb-0 mt-2 text-base leading-snug text-site-body-muted">
-                    Ranked Solo/Duo e os campeões com mais maestria.
-                  </p>
-                </header>
-
-                <div className="flex flex-col gap-6">
-                  {lolLiveGame && <LolLiveGame game={lolLiveGame} />}
-
-                  {lol.ranked && <LolRankedCard ranked={lol.ranked} />}
-
-                  {lol.topChampions.length > 0 && (
-                    <div>
-                      <h4 className="m-0 mb-3 text-sm font-bold uppercase tracking-[0.08em] text-site-body-muted">
-                        Top campeões
-                      </h4>
-                      <div className="grid grid-cols-5 gap-3 lg:gap-6">
-                        {lol.topChampions.map((champion, i) => (
-                          <LolChampionCard
-                            key={champion.id}
-                            champion={champion}
-                            index={i}
-                          />
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                  {lolMatches.length > 0 && (
-                    <LolMatchHistory matches={lolMatches} />
-                  )}
-
-                  <div className="flex justify-end">
-                    <Link
-                      href={`${LOL_PROFILE_URL}${encodeURIComponent(
-                        lol.summonerName.replace('#', '-'),
-                      )}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 border-b border-site-primary pb-0.5 text-sm font-bold text-site-primary no-underline transition-colors hover:border-site-primary-hover hover:text-site-primary-hover"
-                    >
-                      Ver no op.gg
-                      <FontAwesomeIcon
-                        icon={faArrowRight}
-                        aria-hidden="true"
-                        className="text-xs"
-                      />
-                    </Link>
-                  </div>
-                </div>
+            {lolLiveGame && (
+              <div className="mb-8">
+                <h3 className="m-0 mb-3 text-lg font-bold text-site-foreground">
+                  League of Legends
+                </h3>
+                <LolLiveGame game={lolLiveGame} />
               </div>
             )}
 
-            {/* Steam — conteúdo complementar */}
             {steam.games.length > 0 ? (
-              <div
-                className={
-                  lol ? 'border-t border-site-border-subtle pt-10' : ''
-                }
-              >
-                {lol && (
-                  <h3 className="mb-5 text-lg font-bold text-site-foreground">
-                    No Steam
-                  </h3>
-                )}
-                <div className="flex flex-col gap-5">
-                  <div className="grid grid-cols-3 gap-3 sm:grid-cols-5 lg:gap-6">
-                    {steam.games.map((game) => (
-                      <GameCard key={game.appid} game={game} />
-                    ))}
-                  </div>
-                  <div className="flex justify-end">
-                    <Link
-                      href={STEAM_PROFILE_URL}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 border-b border-site-primary pb-0.5 text-sm font-bold text-site-primary no-underline transition-colors hover:border-site-primary-hover hover:text-site-primary-hover"
-                    >
-                      Ver no Steam
-                      <FontAwesomeIcon
-                        icon={faArrowRight}
-                        aria-hidden="true"
-                        className="text-xs"
-                      />
-                    </Link>
-                  </div>
+              <div className="flex flex-col gap-5">
+                <div className="grid grid-cols-3 gap-3 sm:grid-cols-5 lg:gap-6">
+                  {steam.games.map((game) => (
+                    <GameCard key={game.appid} game={game} />
+                  ))}
+                </div>
+                <div className="flex justify-end">
+                  <Link
+                    href={STEAM_PROFILE_URL}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 border-b border-site-primary pb-0.5 text-sm font-bold text-site-primary no-underline transition-colors hover:border-site-primary-hover hover:text-site-primary-hover"
+                  >
+                    Ver no Steam
+                    <FontAwesomeIcon
+                      icon={faArrowRight}
+                      aria-hidden="true"
+                      className="text-xs"
+                    />
+                  </Link>
                 </div>
               </div>
             ) : (
-              <div
-                className={`flex items-center justify-between gap-4${
-                  lol ? ' border-t border-site-border-subtle pt-10' : ''
-                }`}
-              >
+              <div className="flex items-center justify-between gap-4">
                 <p className="m-0 text-site-body-muted">
                   Nenhum jogo para mostrar.
                 </p>
