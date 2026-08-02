@@ -37,7 +37,7 @@ export const ArtistCard = ({
       }
       target="_blank"
       rel="noopener noreferrer"
-      aria-label={`${artist.name}, ${artist.playcount} plays na semana`}
+      aria-label={`${artist.name}, ${artist.playcount} plays no mês`}
       className={`relative flex aspect-square overflow-hidden rounded-md bg-site-card-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-site-primary ${CARD_HOVER_SMALL} ${hoverRotation(
         index,
       )}`}

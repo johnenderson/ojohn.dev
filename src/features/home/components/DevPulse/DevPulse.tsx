@@ -5,6 +5,10 @@ import { faFire } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import { Card } from '@/base/components/Card';
+import {
+  SECTION_ACTION_CLASS,
+  SectionHeader,
+} from '@/base/components/SectionHeader';
 import { formatRelativeTime } from '@/lib/formatRelativeTime';
 import { getGithubPulse } from '@/lib/github';
 
@@ -41,28 +45,28 @@ export async function DevPulse() {
 
   return (
     <section id="dev-pulse" className="mt-6 md:mt-8">
-      <Card interactive className="flex flex-col gap-5 p-4 sm:p-5">
-        <div className="flex flex-wrap items-center justify-between gap-2">
-          <div className="flex items-center gap-2">
-            <h2 className="m-0 text-base font-semibold text-site-foreground">
-              Pulso de dev
-            </h2>
-            <FontAwesomeIcon
-              icon={faGithub}
-              aria-hidden="true"
-              className="text-site-body-muted"
-            />
-          </div>
+      <SectionHeader
+        icon={
+          <FontAwesomeIcon
+            icon={faGithub}
+            aria-hidden="true"
+            className="size-4"
+          />
+        }
+        title="Pulso de dev"
+        action={
           <Link
             href={`https://github.com/${username}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-xs font-medium text-site-body-muted no-underline transition-colors hover:text-site-primary-hover focus-visible:text-site-primary-hover focus-visible:outline-none"
+            className={SECTION_ACTION_CLASS}
           >
             @{username}
           </Link>
-        </div>
+        }
+      />
 
+      <Card interactive className="flex flex-col gap-5 p-4 sm:p-5">
         <div className="grid gap-5 sm:grid-cols-3">
           <Stat label="Sequência">
             <p className="m-0 inline-flex items-center gap-1.5 text-2xl font-bold leading-none text-site-foreground">

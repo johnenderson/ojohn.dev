@@ -2,9 +2,20 @@ import Image from 'next/image';
 import type { CSSProperties, ReactNode } from 'react';
 
 import { PageWrapper } from '../components/PageWrapper';
+import type { IconDefinition } from '@fortawesome/fontawesome-svg-core';
+import {
+  faBriefcase,
+  faCode,
+  faDesktop,
+  faHeadphones,
+  faKeyboard,
+  faLayerGroup,
+} from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import type { Metadata } from 'next';
 
 import { PageTitle } from '@/base/components/PageTitle';
+import { SectionHeader } from '@/base/components/SectionHeader';
 import { SITE_NAME, SITE_URL } from '@/lib/site';
 
 const USES_TITLE = 'Uso';
@@ -182,17 +193,19 @@ const Divider = () => (
 const UsesSection = ({
   id,
   title,
+  icon,
   children,
   delay = 0,
 }: {
   id: string;
   title: string;
+  icon: IconDefinition;
   children: ReactNode;
   delay?: number;
 }) => (
   <section
     aria-labelledby={id}
-    className="site-fade-in flex w-full flex-col gap-6 md:flex-row md:gap-10"
+    className="site-fade-in w-full"
     style={
       {
         '--fade-in-delay': `${delay}ms`,
@@ -200,12 +213,13 @@ const UsesSection = ({
       } as CSSProperties
     }
   >
-    <h2
+    <SectionHeader
+      icon={
+        <FontAwesomeIcon icon={icon} aria-hidden="true" className="size-4" />
+      }
       id={id}
-      className="m-0 flex h-fit w-28 shrink-0 flex-col gap-1 text-xs font-semibold uppercase tracking-widest text-site-body-muted before:mb-1 before:block before:h-px before:w-6 before:bg-site-primary before:content-['']"
-    >
-      {title}
-    </h2>
+      title={title}
+    />
     {children}
   </section>
 );
@@ -287,25 +301,45 @@ export default function UsesPage() {
 
             <Divider />
 
-            <UsesSection id="work-pc-title" title="Trabalho" delay={0}>
+            <UsesSection
+              id="work-pc-title"
+              title="Trabalho"
+              icon={faBriefcase}
+              delay={0}
+            >
               <ProductsGrid items={workPc} />
             </UsesSection>
 
             <Divider />
 
-            <UsesSection id="desktop-title" title="Desktop" delay={80}>
+            <UsesSection
+              id="desktop-title"
+              title="Desktop"
+              icon={faDesktop}
+              delay={80}
+            >
               <ProductsGrid items={desktop} />
             </UsesSection>
 
             <Divider />
 
-            <UsesSection id="desk-title" title="Mesa" delay={160}>
+            <UsesSection
+              id="desk-title"
+              title="Mesa"
+              icon={faKeyboard}
+              delay={160}
+            >
               <ProductsGrid items={desk} />
             </UsesSection>
 
             <Divider />
 
-            <UsesSection id="audio-title" title="Áudio" delay={240}>
+            <UsesSection
+              id="audio-title"
+              title="Áudio"
+              icon={faHeadphones}
+              delay={240}
+            >
               <ProductsGrid items={audio} />
             </UsesSection>
 
@@ -314,6 +348,7 @@ export default function UsesPage() {
             <UsesSection
               id="development-software-title"
               title="Desenvolvimento"
+              icon={faCode}
               delay={320}
             >
               <AppsGrid items={developmentSoftware} />
@@ -321,7 +356,12 @@ export default function UsesPage() {
 
             <Divider />
 
-            <UsesSection id="general-software-title" title="Geral" delay={400}>
+            <UsesSection
+              id="general-software-title"
+              title="Geral"
+              icon={faLayerGroup}
+              delay={400}
+            >
               <AppsGrid items={generalSoftware} />
             </UsesSection>
           </div>

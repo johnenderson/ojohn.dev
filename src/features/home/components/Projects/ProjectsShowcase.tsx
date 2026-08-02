@@ -5,6 +5,10 @@ import { faCodeFork, faStar } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import { Card } from '@/base/components/Card';
+import {
+  SECTION_ACTION_CLASS,
+  SectionHeader,
+} from '@/base/components/SectionHeader';
 import { formatRelativeTime } from '@/lib/formatRelativeTime';
 import type { GithubProject } from '@/lib/github';
 import { getGithubProjects, getGithubUsername } from '@/lib/github';
@@ -105,32 +109,31 @@ export async function ProjectsShowcase() {
       id="projects"
       className="mt-12 border-t border-site-border-subtle pt-12 md:mt-14 md:pt-14"
     >
-      <div className="mb-5 flex items-center gap-2">
-        <h2 className="m-0 text-base font-semibold text-site-foreground">
-          Projetos em destaque
-        </h2>
-        <FontAwesomeIcon
-          icon={faGithub}
-          aria-hidden="true"
-          className="text-site-body-muted"
-        />
-      </div>
+      <SectionHeader
+        icon={
+          <FontAwesomeIcon
+            icon={faGithub}
+            aria-hidden="true"
+            className="size-4"
+          />
+        }
+        title="Projetos em destaque"
+        action={
+          <Link
+            href={`https://github.com/${username}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={SECTION_ACTION_CLASS}
+          >
+            Ver todos no GitHub →
+          </Link>
+        }
+      />
 
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {projects.map((project) => (
           <ProjectCard key={project.name} project={project} />
         ))}
-      </div>
-
-      <div className="mt-4 flex justify-end">
-        <Link
-          href={`https://github.com/${username}`}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-xs font-medium text-site-body-muted no-underline transition-colors hover:text-site-primary-hover focus-visible:text-site-primary-hover focus-visible:outline-none"
-        >
-          Ver todos no GitHub →
-        </Link>
       </div>
     </section>
   );
