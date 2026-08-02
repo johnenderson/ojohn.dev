@@ -14,6 +14,7 @@ import {
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import { LanguageSelector } from './LanguageSelector';
+import { NowPlayingBadge } from './NowPlayingBadge';
 import { PreferencesPanel } from './PreferencesPanel';
 import { SITE_NAME } from '@/lib/site';
 
@@ -125,22 +126,28 @@ export const Navbar = () => {
               })}
             </nav>
 
-            <div className="ml-1 flex items-center gap-1">
-              <PreferencesPanel />
-              <LanguageSelector />
+            <div className="ml-3 flex items-center gap-3">
+              <NowPlayingBadge variant="full" />
+              <div className="flex items-center gap-1">
+                <PreferencesPanel />
+                <LanguageSelector />
+              </div>
             </div>
           </div>
 
-          <button
-            type="button"
-            aria-label="Abrir menu"
-            aria-expanded={mobileMenuOpen}
-            aria-controls="mobile-navigation"
-            onClick={() => setMobileMenuOpen(true)}
-            className="-mr-3 ml-auto flex size-12 items-center justify-center text-site-foreground transition-colors hover:text-site-primary-hover md:hidden"
-          >
-            <MenuIcon />
-          </button>
+          <div className="-mr-3 ml-auto flex items-center gap-3 md:hidden">
+            <NowPlayingBadge variant="compact" />
+            <button
+              type="button"
+              aria-label="Abrir menu"
+              aria-expanded={mobileMenuOpen}
+              aria-controls="mobile-navigation"
+              onClick={() => setMobileMenuOpen(true)}
+              className="flex size-12 items-center justify-center text-site-foreground transition-colors hover:text-site-primary-hover"
+            >
+              <MenuIcon />
+            </button>
+          </div>
         </div>
       </header>
 
