@@ -1,15 +1,15 @@
 import Image from 'next/image';
 import React from 'react';
 
-import {
-  CARD_HOVER_LARGE,
-  CARD_INNER_RING,
-  hoverRotation,
-} from '../card-animation';
 import { faCalendarAlt, faGamepad } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import { CardTooltip } from './CardTooltip';
+import {
+  CARD_HOVER_LARGE,
+  CARD_INNER_RING,
+  hoverRotation,
+} from '@/base/card-animation';
 import { SteamGame } from '@/lib/steam';
 
 /**

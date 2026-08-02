@@ -1,4 +1,4 @@
-import { Geist, Geist_Mono } from 'next/font/google';
+import { Geist_Mono, IBM_Plex_Sans } from 'next/font/google';
 
 import '../styles/globals.css';
 import { config } from '@fortawesome/fontawesome-svg-core';
@@ -13,9 +13,10 @@ import { SITE_NAME, SITE_URL } from '@/lib/site';
 // Prevent FontAwesome from adding its CSS dynamically on the server (causes SSR errors)
 config.autoAddCss = false;
 
-const geistSans = Geist({
+const sans = IBM_Plex_Sans({
   subsets: ['latin'],
-  variable: '--font-geist-sans',
+  weight: ['400', '500', '600', '700'],
+  variable: '--font-sans',
   display: 'swap',
 });
 
@@ -91,7 +92,7 @@ export default function RootLayout({
   return (
     <html
       lang="pt-BR"
-      className={`${geistSans.variable} ${geistMono.variable}`}
+      className={`${sans.variable} ${geistMono.variable}`}
       suppressHydrationWarning
     >
       <body>

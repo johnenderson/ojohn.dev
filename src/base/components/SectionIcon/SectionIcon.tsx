@@ -5,7 +5,7 @@ import type { ReactNode } from 'react';
  * o padrão de header é o mesmo na home, /now, /me e /uses.
  */
 export const SectionIcon = ({ children }: { children: ReactNode }) => (
-  <span className="flex size-9 shrink-0 items-center justify-center rounded-md border border-site-primary bg-site-primary-soft text-site-primary">
+  <span className="section-icon flex size-9 shrink-0 items-center justify-center rounded-md border">
     {children}
   </span>
 );
