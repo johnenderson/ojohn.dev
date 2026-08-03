@@ -17,9 +17,11 @@ const jsonFetcher = (url: string) => fetch(url).then((r) => r.json());
 const NowPlayingArt = ({
   track,
   size,
+  rounded = 'rounded',
 }: {
   track: LastfmTrack;
   size: number;
+  rounded?: string;
 }) => {
   const [failed, setFailed] = useState(false);
 
@@ -27,7 +29,7 @@ const NowPlayingArt = ({
     return (
       <div
         aria-hidden="true"
-        className="shrink-0 rounded bg-site-card-hover"
+        className={`shrink-0 bg-site-card-hover ${rounded}`}
         style={{ width: size, height: size }}
       />
     );
@@ -40,7 +42,7 @@ const NowPlayingArt = ({
       width={size}
       height={size}
       unoptimized
-      className="shrink-0 rounded object-cover"
+      className={`shrink-0 object-cover ${rounded}`}
       style={{ width: size, height: size }}
       onError={() => setFailed(true)}
     />
@@ -85,9 +87,9 @@ export const NowPlayingBadge = ({ variant }: NowPlayingBadgeProps) => {
         target="_blank"
         rel="noopener noreferrer"
         aria-label={`Ouvindo agora: ${track.name}, ${track.artist}`}
-        className="relative flex shrink-0 items-center rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-site-primary"
+        className="relative flex shrink-0 items-center rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-site-primary"
       >
-        <NowPlayingArt track={track} size={28} />
+        <NowPlayingArt track={track} size={28} rounded="rounded-lg" />
         <LiveDot className="absolute -bottom-0.5 -right-0.5 size-2 ring-2 ring-site-background" />
       </Link>
     );
@@ -99,18 +101,18 @@ export const NowPlayingBadge = ({ variant }: NowPlayingBadgeProps) => {
       target="_blank"
       rel="noopener noreferrer"
       title={`Ouvindo agora: ${track.name} — ${track.artist}`}
-      className="flex items-center gap-2 rounded-full border border-site-border-subtle bg-site-card py-1 pl-1 pr-3 no-underline transition-colors hover:border-site-border focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-site-primary"
+      className="flex items-center gap-2.5 rounded-full border border-site-border-subtle bg-site-card py-1.5 pl-1.5 pr-4 no-underline transition-colors hover:border-site-border focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-site-primary"
     >
-      <NowPlayingArt track={track} size={26} />
+      <NowPlayingArt track={track} size={36} rounded="rounded-xl" />
       <div className="min-w-0 leading-tight">
-        <p className="m-0 max-w-[9rem] truncate text-xs font-semibold text-site-foreground">
+        <p className="m-0 max-w-[10rem] truncate text-sm font-semibold text-site-foreground">
           {track.name}
         </p>
-        <p className="m-0 max-w-[9rem] truncate text-[11px] text-site-body-muted">
+        <p className="m-0 max-w-[10rem] truncate text-xs text-site-body-muted">
           {track.artist}
         </p>
       </div>
-      <LiveDot className="size-1.5 shrink-0" />
+      <LiveDot className="size-2 shrink-0" />
     </Link>
   );
 };
