@@ -122,7 +122,7 @@ const PreferenceCard = ({
   items: string[];
 }) => (
   <section aria-labelledby={id} data-preference-tone={tone}>
-    <Card className="preference-card border p-5">
+    <Card className="preference-card h-full border p-5">
       <SectionHeader
         icon={
           <FontAwesomeIcon icon={icon} aria-hidden="true" className="size-4" />
@@ -402,7 +402,7 @@ export default function Page() {
 
             <div className="h-px w-full bg-site-border-muted" />
 
-            <div className="grid w-full items-start gap-3 md:grid-cols-2">
+            <div className="grid w-full items-stretch gap-3 md:grid-cols-2">
               <PreferenceCard
                 id="likes-title"
                 title="Curto"
