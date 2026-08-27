@@ -102,7 +102,9 @@ type LastfmData = {
 
 const computeTrackData = (lastfm: LastfmData) =>
   getUniqueTracks(
-    [lastfm.lastPlayed, ...lastfm.tracks].filter(Boolean) as LastfmTrack[],
+    [lastfm.nowPlaying, lastfm.lastPlayed, ...lastfm.tracks].filter(
+      Boolean,
+    ) as LastfmTrack[],
   );
 
 const getUniqueTracks = (tracks: LastfmTrack[]) => {
@@ -261,7 +263,7 @@ export default async function NowPage() {
                 </h3>
                 {recentTracks.length > 0 ? (
                   <ul className="m-0 flex max-w-md list-none flex-col gap-1 p-0">
-                    {recentTracks.slice(0, 5).map((track, index) => (
+                    {recentTracks.slice(0, 7).map((track, index) => (
                       <RecentTrack
                         key={`${track.name}-${track.artist}-${
                           track.playedAt ?? track.url
