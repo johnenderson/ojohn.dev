@@ -252,10 +252,7 @@ export default async function NowPage() {
             />
 
             <div className="grid gap-12 lg:grid-cols-[1fr_32rem]">
-              <section
-                aria-labelledby="recent-tracks-title"
-                className="flex h-full flex-col"
-              >
+              <section aria-labelledby="recent-tracks-title">
                 <h3
                   id="recent-tracks-title"
                   className="m-0 mb-5 text-lg font-bold text-site-foreground"
@@ -263,7 +260,7 @@ export default async function NowPage() {
                   Mais recentes
                 </h3>
                 {recentTracks.length > 0 ? (
-                  <ul className="m-0 flex max-w-md flex-1 list-none flex-col justify-between gap-2 p-0">
+                  <ul className="m-0 flex max-w-md list-none flex-col gap-1 p-0">
                     {recentTracks.slice(0, 5).map((track, index) => (
                       <RecentTrack
                         key={`${track.name}-${track.artist}-${
