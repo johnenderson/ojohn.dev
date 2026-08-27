@@ -47,9 +47,12 @@ export const CardTooltip = ({
             side="bottom"
             align="center"
             sideOffset={6}
-            className="z-20 w-max max-w-[18ch] rounded-md border border-site-border bg-site-popover px-3 py-2 text-center shadow-xl shadow-black/30 backdrop-blur-sm animate-in fade-in-0 zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[side=bottom]:slide-in-from-top-1"
+            className="z-20 w-max max-w-[18ch] rounded-md border border-site-border bg-site-popover px-3 py-1.5 text-center shadow-xl shadow-black/30 backdrop-blur-sm animate-in fade-in-0 zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[side=bottom]:slide-in-from-top-1"
           >
             {content}
+            <Tooltip.Arrow asChild>
+              <div className="size-2.5 rotate-45 rounded-[2px] bg-site-popover" />
+            </Tooltip.Arrow>
           </Tooltip.Content>
         </Tooltip.Portal>
       </Tooltip.Root>
