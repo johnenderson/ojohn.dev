@@ -19,7 +19,6 @@ import {
   ActivityFeed,
   ArtistCard,
   CodingRhythm,
-  FeaturedTrack,
   GameCard,
   LanguageStack,
   LolLiveGame,
@@ -28,11 +27,7 @@ import {
   StarredRepos,
 } from '@/features/now/components';
 import { getGithubDev, getGithubStarred } from '@/lib/github';
-import {
-  getLastfmRecentStats,
-  getLastfmTopArtists,
-  getLastfmTopTracks,
-} from '@/lib/lastfm';
+import { getLastfmRecentStats, getLastfmTopArtists } from '@/lib/lastfm';
 import { getLolLiveGame } from '@/lib/lol';
 import { SITE_NAME, SITE_URL } from '@/lib/site';
 import { getSteamGames } from '@/lib/steam';
@@ -105,20 +100,10 @@ type LastfmData = {
   tracks: LastfmTrack[];
 };
 
-const computeTrackData = (topTracks: LastfmTrack[], lastfm: LastfmData) => {
-  const recentTracks = getUniqueTracks(
+const computeTrackData = (lastfm: LastfmData) =>
+  getUniqueTracks(
     [lastfm.lastPlayed, ...lastfm.tracks].filter(Boolean) as LastfmTrack[],
   );
-  const featuredTrack = topTracks[0] ?? recentTracks[0];
-  const recentTrackList = featuredTrack
-    ? recentTracks.filter(
-        (track) =>
-          track.name !== featuredTrack.name ||
-          track.artist !== featuredTrack.artist,
-      )
-    : recentTracks;
-  return { recentTracks, featuredTrack, recentTrackList };
-};
 
 const getUniqueTracks = (tracks: LastfmTrack[]) => {
   const seen = new Set<string>();
@@ -134,15 +119,14 @@ const getUniqueTracks = (tracks: LastfmTrack[]) => {
 };
 
 export default async function NowPage() {
-  const [lastfm, artists, topTracks, dev, steam, starred, lolLiveGame] =
-    await Promise.all([
+  const [lastfm, artists, dev, steam, starred, lolLiveGame] = await Promise.all(
+    [
       getLastfmRecentStats().catch(() => ({
         nowPlaying: null,
         lastPlayed: null,
         tracks: [],
       })),
       getLastfmTopArtists({ period: '1month' }).catch(() => []),
-      getLastfmTopTracks({ period: '1month' }).catch(() => []),
       getGithubDev().catch(() => null),
       getSteamGames().catch(() => ({
         games: [],
@@ -151,16 +135,14 @@ export default async function NowPage() {
       })),
       getGithubStarred().catch(() => []),
       getLolLiveGame().catch(() => null),
-    ]);
+    ],
+  );
 
   const hasDevData = Boolean(
     dev && (dev.rhythm || dev.languages.length > 0 || dev.activity.length > 0),
   );
 
-  const { featuredTrack, recentTrackList } = computeTrackData(
-    topTracks,
-    lastfm,
-  );
+  const recentTracks = computeTrackData(lastfm);
 
   return (
     <PageWrapper>
@@ -267,45 +249,22 @@ export default async function NowPage() {
               id="listening-title"
               title="No repeat do mês"
               subtitle={LISTENING_DESCRIPTION}
-              action={
-                <Link
-                  href="https://www.last.fm/user/johnenderson"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={SECTION_ACTION_CLASS}
-                >
-                  Ver no Last.fm →
-                </Link>
-              }
             />
 
             <div className="grid gap-12 lg:grid-cols-[1fr_32rem]">
               <section
-                aria-labelledby="monthly-tracks-title"
+                aria-labelledby="recent-tracks-title"
                 className="flex h-full flex-col"
               >
                 <h3
-                  id="monthly-tracks-title"
+                  id="recent-tracks-title"
                   className="m-0 mb-5 text-lg font-bold text-site-foreground"
                 >
-                  Trilha do mês
-                </h3>
-
-                {featuredTrack ? (
-                  <div className="mb-5 max-w-md">
-                    <FeaturedTrack track={featuredTrack} />
-                  </div>
-                ) : null}
-
-                <h4
-                  id="recent-tracks-title"
-                  className="m-0 mb-3 text-sm font-bold uppercase tracking-[0.08em] text-site-body-muted"
-                >
                   Mais recentes
-                </h4>
-                {recentTrackList.length > 0 ? (
+                </h3>
+                {recentTracks.length > 0 ? (
                   <ul className="m-0 flex max-w-md flex-1 list-none flex-col justify-between gap-2 p-0">
-                    {recentTrackList.slice(0, 4).map((track, index) => (
+                    {recentTracks.slice(0, 5).map((track, index) => (
                       <RecentTrack
                         key={`${track.name}-${track.artist}-${
                           track.playedAt ?? track.url
@@ -317,9 +276,7 @@ export default async function NowPage() {
                   </ul>
                 ) : (
                   <p className="m-0 text-site-body-muted">
-                    {featuredTrack
-                      ? 'Sem outras músicas recentes para mostrar.'
-                      : 'Sem músicas recentes para mostrar.'}
+                    Sem músicas recentes para mostrar.
                   </p>
                 )}
               </section>
@@ -359,6 +316,17 @@ export default async function NowPage() {
                 )}
               </section>
             </div>
+
+            <div className="mt-6 flex justify-end">
+              <Link
+                href="https://www.last.fm/user/johnenderson"
+                target="_blank"
+                rel="noopener noreferrer"
+                className={SECTION_ACTION_CLASS}
+              >
+                Ver no Last.fm →
+              </Link>
+            </div>
           </section>
 
           <section aria-labelledby="playing-title" className="pt-16">
@@ -374,17 +342,6 @@ export default async function NowPage() {
               title="Provável recaída"
               subtitle={PLAYING_DESCRIPTION}
               updatedAt={steam.updatedAt}
-              action={
-                <Link
-                  href={STEAM_PROFILE_URL}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={SECTION_ACTION_CLASS}
-                >
-                  {steam.games.length > 0 ? 'Ver no Steam' : 'Steam fica aqui'}{' '}
-                  →
-                </Link>
-              }
             />
 
             {lolLiveGame && (
@@ -407,6 +364,17 @@ export default async function NowPage() {
                 Nenhum jogo para mostrar.
               </p>
             )}
+
+            <div className="mt-6 flex justify-end">
+              <Link
+                href={STEAM_PROFILE_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={SECTION_ACTION_CLASS}
+              >
+                {steam.games.length > 0 ? 'Ver no Steam' : 'Steam fica aqui'} →
+              </Link>
+            </div>
           </section>
         </div>
       </main>
