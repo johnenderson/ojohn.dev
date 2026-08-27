@@ -1,12 +1,15 @@
 'use client';
 
-import { ReactNode, useSyncExternalStore } from 'react';
+import { MouseEvent, ReactNode, useState, useSyncExternalStore } from 'react';
 
 import * as Tooltip from '@radix-ui/react-tooltip';
 
 const subscribe = () => () => {};
 const getClientSnapshot = () => true;
 const getServerSnapshot = () => false;
+
+/** Sem hover de verdade (touch) — primeiro toque só mostra o tooltip, segundo toque navega. */
+const usesCoarsePointer = () => window.matchMedia('(hover: none)').matches;
 
 /**
  * Tooltip padrão dos cards de imagem da página /now.
@@ -15,6 +18,7 @@ const getServerSnapshot = () => false;
  *  - delayDuration={300}  → abre após 300ms de hover (evita flashes ao passar o mouse)
  *  - skipDelayDuration={0} → se mover de um card para outro, abre imediatamente
  *  - disableHoverableContent → fecha ao sair do trigger, sem "entrar" no tooltip
+ *  - em telas de toque, o Root vira controlado e o primeiro tap intercepta a navegação
  */
 export const CardTooltip = ({
   children,
@@ -31,8 +35,21 @@ export const CardTooltip = ({
     getClientSnapshot,
     getServerSnapshot,
   );
+  const [tapOpen, setTapOpen] = useState(false);
 
   if (!isMounted) return children;
+
+  const isTouch = usesCoarsePointer();
+
+  const handleTriggerClick = (event: MouseEvent<HTMLElement>) => {
+    if (!isTouch) return;
+    if (tapOpen) {
+      setTapOpen(false);
+      return;
+    }
+    event.preventDefault();
+    setTapOpen(true);
+  };
 
   return (
     <Tooltip.Provider
@@ -40,8 +57,12 @@ export const CardTooltip = ({
       skipDelayDuration={0}
       disableHoverableContent
     >
-      <Tooltip.Root>
-        <Tooltip.Trigger asChild>{children}</Tooltip.Trigger>
+      <Tooltip.Root
+        {...(isTouch && { open: tapOpen, onOpenChange: setTapOpen })}
+      >
+        <Tooltip.Trigger asChild onClick={handleTriggerClick}>
+          {children}
+        </Tooltip.Trigger>
         <Tooltip.Portal>
           <Tooltip.Content
             side="bottom"
