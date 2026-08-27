@@ -3,7 +3,6 @@ import Link from 'next/link';
 import { PageWrapper } from '../components/PageWrapper';
 import { faSpotify } from '@fortawesome/free-brands-svg-icons';
 import {
-  faArrowRight,
   faBullseye,
   faCode,
   faGamepad,
@@ -145,7 +144,11 @@ export default async function NowPage() {
       getLastfmTopArtists({ period: '1month' }).catch(() => []),
       getLastfmTopTracks({ period: '1month' }).catch(() => []),
       getGithubDev().catch(() => null),
-      getSteamGames().catch(() => ({ games: [], source: 'recent' as const })),
+      getSteamGames().catch(() => ({
+        games: [],
+        source: 'recent' as const,
+        updatedAt: null,
+      })),
       getGithubStarred().catch(() => []),
       getLolLiveGame().catch(() => null),
     ]);
@@ -370,6 +373,18 @@ export default async function NowPage() {
               id="playing-title"
               title="Provável recaída"
               subtitle={PLAYING_DESCRIPTION}
+              updatedAt={steam.updatedAt}
+              action={
+                <Link
+                  href={STEAM_PROFILE_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={SECTION_ACTION_CLASS}
+                >
+                  {steam.games.length > 0 ? 'Ver no Steam' : 'Steam fica aqui'}{' '}
+                  →
+                </Link>
+              }
             />
 
             {lolLiveGame && (
@@ -382,47 +397,15 @@ export default async function NowPage() {
             )}
 
             {steam.games.length > 0 ? (
-              <div className="flex flex-col gap-5">
-                <div className="grid grid-cols-3 gap-3 sm:grid-cols-5 lg:gap-6">
-                  {steam.games.map((game) => (
-                    <GameCard key={game.appid} game={game} />
-                  ))}
-                </div>
-                <div className="flex justify-end">
-                  <Link
-                    href={STEAM_PROFILE_URL}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 border-b border-site-primary pb-0.5 text-sm font-bold text-site-primary no-underline transition-colors hover:border-site-primary-hover hover:text-site-primary-hover"
-                  >
-                    Ver no Steam
-                    <FontAwesomeIcon
-                      icon={faArrowRight}
-                      aria-hidden="true"
-                      className="text-xs"
-                    />
-                  </Link>
-                </div>
+              <div className="grid grid-cols-3 gap-3 sm:grid-cols-5 lg:gap-6">
+                {steam.games.map((game) => (
+                  <GameCard key={game.appid} game={game} />
+                ))}
               </div>
             ) : (
-              <div className="flex items-center justify-between gap-4">
-                <p className="m-0 text-site-body-muted">
-                  Nenhum jogo para mostrar.
-                </p>
-                <Link
-                  href={STEAM_PROFILE_URL}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 border-b border-site-primary pb-0.5 text-sm font-bold text-site-primary no-underline transition-colors hover:border-site-primary-hover hover:text-site-primary-hover"
-                >
-                  Steam fica aqui
-                  <FontAwesomeIcon
-                    icon={faArrowRight}
-                    aria-hidden="true"
-                    className="text-xs"
-                  />
-                </Link>
-              </div>
+              <p className="m-0 text-site-body-muted">
+                Nenhum jogo para mostrar.
+              </p>
             )}
           </section>
         </div>
