@@ -4,7 +4,6 @@ import { AnimationLayout } from '@/base/components/Layout/AnimationLayout';
 import { Navbar } from '@/base/components/Navbar';
 import { ArticlesList } from '@/features/articles/components/ArticlesList';
 import { About } from '@/features/home/components/About';
-import { LastfmCard } from '@/features/home/components/Activity';
 import { DevPulse } from '@/features/home/components/DevPulse';
 import { Hero } from '@/features/home/components/Hero';
 import { ProjectsShowcase } from '@/features/home/components/Projects';
@@ -51,7 +50,6 @@ export default function Page() {
             <About />
             <DevPulse />
             <ProjectsShowcase />
-            <LastfmCard />
             <ArticlesList />
           </div>
         </main>

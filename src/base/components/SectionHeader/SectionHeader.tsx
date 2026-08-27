@@ -1,6 +1,10 @@
 import type { ReactNode } from 'react';
 
+import { faCalendarCheck } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+
 import { SectionIcon } from '@/base/components/SectionIcon';
+import { formatRelativeTime } from '@/lib/formatRelativeTime';
 
 /** Estilo único dos links de ação das seções ("Ver todos", "@usuario"…). */
 export const SECTION_ACTION_CLASS =
@@ -16,6 +20,8 @@ type SectionHeaderProps = {
   /** Link/ação alinhada à direita (ex.: "Ver todos"). */
   action?: ReactNode;
   className?: string;
+  /** ISO da última sincronização. Quando informado, mostra o selo "Atualizado há X". */
+  updatedAt?: string | null;
 };
 
 /**
@@ -30,6 +36,7 @@ export const SectionHeader = ({
   subtitle,
   action,
   className = '',
+  updatedAt,
 }: SectionHeaderProps) => (
   <header
     className={`mb-6 flex flex-wrap items-center gap-x-4 gap-y-2 ${className}`}
@@ -46,6 +53,19 @@ export const SectionHeader = ({
       {subtitle ? (
         <p className="mb-0 mt-1.5 max-w-2xl text-base leading-snug text-site-body-muted">
           {subtitle}
+        </p>
+      ) : null}
+      {updatedAt ? (
+        <p className="m-0 mt-2 inline-flex items-center gap-1.5 rounded-full border border-site-border-subtle px-2.5 py-1 text-xs font-medium text-site-body-muted">
+          <FontAwesomeIcon
+            icon={faCalendarCheck}
+            aria-hidden="true"
+            className="text-sm"
+          />
+          Atualizado{' '}
+          <strong className="font-semibold text-site-foreground">
+            {formatRelativeTime(updatedAt)}
+          </strong>
         </p>
       ) : null}
     </div>

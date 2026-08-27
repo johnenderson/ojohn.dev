@@ -3,7 +3,6 @@ import Link from 'next/link';
 import { PageWrapper } from '../components/PageWrapper';
 import { faSpotify } from '@fortawesome/free-brands-svg-icons';
 import {
-  faArrowRight,
   faBullseye,
   faCode,
   faGamepad,
@@ -20,7 +19,6 @@ import {
   ActivityFeed,
   ArtistCard,
   CodingRhythm,
-  FeaturedTrack,
   GameCard,
   LanguageStack,
   LolLiveGame,
@@ -29,11 +27,7 @@ import {
   StarredRepos,
 } from '@/features/now/components';
 import { getGithubDev, getGithubStarred } from '@/lib/github';
-import {
-  getLastfmRecentStats,
-  getLastfmTopArtists,
-  getLastfmTopTracks,
-} from '@/lib/lastfm';
+import { getLastfmRecentStats, getLastfmTopArtists } from '@/lib/lastfm';
 import { getLolLiveGame } from '@/lib/lol';
 import { SITE_NAME, SITE_URL } from '@/lib/site';
 import { getSteamGames } from '@/lib/steam';
@@ -106,20 +100,12 @@ type LastfmData = {
   tracks: LastfmTrack[];
 };
 
-const computeTrackData = (topTracks: LastfmTrack[], lastfm: LastfmData) => {
-  const recentTracks = getUniqueTracks(
-    [lastfm.lastPlayed, ...lastfm.tracks].filter(Boolean) as LastfmTrack[],
+const computeTrackData = (lastfm: LastfmData) =>
+  getUniqueTracks(
+    [lastfm.nowPlaying, lastfm.lastPlayed, ...lastfm.tracks].filter(
+      Boolean,
+    ) as LastfmTrack[],
   );
-  const featuredTrack = topTracks[0] ?? recentTracks[0];
-  const recentTrackList = featuredTrack
-    ? recentTracks.filter(
-        (track) =>
-          track.name !== featuredTrack.name ||
-          track.artist !== featuredTrack.artist,
-      )
-    : recentTracks;
-  return { recentTracks, featuredTrack, recentTrackList };
-};
 
 const getUniqueTracks = (tracks: LastfmTrack[]) => {
   const seen = new Set<string>();
@@ -135,29 +121,30 @@ const getUniqueTracks = (tracks: LastfmTrack[]) => {
 };
 
 export default async function NowPage() {
-  const [lastfm, artists, topTracks, dev, steam, starred, lolLiveGame] =
-    await Promise.all([
+  const [lastfm, artists, dev, steam, starred, lolLiveGame] = await Promise.all(
+    [
       getLastfmRecentStats().catch(() => ({
         nowPlaying: null,
         lastPlayed: null,
         tracks: [],
       })),
       getLastfmTopArtists({ period: '1month' }).catch(() => []),
-      getLastfmTopTracks({ period: '1month' }).catch(() => []),
       getGithubDev().catch(() => null),
-      getSteamGames().catch(() => ({ games: [], source: 'recent' as const })),
+      getSteamGames().catch(() => ({
+        games: [],
+        source: 'recent' as const,
+        updatedAt: null,
+      })),
       getGithubStarred().catch(() => []),
       getLolLiveGame().catch(() => null),
-    ]);
+    ],
+  );
 
   const hasDevData = Boolean(
     dev && (dev.rhythm || dev.languages.length > 0 || dev.activity.length > 0),
   );
 
-  const { featuredTrack, recentTrackList } = computeTrackData(
-    topTracks,
-    lastfm,
-  );
+  const recentTracks = computeTrackData(lastfm);
 
   return (
     <PageWrapper>
@@ -264,45 +251,19 @@ export default async function NowPage() {
               id="listening-title"
               title="No repeat do mês"
               subtitle={LISTENING_DESCRIPTION}
-              action={
-                <Link
-                  href="https://www.last.fm/user/johnenderson"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={SECTION_ACTION_CLASS}
-                >
-                  Ver no Last.fm →
-                </Link>
-              }
             />
 
             <div className="grid gap-12 lg:grid-cols-[1fr_32rem]">
-              <section
-                aria-labelledby="monthly-tracks-title"
-                className="flex h-full flex-col"
-              >
+              <section aria-labelledby="recent-tracks-title">
                 <h3
-                  id="monthly-tracks-title"
+                  id="recent-tracks-title"
                   className="m-0 mb-5 text-lg font-bold text-site-foreground"
                 >
-                  Trilha do mês
-                </h3>
-
-                {featuredTrack ? (
-                  <div className="mb-5 max-w-md">
-                    <FeaturedTrack track={featuredTrack} />
-                  </div>
-                ) : null}
-
-                <h4
-                  id="recent-tracks-title"
-                  className="m-0 mb-3 text-sm font-bold uppercase tracking-[0.08em] text-site-body-muted"
-                >
                   Mais recentes
-                </h4>
-                {recentTrackList.length > 0 ? (
-                  <ul className="m-0 flex max-w-md flex-1 list-none flex-col justify-between gap-2 p-0">
-                    {recentTrackList.slice(0, 4).map((track, index) => (
+                </h3>
+                {recentTracks.length > 0 ? (
+                  <ul className="m-0 flex max-w-md list-none flex-col gap-1 p-0">
+                    {recentTracks.slice(0, 7).map((track, index) => (
                       <RecentTrack
                         key={`${track.name}-${track.artist}-${
                           track.playedAt ?? track.url
@@ -314,9 +275,7 @@ export default async function NowPage() {
                   </ul>
                 ) : (
                   <p className="m-0 text-site-body-muted">
-                    {featuredTrack
-                      ? 'Sem outras músicas recentes para mostrar.'
-                      : 'Sem músicas recentes para mostrar.'}
+                    Sem músicas recentes para mostrar.
                   </p>
                 )}
               </section>
@@ -356,6 +315,17 @@ export default async function NowPage() {
                 )}
               </section>
             </div>
+
+            <div className="mt-6 flex justify-end">
+              <Link
+                href="https://www.last.fm/user/johnenderson"
+                target="_blank"
+                rel="noopener noreferrer"
+                className={SECTION_ACTION_CLASS}
+              >
+                Ver no Last.fm →
+              </Link>
+            </div>
           </section>
 
           <section aria-labelledby="playing-title" className="pt-16">
@@ -370,6 +340,7 @@ export default async function NowPage() {
               id="playing-title"
               title="Provável recaída"
               subtitle={PLAYING_DESCRIPTION}
+              updatedAt={steam.updatedAt}
             />
 
             {lolLiveGame && (
@@ -382,48 +353,27 @@ export default async function NowPage() {
             )}
 
             {steam.games.length > 0 ? (
-              <div className="flex flex-col gap-5">
-                <div className="grid grid-cols-3 gap-3 sm:grid-cols-5 lg:gap-6">
-                  {steam.games.map((game) => (
-                    <GameCard key={game.appid} game={game} />
-                  ))}
-                </div>
-                <div className="flex justify-end">
-                  <Link
-                    href={STEAM_PROFILE_URL}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 border-b border-site-primary pb-0.5 text-sm font-bold text-site-primary no-underline transition-colors hover:border-site-primary-hover hover:text-site-primary-hover"
-                  >
-                    Ver no Steam
-                    <FontAwesomeIcon
-                      icon={faArrowRight}
-                      aria-hidden="true"
-                      className="text-xs"
-                    />
-                  </Link>
-                </div>
+              <div className="grid grid-cols-3 gap-3 sm:grid-cols-5 lg:gap-6">
+                {steam.games.map((game) => (
+                  <GameCard key={game.appid} game={game} />
+                ))}
               </div>
             ) : (
-              <div className="flex items-center justify-between gap-4">
-                <p className="m-0 text-site-body-muted">
-                  Nenhum jogo para mostrar.
-                </p>
-                <Link
-                  href={STEAM_PROFILE_URL}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 border-b border-site-primary pb-0.5 text-sm font-bold text-site-primary no-underline transition-colors hover:border-site-primary-hover hover:text-site-primary-hover"
-                >
-                  Steam fica aqui
-                  <FontAwesomeIcon
-                    icon={faArrowRight}
-                    aria-hidden="true"
-                    className="text-xs"
-                  />
-                </Link>
-              </div>
+              <p className="m-0 text-site-body-muted">
+                Nenhum jogo para mostrar.
+              </p>
             )}
+
+            <div className="mt-6 flex justify-end">
+              <Link
+                href={STEAM_PROFILE_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={SECTION_ACTION_CLASS}
+              >
+                {steam.games.length > 0 ? 'Ver no Steam' : 'Steam fica aqui'} →
+              </Link>
+            </div>
           </section>
         </div>
       </main>

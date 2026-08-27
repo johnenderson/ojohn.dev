@@ -6,6 +6,7 @@ import { useState } from 'react';
 
 import useSWR from 'swr';
 
+import { LiveDot } from '@/base/components/LiveDot';
 import { LastfmTrack } from '@/types/Lastfm';
 
 type NowPlayingResponse = {
@@ -48,13 +49,6 @@ const NowPlayingArt = ({
     />
   );
 };
-
-const LiveDot = ({ className = '' }: { className?: string }) => (
-  <span
-    aria-hidden="true"
-    className={`rounded-full bg-spotify motion-safe:animate-pulse ${className}`}
-  />
-);
 
 type NowPlayingBadgeProps = {
   /** 'full' = capa + faixa + artista (desktop). 'compact' = só a capa (mobile). */

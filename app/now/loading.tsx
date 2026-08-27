@@ -75,8 +75,15 @@ export default function Loading() {
             </div>
           </section>
 
-          <section className="border-b border-site-border-subtle py-16">
+          <section className="pt-16">
             <SectionHeader />
+            <div className="grid grid-cols-3 gap-3 sm:grid-cols-5 lg:gap-6">
+              <Skeleton className="aspect-[2/3]" />
+              <Skeleton className="aspect-[2/3]" />
+              <Skeleton className="aspect-[2/3]" />
+              <Skeleton className="aspect-[2/3]" />
+              <Skeleton className="aspect-[2/3]" />
+            </div>
           </section>
         </div>
       </main>
