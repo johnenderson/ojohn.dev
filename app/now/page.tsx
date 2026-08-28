@@ -144,6 +144,12 @@ export default async function NowPage() {
     dev && (dev.rhythm || dev.languages.length > 0 || dev.activity.length > 0),
   );
 
+  // Momento em que a página foi gerada — teto real de "atualizado há X" para
+  // as seções sem cache próprio (GitHub, Last.fm): elas buscam ao vivo a
+  // cada regeneração da página (revalidate acima), então "agora" aqui É a
+  // última sincronização.
+  const renderedAt = new Date().toISOString();
+
   const recentTracks = computeTrackData(lastfm);
 
   return (
@@ -209,6 +215,7 @@ export default async function NowPage() {
                 id="code-title"
                 title="Código"
                 subtitle={CODE_DESCRIPTION}
+                updatedAt={renderedAt}
               />
 
               <div className="flex flex-col gap-4">
@@ -237,6 +244,7 @@ export default async function NowPage() {
                 }
                 id="starred-title"
                 title="Código"
+                updatedAt={renderedAt}
               />
               <StarredRepos repos={starred} />
             </section>
@@ -251,6 +259,7 @@ export default async function NowPage() {
               id="listening-title"
               title="No repeat do mês"
               subtitle={LISTENING_DESCRIPTION}
+              updatedAt={renderedAt}
             />
 
             <div className="grid gap-12 lg:grid-cols-[1fr_32rem]">
