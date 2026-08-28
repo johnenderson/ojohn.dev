@@ -25,9 +25,10 @@ type SectionHeaderProps = {
 };
 
 /**
- * Header padrão de seção: selo do ícone à esquerda, título e subtítulo
- * opcional, ação opcional à direita. É o único padrão de seção do site —
- * páginas não devem montar cabeçalhos próprios.
+ * Header padrão de seção: selo do ícone + título numa linha, subtítulo e
+ * selo de atualização abaixo (largura cheia, rente ao ícone — não
+ * indentados sob o título). Ação opcional à direita do título. É o único
+ * padrão de seção do site — páginas não devem montar cabeçalhos próprios.
  */
 export const SectionHeader = ({
   icon,
@@ -38,38 +39,35 @@ export const SectionHeader = ({
   className = '',
   updatedAt,
 }: SectionHeaderProps) => (
-  <header
-    className={`mb-6 flex flex-wrap items-start gap-x-4 gap-y-2 ${className}`}
-  >
-    <SectionIcon>{icon}</SectionIcon>
-
-    <div className="min-w-0 flex-1">
+  <header className={`mb-6 flex flex-col gap-y-2 ${className}`}>
+    <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+      <SectionIcon>{icon}</SectionIcon>
       <h2
         id={id}
-        className="m-0 text-2xl font-bold tracking-normal text-site-foreground"
+        className="m-0 min-w-0 flex-1 text-2xl font-bold tracking-normal text-site-foreground"
       >
         {title}
       </h2>
-      {subtitle ? (
-        <p className="mb-0 mt-1.5 max-w-2xl text-base leading-snug text-site-body-muted">
-          {subtitle}
-        </p>
-      ) : null}
-      {updatedAt ? (
-        <p className="m-0 mt-2 inline-flex items-center gap-1.5 rounded-full border border-site-border-subtle px-2.5 py-1 text-xs font-medium text-site-body-muted">
-          <FontAwesomeIcon
-            icon={faCalendarCheck}
-            aria-hidden="true"
-            className="text-sm"
-          />
-          Atualizado{' '}
-          <strong className="font-semibold text-site-foreground">
-            {formatRelativeTime(updatedAt)}
-          </strong>
-        </p>
-      ) : null}
+      {action ? <div className="shrink-0">{action}</div> : null}
     </div>
 
-    {action ? <div className="shrink-0">{action}</div> : null}
+    {subtitle ? (
+      <p className="m-0 max-w-2xl text-base leading-snug text-site-body-muted">
+        {subtitle}
+      </p>
+    ) : null}
+    {updatedAt ? (
+      <p className="m-0 inline-flex w-fit items-center gap-1.5 rounded-full border border-site-border-subtle px-2.5 py-1 text-xs font-medium text-site-body-muted">
+        <FontAwesomeIcon
+          icon={faCalendarCheck}
+          aria-hidden="true"
+          className="text-sm"
+        />
+        Atualizado{' '}
+        <strong className="font-semibold text-site-foreground">
+          {formatRelativeTime(updatedAt)}
+        </strong>
+      </p>
+    ) : null}
   </header>
 );
