@@ -39,7 +39,7 @@ export const SectionHeader = ({
   updatedAt,
 }: SectionHeaderProps) => (
   <header
-    className={`mb-6 flex flex-wrap items-center gap-x-4 gap-y-2 ${className}`}
+    className={`mb-6 flex flex-wrap items-start gap-x-4 gap-y-2 ${className}`}
   >
     <SectionIcon>{icon}</SectionIcon>
 
