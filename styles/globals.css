@@ -590,20 +590,11 @@ body > * {
   z-index: 1;
 }
 
-html.light body {
-  background: var(--site-background);
-  color: var(--site-foreground);
-}
-
 /* Preferences dropdown panel */
 .prefs-panel {
   background: var(--site-popover);
   backdrop-filter: blur(24px) saturate(180%);
   -webkit-backdrop-filter: blur(24px) saturate(180%);
-}
-
-html.light .prefs-panel {
-  background: var(--site-popover);
 }
 
 /* Navbar — mobile keeps a blurred surface; desktop is transparent until scrolled. */
@@ -614,16 +605,7 @@ html.light .prefs-panel {
   border-bottom: 1px solid transparent;
 }
 
-html.light .navbar {
-  background: var(--site-navbar);
-}
-
 .navbar.scrolled {
-  background: var(--site-navbar-scrolled);
-  border-bottom-color: var(--site-border-subtle);
-}
-
-html.light .navbar.scrolled {
   background: var(--site-navbar-scrolled);
   border-bottom-color: var(--site-border-subtle);
 }
@@ -640,11 +622,6 @@ html.light .navbar.scrolled {
     background: var(--site-navbar-scrolled);
     backdrop-filter: blur(64px) saturate(220%);
     -webkit-backdrop-filter: blur(64px) saturate(220%);
-    border-bottom-color: var(--site-border-subtle);
-  }
-
-  html.light .navbar.scrolled {
-    background: var(--site-navbar-scrolled);
     border-bottom-color: var(--site-border-subtle);
   }
 }
@@ -709,10 +686,6 @@ article h2::before {
   );
 }
 
-html.light article h2 {
-  color: var(--site-foreground);
-}
-
 article h3 {
   position: relative;
   margin-top: 2rem;
@@ -729,10 +702,6 @@ article h3 {
 
 article h3::before {
   content: none;
-}
-
-html.light article h3 {
-  color: var(--site-foreground);
 }
 
 article h4 {
@@ -897,15 +866,7 @@ article blockquote p {
   color: var(--site-body);
 }
 
-html.light article blockquote {
-  color: var(--site-body);
-}
-
 article blockquote::before {
-  content: none;
-}
-
-html.light article blockquote::before {
   content: none;
 }
 
@@ -1065,15 +1026,6 @@ html.light .mdx-admonition-content li {
     text-decoration-color: var(--site-primary);
   }
 
-  html.light a,
-  html.light article a {
-    color: var(--site-foreground);
-    text-decoration-color: var(--site-border);
-    text-decoration-thickness: 1px;
-    text-decoration-skip-ink: none;
-    text-underline-offset: 4px;
-  }
-
   html.light a:hover {
     color: var(--site-primary-hover);
     text-decoration-color: var(--site-primary-hover);
@@ -1086,14 +1038,12 @@ html.light .mdx-admonition-content li {
  * the same level.
  */
 a.cta-solid,
-a.cta-solid:hover,
-html.light a.cta-solid:hover {
+a.cta-solid:hover {
   color: var(--site-primary-foreground);
   text-decoration: none;
 }
 
-a.cta-ghost:hover,
-html.light a.cta-ghost:hover {
+a.cta-ghost:hover {
   color: var(--site-primary);
   text-decoration: none;
 }
@@ -1221,32 +1171,8 @@ a.icon:hover {
   );
 }
 
-html.light h1 a:hover,
-html.light h2 a:hover,
-html.light h3 a:hover,
-html.light h4 a:hover,
-html.light h5 a:hover,
-html.light h6 a:hover,
-html.light p a.icon:hover,
-html.light a.icon:hover {
-  background-repeat: repeat-x;
-  background-position: bottom;
-  background-size: 100% 6px;
-  background-image: linear-gradient(
-    transparent,
-    transparent 6px,
-    var(--site-foreground) 6px,
-    var(--site-foreground)
-  );
-}
-
 p a.icon:hover,
 a.icon:hover {
-  color: var(--site-foreground);
-}
-
-html.light p a.icon:hover,
-html.light a.icon:hover {
   color: var(--site-foreground);
 }
 
@@ -1309,11 +1235,6 @@ p.no-margin-top {
 
 .content pre:has(.code-block-header) {
   padding-top: 4.35rem;
-}
-
-html.light .content pre {
-  background: var(--code-surface) !important;
-  border-color: var(--code-border);
 }
 
 .content pre,
@@ -1473,20 +1394,6 @@ html.light .content pre code {
   background: color-mix(in srgb, var(--site-primary) 16%, transparent);
   border-color: var(--site-primary);
   color: var(--site-primary);
-}
-
-a.link {
-  text-decoration: none;
-  color: white;
-  background-repeat: repeat-x;
-  background-position: bottom;
-  background-size: 100% 6px;
-  background-image: linear-gradient(
-    transparent,
-    transparent 5px,
-    white 5px,
-    white
-  );
 }
 
 table {
