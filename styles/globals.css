@@ -263,7 +263,6 @@ html.light {
   box-shadow: 0 0 0 transparent;
   transition: background-color 180ms ease, border-color 180ms ease,
     box-shadow 180ms ease, transform 380ms var(--ease-elastic);
-  will-change: transform;
 }
 
 .interactive-card:hover,
@@ -272,6 +271,7 @@ html.light {
   border-color: var(--site-border);
   box-shadow: var(--site-card-shadow);
   transform: translateY(-4px);
+  will-change: transform;
 }
 
 .interactive-card:focus-within {
@@ -445,7 +445,6 @@ html.light [data-preference-tone='negative'] {
     color-mix(in srgb, var(--site-foreground) 7%, transparent);
   transition: background-color 180ms ease, border-color 180ms ease,
     color 180ms ease, transform 280ms var(--ease-elastic);
-  will-change: transform;
 }
 
 .about-tag:hover {
@@ -461,6 +460,7 @@ html.light [data-preference-tone='negative'] {
   );
   color: var(--site-foreground);
   transform: translateY(-2px);
+  will-change: transform;
 }
 
 .about-tag[data-variant='neutral'] {
@@ -503,13 +503,13 @@ html.light [data-preference-tone='negative'] {
 .interactive-row {
   transition: background-color 180ms ease, color 180ms ease,
     transform 320ms var(--ease-elastic);
-  will-change: transform;
 }
 
 .interactive-row:hover,
 .interactive-row:focus-within {
   background: var(--site-card-hover);
   transform: translateX(3px);
+  will-change: transform;
 }
 
 @media (prefers-reduced-motion: reduce) {
