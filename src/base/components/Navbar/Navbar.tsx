@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
+import type { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 import {
   faEnvelope,
   faHeadphones,
@@ -16,15 +17,30 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { LanguageSelector } from './LanguageSelector';
 import { NowPlayingBadge } from './NowPlayingBadge';
 import { PreferencesPanel } from './PreferencesPanel';
+import { SECTION_FLAGS, type SectionKey } from '@/lib/section-flags';
 import { SITE_NAME } from '@/lib/site';
 
-// `disabled` marca itens ainda sem página: aparecem no menu, mas não navegam.
-const navLinks = [
+type NavLink = {
+  href: string;
+  label: string;
+  icon: IconDefinition;
+  section?: SectionKey;
+};
+
+// `section` liga o item a uma flag em SECTION_FLAGS: quando desativada, o
+// item aparece no menu, mas não navega ("em breve"). Itens sem `section`
+// nunca ficam desativados por essa configuração.
+const navLinks: NavLink[] = [
   { href: '/blog', label: 'Blog', icon: faNewspaper },
   { href: '/me', label: 'Sobre mim', icon: faUser },
   { href: '/now', label: 'Agora', icon: faHeadphones },
-  { href: '/uses', label: 'Uso', icon: faScrewdriverWrench },
-  { href: '/contact', label: 'Contato', icon: faEnvelope, disabled: true },
+  { href: '/uses', label: 'Uso', icon: faScrewdriverWrench, section: 'uses' },
+  {
+    href: '/contact',
+    label: 'Contato',
+    icon: faEnvelope,
+    section: 'contact',
+  },
 ];
 
 const MenuIcon = () => (
@@ -94,7 +110,8 @@ export const Navbar = () => {
 
           <div className="-mr-3 ml-auto hidden h-full items-center md:flex">
             <nav className="flex items-center h-full">
-              {navLinks.map(({ href, label, disabled }) => {
+              {navLinks.map(({ href, label, section }) => {
+                const disabled = section ? !SECTION_FLAGS[section] : false;
                 if (disabled) {
                   return (
                     <span
@@ -168,7 +185,8 @@ export const Navbar = () => {
           <div className="mx-auto mt-1 h-1.5 w-24 shrink-0 rounded-full bg-site-primary-soft" />
 
           <nav className="flex w-full flex-col">
-            {navLinks.map(({ href, label, icon, disabled }) => {
+            {navLinks.map(({ href, label, icon, section }) => {
+              const disabled = section ? !SECTION_FLAGS[section] : false;
               if (disabled) {
                 return (
                   <span
