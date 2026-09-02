@@ -1,4 +1,5 @@
 import Image from 'next/image';
+import { notFound } from 'next/navigation';
 import type { CSSProperties, ReactNode } from 'react';
 
 import { PageWrapper } from '../components/PageWrapper';
@@ -16,6 +17,7 @@ import type { Metadata } from 'next';
 
 import { PageTitle } from '@/base/components/PageTitle';
 import { SectionHeader } from '@/base/components/SectionHeader';
+import { SECTION_FLAGS } from '@/lib/section-flags';
 import { SITE_NAME, SITE_URL } from '@/lib/site';
 
 const USES_TITLE = 'Uso';
@@ -289,6 +291,8 @@ const AppsGrid = ({ items }: { items: App[] }) => (
 );
 
 export default function UsesPage() {
+  if (!SECTION_FLAGS.uses) notFound();
+
   return (
     <PageWrapper>
       <main id="main">

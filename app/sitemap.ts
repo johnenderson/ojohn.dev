@@ -4,6 +4,7 @@ import {
   getArticlesList,
   parseArticleDate,
 } from '@/features/articles/lib/articles';
+import { SECTION_FLAGS } from '@/lib/section-flags';
 import { SITE_URL } from '@/lib/site';
 
 export default function sitemap(): MetadataRoute.Sitemap {
@@ -40,12 +41,16 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: 'monthly',
       priority: 0.5,
     },
-    {
-      url: `${SITE_URL}/uses`,
-      lastModified: now,
-      changeFrequency: 'monthly',
-      priority: 0.5,
-    },
+    ...(SECTION_FLAGS.uses
+      ? [
+          {
+            url: `${SITE_URL}/uses`,
+            lastModified: now,
+            changeFrequency: 'monthly' as const,
+            priority: 0.5,
+          },
+        ]
+      : []),
     ...articles,
   ];
 }
