@@ -8,7 +8,9 @@ const FONT_SIZES = ['14px', '16px', '17px', '18px', '20px'];
 const DEFAULT_FONT_SIZE = '16px';
 const ELEVATOR_SPEED_KEY = 'elevator_speed';
 
-const isFontSize = (value: string | null): value is typeof FONT_SIZES[number] =>
+const isFontSize = (
+  value: string | null,
+): value is (typeof FONT_SIZES)[number] =>
   value !== null && FONT_SIZES.includes(value);
 
 function useLocalFontSize() {
