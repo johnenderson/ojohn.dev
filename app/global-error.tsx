@@ -20,8 +20,8 @@ export default function GlobalError({
       <body
         style={{
           alignItems: 'center',
-          background: '#09080d',
-          color: '#fffaf5',
+          background: '#0a0b10',
+          color: '#f2f4fa',
           display: 'flex',
           fontFamily: 'system-ui, -apple-system, sans-serif',
           justifyContent: 'center',
@@ -62,7 +62,7 @@ export default function GlobalError({
             style={{
               background: 'transparent',
               border: 0,
-              color: '#fffaf5',
+              color: '#f2f4fa',
               cursor: 'pointer',
               fontSize: '1rem',
               fontWeight: 600,

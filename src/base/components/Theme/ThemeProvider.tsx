@@ -40,8 +40,8 @@ const getStoredTheme = (): Theme => {
 };
 
 const THEME_COLORS: Record<'light' | 'dark', string> = {
-  light: '#fffdf9',
-  dark: '#09080d',
+  light: '#fafbfd',
+  dark: '#0a0b10',
 };
 
 // The themeColor metas from app/layout.tsx follow prefers-color-scheme, which

@@ -61,9 +61,9 @@ export async function GET(
           flexDirection: 'column',
           justifyContent: 'space-between',
           padding: '72px',
-          color: '#fffaf5',
+          color: '#f2f4fa',
           background:
-            'radial-gradient(circle at 18% 8%, rgba(91, 211, 199, 0.28), transparent 30%), radial-gradient(circle at 82% 18%, rgba(240, 166, 109, 0.2), transparent 30%), #09080d',
+            'radial-gradient(circle at 18% 8%, rgba(195, 240, 107, 0.28), transparent 30%), radial-gradient(circle at 82% 18%, rgba(122, 140, 255, 0.2), transparent 30%), #0a0b10',
           fontFamily: 'Arial, sans-serif',
         }}
       >
@@ -85,8 +85,8 @@ export async function GET(
               alignItems: 'center',
               justifyContent: 'center',
               borderRadius: '12px',
-              background: '#fffaf5',
-              color: '#09080d',
+              background: '#f2f4fa',
+              color: '#0a0b10',
               fontSize: '28px',
               fontWeight: 900,
             }}
@@ -100,7 +100,7 @@ export async function GET(
           <h1
             style={{
               margin: 0,
-              color: '#fffaf5',
+              color: '#f2f4fa',
               fontSize: '86px',
               fontWeight: 850,
               lineHeight: 1,
@@ -126,10 +126,10 @@ export async function GET(
         <div
           style={{
             width: 'fit-content',
-            border: '1px solid rgba(91, 211, 199, 0.45)',
+            border: '1px solid rgba(195, 240, 107, 0.45)',
             borderRadius: '999px',
-            background: 'rgba(91, 211, 199, 0.12)',
-            color: '#5bd3c7',
+            background: 'rgba(195, 240, 107, 0.12)',
+            color: '#c3f06b',
             fontSize: '24px',
             fontWeight: 800,
             padding: '12px 18px',

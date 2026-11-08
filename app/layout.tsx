@@ -79,8 +79,8 @@ const themeInitScript = `(function () {
 
 export const viewport: Viewport = {
   themeColor: [
-    { media: '(prefers-color-scheme: light)', color: '#fffdf9' },
-    { media: '(prefers-color-scheme: dark)', color: '#09080d' },
+    { media: '(prefers-color-scheme: light)', color: '#fafbfd' },
+    { media: '(prefers-color-scheme: dark)', color: '#0a0b10' },
   ],
 };
 

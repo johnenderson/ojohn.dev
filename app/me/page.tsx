@@ -76,7 +76,7 @@ const tldrCards = [
   },
   {
     icon: faCode,
-    accent: '#5bd3c7',
+    accent: 'var(--site-primary)',
     pretitle: 'Trampo',
     title: 'Itaú Unibanco',
     description: 'Engenheiro de Software',
