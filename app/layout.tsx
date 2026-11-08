@@ -59,7 +59,9 @@ export const metadata: Metadata = {
 // Aplica o tema salvo ANTES do primeiro paint (parser-blocking), evitando o
 // flash de tema escuro para quem usa tema claro. Espelha a resolução do
 // ThemeProvider: 'light' | 'dark' | 'system' (via prefers-color-scheme), com
-// 'dark' como padrão. O ThemeProvider assume o controle após a hidratação.
+// 'dark' como padrão. Também aplica a paleta salva (data-palette, padrão
+// 'lima' — ver PALETTES no ThemeProvider). O ThemeProvider assume o controle
+// após a hidratação.
 const themeInitScript = `(function () {
   try {
     var stored = localStorage.getItem('theme');
@@ -72,6 +74,9 @@ const themeInitScript = `(function () {
         : 'dark';
     document.documentElement.classList.add(resolved);
     document.documentElement.style.colorScheme = resolved;
+    var palette = localStorage.getItem('palette');
+    document.documentElement.dataset.palette =
+      palette === 'ambar' || palette === 'teal' ? palette : 'lima';
   } catch (e) {
     document.documentElement.classList.add('dark');
   }

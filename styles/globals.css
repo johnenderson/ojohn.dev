@@ -71,6 +71,122 @@ html.light {
   --site-selection-foreground: #12141c;
 }
 
+/* ── Paletas alternativas ────────────────────────────────────────────────
+   A paleta padrão (Lima & Índigo) fica em :root / html.light acima. As
+   demais são escolhidas no painel de Preferências e aplicadas via
+   html[data-palette]. O bloco claro usa .light junto do atributo para ter
+   especificidade maior que o bloco escuro da mesma paleta. */
+
+/* A — Âmbar & Grafite */
+html[data-palette='ambar'] {
+  --site-background: #0d0c0a;
+  --site-foreground: #f7f2ea;
+  --site-body: rgba(247, 242, 234, 0.74);
+  --site-body-muted: #b0a799;
+  --site-card: rgba(30, 27, 23, 0.88);
+  --site-card-hover: rgba(41, 37, 31, 0.96);
+  --site-popover: rgba(15, 13, 11, 0.96);
+  --site-navbar: rgba(13, 12, 10, 0.84);
+  --site-navbar-desktop: rgba(13, 12, 10, 0.45);
+  --site-navbar-scrolled: rgba(13, 12, 10, 0.94);
+  --site-primary: #f4a85c;
+  --site-primary-hover: #f8c189;
+  --site-primary-foreground: #1c1004;
+  --site-primary-soft: rgba(244, 168, 92, 0.13);
+  --site-spotlight: rgba(244, 168, 92, 0.12);
+  --site-border: rgba(148, 134, 114, 0.46);
+  --site-border-muted: rgba(148, 134, 114, 0.32);
+  --site-border-subtle: rgba(134, 121, 103, 0.18);
+  --site-code: rgba(30, 27, 23, 0.82);
+  --site-code-inline: rgba(244, 168, 92, 0.13);
+  --code-surface: #161411;
+  --code-surface-header: #211e19;
+  --code-border: rgba(134, 121, 103, 0.22);
+  --code-muted: #b0a799;
+  --code-fg: #f7f2ea;
+  --site-selection: rgba(244, 168, 92, 0.32);
+  --site-selection-foreground: #f7f2ea;
+}
+html.light[data-palette='ambar'] {
+  --site-background: #fbf8f2;
+  --site-foreground: #1b1712;
+  --site-body: rgba(27, 23, 18, 0.72);
+  --site-body-muted: #6b6255;
+  --site-card: #f5efe5;
+  --site-card-hover: #fffcf6;
+  --site-popover: rgba(251, 248, 242, 0.96);
+  --site-navbar: rgba(251, 248, 242, 0.78);
+  --site-navbar-desktop: rgba(251, 248, 242, 0.45);
+  --site-navbar-scrolled: rgba(251, 248, 242, 0.95);
+  --site-primary: #b45309;
+  --site-primary-hover: #92400e;
+  --site-primary-foreground: #ffffff;
+  --site-primary-soft: rgba(180, 83, 9, 0.1);
+  --site-spotlight: rgba(180, 83, 9, 0.08);
+  --site-border: rgba(120, 106, 88, 0.38);
+  --site-border-muted: rgba(120, 106, 88, 0.26);
+  --site-border-subtle: rgba(120, 106, 88, 0.15);
+  --site-code: #f5efe5;
+  --site-code-inline: rgba(180, 83, 9, 0.09);
+  --site-selection: rgba(180, 83, 9, 0.2);
+  --site-selection-foreground: #1b1712;
+}
+
+/* C — Teal (original, com contraste corrigido no tema claro) */
+html[data-palette='teal'] {
+  --site-background: #09080d;
+  --site-foreground: #fffaf5;
+  --site-body: rgba(255, 250, 245, 0.74);
+  --site-body-muted: #b4adb7;
+  --site-card: rgba(29, 26, 36, 0.88);
+  --site-card-hover: rgba(39, 35, 48, 0.96);
+  --site-popover: rgba(12, 10, 17, 0.96);
+  --site-navbar: rgba(9, 8, 13, 0.84);
+  --site-navbar-desktop: rgba(9, 8, 13, 0.45);
+  --site-navbar-scrolled: rgba(9, 8, 13, 0.94);
+  --site-primary: #5bd3c7;
+  --site-primary-hover: #82e6db;
+  --site-primary-foreground: #061211;
+  --site-primary-soft: rgba(91, 211, 199, 0.13);
+  --site-spotlight: rgba(91, 211, 199, 0.14);
+  --site-border: rgba(139, 124, 143, 0.48);
+  --site-border-muted: rgba(139, 124, 143, 0.34);
+  --site-border-subtle: rgba(123, 108, 126, 0.18);
+  --site-code: rgba(28, 25, 35, 0.82);
+  --site-code-inline: rgba(91, 211, 199, 0.14);
+  --code-surface: #14121b;
+  --code-surface-header: #1f1c27;
+  --code-border: rgba(123, 108, 126, 0.22);
+  --code-muted: #b4adb7;
+  --code-fg: #fffaf5;
+  --site-selection: rgba(91, 211, 199, 0.34);
+  --site-selection-foreground: #fffaf5;
+}
+html.light[data-palette='teal'] {
+  --site-background: #fffdfa;
+  --site-foreground: #17131d;
+  --site-body: rgba(23, 19, 29, 0.7);
+  --site-body-muted: #665f6d;
+  --site-card: #faf6f1;
+  --site-card-hover: #fffaf5;
+  --site-popover: rgba(255, 253, 250, 0.96);
+  --site-navbar: rgba(255, 253, 250, 0.78);
+  --site-navbar-desktop: rgba(255, 253, 250, 0.45);
+  --site-navbar-scrolled: rgba(255, 253, 250, 0.95);
+  --site-primary: #0f766e;
+  --site-primary-hover: #115e59;
+  --site-primary-foreground: #ffffff;
+  --site-primary-soft: rgba(15, 118, 110, 0.1);
+  --site-spotlight: rgba(15, 118, 110, 0.09);
+  --site-border: rgba(118, 108, 126, 0.38);
+  --site-border-muted: rgba(118, 108, 126, 0.26);
+  --site-border-subtle: rgba(118, 108, 126, 0.15);
+  --site-code: #faf6f1;
+  --site-code-inline: rgba(15, 118, 110, 0.09);
+  --site-selection: rgba(15, 118, 110, 0.22);
+  --site-selection-foreground: #17131d;
+}
+
 /* Elastic spring easing — same as doce.sh */
 @theme {
   --color-site-background: var(--site-background);
