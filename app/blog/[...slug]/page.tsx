@@ -20,6 +20,10 @@ type Props = {
   params: Promise<{ slug: string[] }>;
 };
 
+// Slugs fora de generateStaticParams respondem 404 de verdade. Sem isso, o
+// loading.tsx da raiz faz o notFound() sair com status 200 (soft-404).
+export const dynamicParams = false;
+
 export async function generateStaticParams() {
   return getArticlePaths().map(({ params }) => params);
 }
