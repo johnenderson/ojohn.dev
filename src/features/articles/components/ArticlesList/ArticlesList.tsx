@@ -18,6 +18,8 @@ import {
 
 type Header = 'h1' | 'h2' | false;
 type ArticlesListProps = {
+  /** Destaca o primeiro artigo (capa grande). Só vale na lista não agrupada. */
+  featureFirst?: boolean;
   filterTag?: string;
   grouped?: boolean;
   header?: Header;
@@ -43,6 +45,7 @@ const formatArticleCount = (count: number) =>
   count === 1 ? '1 artigo' : `${count} artigos`;
 
 export const ArticlesList: FC<ArticlesListProps> = ({
+  featureFirst = false,
   filterTag,
   grouped = false,
   header = 'h2',
@@ -136,7 +139,7 @@ export const ArticlesList: FC<ArticlesListProps> = ({
         </div>
       ) : (
         <ul className="m-0 grid list-none gap-3 p-0">
-          {articles.map((article) => (
+          {articles.map((article, index) => (
             <ArticleListItem
               key={article.slug}
               cover={article.cover}
@@ -148,7 +151,7 @@ export const ArticlesList: FC<ArticlesListProps> = ({
               showTags={showTags}
               tags={article.tags}
               title={article.title}
-              variant={itemVariant}
+              variant={featureFirst && index === 0 ? 'feature' : itemVariant}
             />
           ))}
         </ul>

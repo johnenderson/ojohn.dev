@@ -16,8 +16,20 @@ type PostPropType = {
   showTags?: boolean;
   tags: string[];
   title: string;
-  variant?: 'default' | 'compact';
+  variant?: 'default' | 'compact' | 'feature';
 };
+
+/** Capa em destaque: empilhada no mobile, ao lado do texto a partir de md. */
+const FeatureCover = ({ cover, title }: { cover: string; title: string }) => (
+  <Image
+    src={cover}
+    alt={`Capa do artigo ${title}`}
+    width={640}
+    height={360}
+    sizes="(min-width: 768px) 320px, 100vw"
+    className="aspect-video w-full shrink-0 rounded-md border border-site-border-subtle object-cover transition-transform duration-300 group-hover:scale-[1.02] md:w-80"
+  />
+);
 
 const CardCover = ({ cover, title }: { cover: string; title: string }) => (
   <Image
@@ -78,6 +90,43 @@ export const ArticleListItem: FC<PostPropType> = ({
 }) => {
   const isCompact = variant === 'compact';
   const formattedDate = formatArticleDate(datetime);
+
+  if (variant === 'feature') {
+    return (
+      <li>
+        <Card
+          href={link}
+          interactive
+          className="article-card-glass group p-4 focus-visible:outline-none sm:p-5"
+        >
+          <div className="article-card-content flex flex-col gap-5 md:flex-row md:items-center">
+            {cover ? <FeatureCover cover={cover} title={title} /> : null}
+
+            <div className="min-w-0 flex-1">
+              <div className="flex items-start gap-2.5">
+                {icon ? <ArticleIcon icon={icon} size="sm" /> : null}
+                <h3 className="m-0 text-balance text-xl font-bold leading-snug text-site-foreground transition-colors group-hover:text-site-primary group-focus-visible:text-site-primary">
+                  {title}
+                </h3>
+              </div>
+
+              <MetaLine
+                datetime={datetime}
+                formattedDate={formattedDate}
+                minutes={minutes}
+              />
+
+              <p className="mb-0 mt-3 text-pretty text-sm leading-6 text-site-body">
+                {description}
+              </p>
+
+              {showTags && tags.length > 0 && <TagList tags={tags} />}
+            </div>
+          </div>
+        </Card>
+      </li>
+    );
+  }
 
   if (isCompact) {
     return (

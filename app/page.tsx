@@ -48,7 +48,7 @@ export default function Page() {
             <About />
             <DevPulse />
             <ProjectsShowcase />
-            <ArticlesList />
+            <ArticlesList featureFirst />
           </div>
         </main>
       </AnimationLayout>
