@@ -9,7 +9,7 @@ export const REACTIONS = [
   { id: 'mind', emoji: '🤯', label: 'Mente explodida' },
 ] as const;
 
-export type ReactionId = typeof REACTIONS[number]['id'];
+export type ReactionId = (typeof REACTIONS)[number]['id'];
 
 export const REACTION_IDS = new Set<string>(REACTIONS.map((r) => r.id));
 

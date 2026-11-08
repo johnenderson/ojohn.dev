@@ -64,7 +64,7 @@ const bumpCount = (
 type ReactionButtonProps = {
   likesId: string;
   slug: string;
-  reaction: typeof REACTIONS[number];
+  reaction: (typeof REACTIONS)[number];
   count: number;
   onReact: (slug: string, reaction: ReactionId) => void;
 };
