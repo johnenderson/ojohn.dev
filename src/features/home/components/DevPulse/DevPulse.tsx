@@ -10,27 +10,16 @@ import { getGithubPulse } from '@/lib/github';
 const formatNumber = (value: number) =>
   new Intl.NumberFormat('pt-BR').format(value);
 
-const Metric = ({
-  label,
-  children,
-  className = '',
-}: {
-  label: string;
-  children: React.ReactNode;
-  className?: string;
-}) => (
-  <div className={`flex min-w-0 items-baseline gap-2 ${className}`}>
-    <dt className="shrink-0 text-xs text-site-body-muted">{label}</dt>
-    <dd className="m-0 min-w-0 text-sm font-semibold text-site-foreground">
-      {children}
-    </dd>
-  </div>
-);
+const CELL_CLASS = 'flex min-w-0 flex-col gap-1 bg-site-card px-4 py-3';
+const LABEL_CLASS = 'm-0 text-xs text-site-body-muted';
+const VALUE_CLASS =
+  'm-0 flex min-w-0 items-baseline gap-1.5 text-base font-bold leading-tight text-site-foreground';
 
 /**
- * Faixa compacta com os sinais do GitHub. Não é uma seção "de conteúdo":
- * fica abaixo do hero como uma linha de status, sem cabeçalho nem card, para
- * que Projetos e Artigos tenham mais peso na página.
+ * Barra de status do GitHub, logo abaixo do hero. Um único bloco com células
+ * separadas por filetes de 1px (o `gap-px` sobre o fundo da borda): rótulo
+ * pequeno em cima, valor em destaque embaixo. Sem cabeçalho de seção, para
+ * pesar menos que Projetos e Artigos.
  */
 export async function DevPulse() {
   const pulse = await getGithubPulse().catch(() => null);
@@ -46,69 +35,70 @@ export async function DevPulse() {
   } = pulse;
 
   return (
-    <section
-      id="dev-pulse"
-      aria-label="Pulso de dev"
-      className="mt-6 flex flex-col gap-2 md:mt-8 md:flex-row md:items-center md:gap-6"
-    >
-      <Link
-        href={`https://github.com/${username}`}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="inline-flex min-h-11 shrink-0 items-center gap-2 text-sm font-semibold text-site-foreground no-underline transition-colors hover:text-site-primary-hover focus-visible:text-site-primary-hover focus-visible:outline-none md:min-h-0"
-      >
-        <FontAwesomeIcon
-          icon={faGithub}
-          aria-hidden="true"
-          className="size-4 text-site-primary"
-        />
-        @{username}
-      </Link>
+    <section id="dev-pulse" aria-label="Pulso de dev" className="mt-8 md:mt-10">
+      <dl className="m-0 grid grid-cols-2 gap-px overflow-hidden rounded-md border border-site-border-muted bg-site-border-subtle md:grid-cols-[auto_auto_auto_minmax(0,1fr)]">
+        <div className={`${CELL_CLASS} col-span-2 md:col-span-1`}>
+          <dt className={LABEL_CLASS}>GitHub</dt>
+          <dd className={VALUE_CLASS}>
+            <Link
+              href={`https://github.com/${username}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 text-site-foreground no-underline transition-colors hover:text-site-primary-hover focus-visible:text-site-primary-hover focus-visible:outline-none"
+            >
+              <FontAwesomeIcon
+                icon={faGithub}
+                aria-hidden="true"
+                className="size-4 text-site-primary"
+              />
+              @{username}
+            </Link>
+          </dd>
+        </div>
 
-      <dl className="m-0 flex min-w-0 flex-1 flex-wrap items-baseline gap-x-6 gap-y-2">
-        <Metric label="Sequência">
-          <span className="inline-flex items-center gap-1.5">
+        <div className={CELL_CLASS}>
+          <dt className={LABEL_CLASS}>Sequência</dt>
+          <dd className={VALUE_CLASS}>
             <FontAwesomeIcon
               icon={faFire}
               aria-hidden="true"
-              className="text-xs text-site-primary"
+              className="self-center text-sm text-site-primary"
             />
             {currentStreak} {currentStreak === 1 ? 'dia' : 'dias'}
             <span className="text-xs font-normal text-site-body-muted">
-              (recorde {longestStreak})
+              recorde {longestStreak}
             </span>
-          </span>
-        </Metric>
+          </dd>
+        </div>
 
-        <Metric label="Contribuições">
-          {formatNumber(totalContributions)}
-          <span className="ml-1.5 text-xs font-normal text-site-body-muted">
-            no último ano
-          </span>
-        </Metric>
+        <div className={CELL_CLASS}>
+          <dt className={LABEL_CLASS}>Contribuições no último ano</dt>
+          <dd className={VALUE_CLASS}>{formatNumber(totalContributions)}</dd>
+        </div>
 
-        {lastActivity ? (
-          <Metric label="Último commit" className="w-full md:w-auto md:flex-1">
-            <Link
-              href={lastActivity.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="block max-w-full truncate text-site-foreground no-underline transition-colors hover:text-site-primary-hover focus-visible:text-site-primary-hover focus-visible:outline-none"
-              title={`${lastActivity.message} · ${lastActivity.repo}`}
-            >
-              {lastActivity.message}
-            </Link>
-            <span className="block text-xs font-normal text-site-body-muted">
-              {lastActivity.repo} · {formatRelativeTime(lastActivity.at)}
-            </span>
-          </Metric>
-        ) : (
-          <Metric label="Último commit">
-            <span className="font-normal text-site-body-muted">
+        <div className={`${CELL_CLASS} col-span-2 md:col-span-1`}>
+          <dt className={LABEL_CLASS}>Último commit</dt>
+          {lastActivity ? (
+            <dd className="m-0 flex min-w-0 flex-col gap-0.5">
+              <Link
+                href={lastActivity.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block max-w-full truncate text-base font-bold leading-tight text-site-foreground no-underline transition-colors hover:text-site-primary-hover focus-visible:text-site-primary-hover focus-visible:outline-none"
+                title={`${lastActivity.message} · ${lastActivity.repo}`}
+              >
+                {lastActivity.message}
+              </Link>
+              <span className="truncate text-xs text-site-body-muted">
+                {lastActivity.repo} · {formatRelativeTime(lastActivity.at)}
+              </span>
+            </dd>
+          ) : (
+            <dd className="m-0 text-sm text-site-body-muted">
               Sem atividade pública recente.
-            </span>
-          </Metric>
-        )}
+            </dd>
+          )}
+        </div>
       </dl>
     </section>
   );
