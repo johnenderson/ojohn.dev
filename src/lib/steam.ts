@@ -2,6 +2,13 @@ import { cacheGet, cacheSet } from './redis';
 
 const STEAM_API_BASE = 'https://api.steampowered.com';
 const STEAM_CDN_BASE = 'https://cdn.cloudflare.steamstatic.com/steam/apps';
+/**
+ * Base dos assets da loja. Jogos lançados a partir de ~2024 (ex: AION 2) só
+ * publicam as capas num caminho com hash (`steam/apps/<appid>/<hash>/...`),
+ * então a URL "clássica" em STEAM_CDN_BASE devolve 404 para eles.
+ */
+const STEAM_STORE_ASSETS_BASE =
+  'https://shared.akamai.steamstatic.com/store_item_assets/';
 
 const debugLog = (...args: unknown[]) => {
   if (process.env.STEAM_DEBUG === 'true') {
@@ -13,8 +20,9 @@ const debugLog = (...args: unknown[]) => {
 const CACHE_TTL_RECENT = 60 * 60 * 24; // 24h
 // Top all-time: ranking de horas totais não muda do dia pra noite
 const CACHE_TTL_ALLTIME = 60 * 60 * 24 * 7; // 7 dias
-const CACHE_KEY_RECENT = 'steam:recently-played:v4'; // v4: payload passa a incluir updatedAt
-const CACHE_KEY_ALLTIME = 'steam:alltime:v4'; // v4: payload passa a incluir updatedAt
+// v5: capas resolvidas via IStoreBrowseService (assets com hash)
+const CACHE_KEY_RECENT = 'steam:recently-played:v5';
+const CACHE_KEY_ALLTIME = 'steam:alltime:v5';
 
 /** Quantos cards a grade exibe — sempre completamos até esse número. */
 const TARGET_COUNT = 5;
@@ -41,7 +49,7 @@ export type SteamGame = {
   lastPlayedAt: number | null;
   /** URL da capa vertical (600×900) via Steam CDN */
   coverUrl: string;
-  /** URL da biblioteca horizontal (460×215) — fallback */
+  /** URL do header horizontal (460×215) — fallback quando a capa falha */
   headerUrl: string;
   /** Página da loja do jogo */
   storeUrl: string;
@@ -115,6 +123,77 @@ const steamFetch = async (
   return data;
 };
 
+type SteamStoreAssets = {
+  asset_url_format?: string;
+  library_capsule?: string;
+  library_capsule_2x?: string;
+  header?: string;
+};
+
+type SteamStoreItemsResponse = {
+  response?: {
+    store_items?: { appid?: number; assets?: SteamStoreAssets }[];
+  };
+};
+
+const buildAssetUrl = (format: string, file: string) =>
+  `${STEAM_STORE_ASSETS_BASE}${format.replace('${FILENAME}', file)}`;
+
+/**
+ * Troca as URLs "chutadas" de capa/header pelas URLs reais que a loja
+ * informa. Se a chamada falhar, mantém as URLs clássicas — o GameCard ainda
+ * tem fallback no cliente (capa → header → placeholder com o nome).
+ */
+const resolveStoreAssets = async (
+  games: SteamGame[],
+  apiKey: string,
+): Promise<SteamGame[]> => {
+  if (games.length === 0) return games;
+
+  const url = new URL(`${STEAM_API_BASE}/IStoreBrowseService/GetItems/v1/`);
+  url.searchParams.set('key', apiKey);
+  url.searchParams.set(
+    'input_json',
+    JSON.stringify({
+      ids: games.map((game) => ({ appid: game.appid })),
+      context: { language: 'english', country_code: 'US' },
+      data_request: { include_assets: true },
+    }),
+  );
+
+  try {
+    const response = await fetch(url.toString(), { cache: 'no-store' });
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+    const data = (await response.json()) as SteamStoreItemsResponse;
+    const assetsByAppid = new Map<number, SteamStoreAssets>();
+    for (const item of data.response?.store_items ?? []) {
+      if (item.appid && item.assets) assetsByAppid.set(item.appid, item.assets);
+    }
+
+    return games.map((game) => {
+      const assets = assetsByAppid.get(game.appid);
+      const format = assets?.asset_url_format;
+      if (!format) return game;
+
+      const header = assets.header
+        ? buildAssetUrl(format, assets.header)
+        : game.headerUrl;
+      const capsule = assets.library_capsule ?? assets.library_capsule_2x;
+
+      return {
+        ...game,
+        // Sem capa vertical publicada: usa o header (o card faz object-cover)
+        coverUrl: capsule ? buildAssetUrl(format, capsule) : header,
+        headerUrl: header,
+      };
+    });
+  } catch (err) {
+    debugLog('erro ao resolver assets da loja:', err);
+    return games;
+  }
+};
+
 const fetchRecentlyPlayed = async (
   userId: string,
   apiKey: string,
@@ -137,10 +216,12 @@ const fetchRecentlyPlayed = async (
     );
   }
 
-  return games
+  const recent = games
     .map(toSteamGame)
     .filter((game): game is SteamGame => game !== null)
     .slice(0, TARGET_COUNT);
+
+  return resolveStoreAssets(recent, apiKey);
 };
 
 const fetchTopAllTime = async (
@@ -159,10 +240,12 @@ const fetchTopAllTime = async (
     .filter((g) => (g.playtime_forever ?? 0) > 0)
     .sort((a, b) => (b.playtime_forever ?? 0) - (a.playtime_forever ?? 0));
 
-  return games
+  const alltime = games
     .map(toSteamGame)
     .filter((game): game is SteamGame => game !== null)
     .slice(0, ALLTIME_POOL);
+
+  return resolveStoreAssets(alltime, apiKey);
 };
 
 /** Recentes (cache → API). Lista vazia em caso de falha. */

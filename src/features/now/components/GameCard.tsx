@@ -1,10 +1,10 @@
-import Image from 'next/image';
 import React from 'react';
 
 import { faCalendarAlt, faGamepad } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import { CardTooltip } from './CardTooltip';
+import { GameCover } from './GameCover';
 import {
   CARD_HOVER_LARGE,
   CARD_INNER_RING,
@@ -100,13 +100,10 @@ export const GameCard = ({ game }: { game: SteamGame }) => {
           game.appid,
         )}`}
       >
-        <Image
-          src={game.coverUrl}
-          alt={game.name}
-          fill
-          unoptimized
-          sizes="(min-width: 768px) 20vw, 33vw"
-          className="object-cover"
+        <GameCover
+          name={game.name}
+          coverUrl={game.coverUrl}
+          headerUrl={game.headerUrl}
         />
         <span aria-hidden="true" className={CARD_INNER_RING} />
       </a>
