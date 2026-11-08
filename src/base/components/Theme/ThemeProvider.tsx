@@ -18,7 +18,7 @@ export type Theme = 'system' | 'light' | 'dark';
  * Mantenha em sincronia com o paletteInitScript de app/layout.tsx.
  */
 export const PALETTES = ['lima', 'ambar', 'teal'] as const;
-export type Palette = typeof PALETTES[number];
+export type Palette = (typeof PALETTES)[number];
 export const DEFAULT_PALETTE: Palette = 'lima';
 
 type ThemeContextValue = {
