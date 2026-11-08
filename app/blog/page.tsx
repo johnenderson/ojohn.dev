@@ -35,6 +35,8 @@ export const metadata: Metadata = {
   },
 };
 
+const MIN_ARTICLES_PER_TAG = 2;
+
 const getAllTags = () => {
   const counts = new Map<string, number>();
   for (const article of getArticlesList()) {
@@ -56,7 +58,12 @@ const tagChipClassName = (active: boolean) =>
   ].join(' ');
 
 const TagFilter = ({ activeTag }: { activeTag?: string }) => {
-  const tags = getAllTags();
+  // Uma tag usada por um único artigo só leva a uma lista de um item, então
+  // vira ruído. O filtro só aparece quando alguma tag agrupa 2+ artigos; a tag
+  // ativa (vinda da URL) sempre fica visível para dar uma saída ("todas").
+  const tags = getAllTags().filter(
+    ([tag, count]) => count >= MIN_ARTICLES_PER_TAG || tag === activeTag,
+  );
   if (tags.length === 0) return null;
 
   return (
