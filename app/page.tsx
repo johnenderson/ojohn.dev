@@ -7,7 +7,6 @@ import { About } from '@/features/home/components/About';
 import { DevPulse } from '@/features/home/components/DevPulse';
 import { Hero } from '@/features/home/components/Hero';
 import { ProjectsShowcase } from '@/features/home/components/Projects';
-import { SkipLink } from '@/features/home/components/SkipLink';
 import { SITE_NAME, SITE_URL } from '@/lib/site';
 
 const HOME_TITLE = 'John Enderson - O John Backend Developer';
@@ -42,7 +41,6 @@ export default function Page() {
   return (
     <>
       <Navbar />
-      <SkipLink />
       <AnimationLayout>
         <main id="main">
           <div className="content">

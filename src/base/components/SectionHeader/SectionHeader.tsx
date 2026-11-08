@@ -8,7 +8,7 @@ import { formatRelativeTime } from '@/lib/formatRelativeTime';
 
 /** Estilo único dos links de ação das seções ("Ver todos", "@usuario"…). */
 export const SECTION_ACTION_CLASS =
-  'text-sm font-medium text-site-body-muted no-underline transition-colors hover:text-site-primary-hover focus-visible:text-site-primary-hover focus-visible:outline-none';
+  'inline-flex min-h-11 items-center text-sm font-medium text-site-body-muted no-underline transition-colors hover:text-site-primary-hover focus-visible:text-site-primary-hover focus-visible:outline-none';
 
 type SectionHeaderProps = {
   /** Ícone da seção; renderizado dentro do selo teal. */
@@ -44,7 +44,7 @@ export const SectionHeader = ({
       <SectionIcon>{icon}</SectionIcon>
       <h2
         id={id}
-        className="m-0 min-w-0 flex-1 text-2xl font-bold tracking-normal text-site-foreground"
+        className="m-0 min-w-0 flex-1 text-balance text-xl font-bold tracking-normal text-site-foreground sm:text-2xl"
       >
         {title}
       </h2>
