@@ -64,8 +64,8 @@ export const Layout: FC<PropsWithChildren<LayoutPropTypes>> = ({
                 itemType="https://schema.org/BlogPosting"
               >
                 <header className="mb-12 border-b border-site-border-subtle pb-8">
-                  <div className="flex items-start justify-between gap-3 sm:gap-4">
-                    <div className="flex min-w-0 items-start gap-3 sm:gap-4">
+                  <div className="relative flex items-start justify-between gap-3 sm:gap-4">
+                    <div className="flex min-w-0 flex-col items-start gap-4 sm:flex-row">
                       {icon ? <ArticleIcon icon={icon} size="lg" /> : null}
                       <div className="flex min-w-0 flex-col gap-3">
                         <Title text={title} />
@@ -77,7 +77,13 @@ export const Layout: FC<PropsWithChildren<LayoutPropTypes>> = ({
                         />
                       </div>
                     </div>
-                    <ShareMenu url={url} title={title} />
+                    {/* No mobile o ícone fica acima do título, então o botão
+                        sobe para a linha do ícone e o título usa a largura toda. */}
+                    <div
+                      className={icon ? 'absolute right-0 top-0 sm:static' : ''}
+                    >
+                      <ShareMenu url={url} title={title} />
+                    </div>
                   </div>
                 </header>
                 <TableOfContents variant="mobile" />

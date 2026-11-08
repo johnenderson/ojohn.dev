@@ -101,13 +101,20 @@ export const SocialIcons: FC<SocialIconsProps> = ({ className = '' }) => (
           target="_blank"
           rel="noopener noreferrer"
           title={label}
+          aria-label={label}
           className={cls}
         >
-          {icon}
+          <span aria-hidden="true">{icon}</span>
         </a>
       ) : (
-        <Link key={href} href={href} title={label} className={cls}>
-          {icon}
+        <Link
+          key={href}
+          href={href}
+          title={label}
+          aria-label={label}
+          className={cls}
+        >
+          <span aria-hidden="true">{icon}</span>
         </Link>
       );
     })}

@@ -35,7 +35,7 @@ export const hoverRotation = (seed: number): string =>
 // ─── Classes de hover ─────────────────────────────────────────────────────────
 
 const CARD_HOVER_BASE =
-  'transform-gpu will-change-transform transition-transform ease-[cubic-bezier(0.22,1,0.36,1)] hover:z-10 hover:scale-[1.04] lg:hover:scale-[1.08]';
+  'transform-gpu hover:will-change-transform transition-transform ease-[cubic-bezier(0.22,1,0.36,1)] hover:z-10 hover:scale-[1.04] lg:hover:scale-[1.08]';
 
 /** Cards grandes — ex: capas de jogo (aspect-[2/3]) */
 export const CARD_HOVER_LARGE = `${CARD_HOVER_BASE} duration-300`;

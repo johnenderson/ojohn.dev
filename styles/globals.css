@@ -722,10 +722,13 @@ html.light article h4 {
 
 .heading-anchor {
   align-items: center;
+  border-radius: 4px;
   color: var(--site-body-muted);
   display: inline-flex;
-  margin-left: 0.4rem;
+  /* Padding amplia a área de toque (18px → 26px) sem deslocar o ícone. */
+  margin: -0.25rem -0.25rem -0.25rem 0.15rem;
   opacity: 0;
+  padding: 0.25rem;
   transition: color 150ms ease, opacity 150ms ease;
   vertical-align: middle;
 }
@@ -739,7 +742,11 @@ article h3:hover .heading-anchor,
 .heading-anchor:hover,
 .heading-anchor:focus-visible {
   color: var(--site-primary-hover);
-  outline: none;
+}
+
+.heading-anchor:focus-visible {
+  outline: 2px solid var(--site-primary);
+  outline-offset: 1px;
 }
 
 .content figure.article-image {
@@ -1374,12 +1381,16 @@ html.light .content pre code {
   }
 }
 
+.code-copy-button:focus-visible {
+  outline: 2px solid var(--site-primary);
+  outline-offset: 2px;
+}
+
 .code-copy-button:hover,
 .code-copy-button:focus-visible {
   background: color-mix(in srgb, var(--site-primary) 16%, transparent);
   border-color: var(--site-primary);
   color: var(--site-primary-hover);
-  outline: none;
   transform: translateY(calc(-50% - 1px));
 }
 
