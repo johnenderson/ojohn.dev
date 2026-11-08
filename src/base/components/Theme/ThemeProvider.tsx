@@ -12,12 +12,24 @@ import {
 
 export type Theme = 'system' | 'light' | 'dark';
 
+/**
+ * Paletas de cor escolhíveis no painel de Preferências. Os tokens de cada uma
+ * ficam em styles/globals.css (html[data-palette=...]); 'lima' é o padrão.
+ * Mantenha em sincronia com o paletteInitScript de app/layout.tsx.
+ */
+export const PALETTES = ['lima', 'ambar', 'teal'] as const;
+export type Palette = typeof PALETTES[number];
+export const DEFAULT_PALETTE: Palette = 'lima';
+
 type ThemeContextValue = {
   theme: Theme;
   setTheme: (theme: Theme) => void;
+  palette: Palette;
+  setPalette: (palette: Palette) => void;
 };
 
 const STORAGE_KEY = 'theme';
+const PALETTE_STORAGE_KEY = 'palette';
 const DEFAULT_THEME: Theme = 'dark';
 const ThemeContext = createContext<ThemeContextValue | null>(null);
 
@@ -39,20 +51,33 @@ const getStoredTheme = (): Theme => {
   }
 };
 
-const THEME_COLORS: Record<'light' | 'dark', string> = {
-  light: '#fffdf9',
-  dark: '#09080d',
+const isPalette = (value: string | null): value is Palette =>
+  PALETTES.includes(value as Palette);
+
+const getStoredPalette = (): Palette => {
+  if (typeof globalThis.window === 'undefined') return DEFAULT_PALETTE;
+  try {
+    const storedPalette = globalThis.localStorage.getItem(PALETTE_STORAGE_KEY);
+    return isPalette(storedPalette) ? storedPalette : DEFAULT_PALETTE;
+  } catch {
+    return DEFAULT_PALETTE;
+  }
 };
 
 // The themeColor metas from app/layout.tsx follow prefers-color-scheme, which
-// is wrong when the user forces the opposite theme — pin them to the resolved
-// theme instead.
-const applyThemeColor = (resolvedTheme: 'light' | 'dark') => {
+// is wrong when the user forces the opposite theme — pin them to the page
+// background actually in effect (it depends on both theme and palette).
+const applyThemeColor = () => {
+  const background = getComputedStyle(globalThis.document.documentElement)
+    .getPropertyValue('--site-background')
+    .trim();
+  if (!background) return;
+
   const metas = globalThis.document.querySelectorAll<HTMLMetaElement>(
     'meta[name="theme-color"]',
   );
   for (const meta of metas) {
-    meta.content = THEME_COLORS[resolvedTheme];
+    meta.content = background;
   }
 };
 
@@ -63,9 +88,14 @@ const applyTheme = (theme: Theme) => {
   root.classList.remove('light', 'dark');
   root.classList.add(resolvedTheme);
   root.style.colorScheme = resolvedTheme;
-  applyThemeColor(resolvedTheme);
+  applyThemeColor();
 
   return resolvedTheme;
+};
+
+const applyPalette = (palette: Palette) => {
+  globalThis.document.documentElement.dataset.palette = palette;
+  applyThemeColor();
 };
 
 type ThemeProviderProps = Readonly<{
@@ -74,6 +104,12 @@ type ThemeProviderProps = Readonly<{
 
 export function ThemeProvider({ children }: ThemeProviderProps) {
   const [currentTheme, setCurrentTheme] = useState<Theme>(getStoredTheme);
+  const [currentPalette, setCurrentPalette] =
+    useState<Palette>(getStoredPalette);
+
+  useEffect(() => {
+    applyPalette(currentPalette);
+  }, [currentPalette]);
 
   useEffect(() => {
     applyTheme(currentTheme);
@@ -94,9 +130,21 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
     } catch {}
   }, []);
 
+  const setPalette = useCallback((nextPalette: Palette) => {
+    setCurrentPalette(nextPalette);
+    try {
+      globalThis.localStorage.setItem(PALETTE_STORAGE_KEY, nextPalette);
+    } catch {}
+  }, []);
+
   const value = useMemo(
-    () => ({ theme: currentTheme, setTheme }),
-    [currentTheme, setTheme],
+    () => ({
+      theme: currentTheme,
+      setTheme,
+      palette: currentPalette,
+      setPalette,
+    }),
+    [currentTheme, setTheme, currentPalette, setPalette],
   );
 
   return (

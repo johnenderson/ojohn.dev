@@ -55,9 +55,9 @@ export async function GET(
           flexDirection: 'column',
           justifyContent: 'space-between',
           padding: '80px',
-          color: '#fffaf5',
+          color: '#f2f4fa',
           background:
-            'radial-gradient(circle at 15% 10%, rgba(91, 211, 199, 0.28), transparent 32%), radial-gradient(circle at 85% 12%, rgba(240, 166, 109, 0.18), transparent 28%), #09080d',
+            'radial-gradient(circle at 15% 10%, rgba(195, 240, 107, 0.28), transparent 32%), radial-gradient(circle at 85% 12%, rgba(122, 140, 255, 0.18), transparent 28%), #0a0b10',
           fontFamily: 'Arial, sans-serif',
         }}
       >
@@ -74,7 +74,7 @@ export async function GET(
             style={{
               maxWidth: '1040px',
               margin: 0,
-              color: '#fffaf5',
+              color: '#f2f4fa',
               fontSize: titleFontSize,
               fontWeight: 800,
               lineHeight: 1.04,
@@ -116,9 +116,9 @@ export async function GET(
             style={{
               display: 'flex',
               alignItems: 'center',
-              border: '1px solid rgba(240, 166, 109, 0.55)',
+              border: '1px solid rgba(122, 140, 255, 0.55)',
               borderRadius: '999px',
-              background: 'rgba(240, 166, 109, 0.14)',
+              background: 'rgba(122, 140, 255, 0.14)',
               color: '#f0a66d',
               fontSize: '22px',
               fontWeight: 800,

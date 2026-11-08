@@ -1,2 +1,7 @@
-export type { Theme } from './ThemeProvider';
-export { ThemeProvider, useTheme } from './ThemeProvider';
+export type { Palette, Theme } from './ThemeProvider';
+export {
+  DEFAULT_PALETTE,
+  PALETTES,
+  ThemeProvider,
+  useTheme,
+} from './ThemeProvider';
