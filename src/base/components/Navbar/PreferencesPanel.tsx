@@ -248,6 +248,13 @@ const PALETTE_OPTIONS: {
     accent: '#c3f06b',
   },
   {
+    value: 'ameixa',
+    name: 'Lima & Ameixa',
+    // Mais clara que o fundo real, para não se confundir com a Índigo.
+    background: '#5b3d6e',
+    accent: '#c3f06b',
+  },
+  {
     value: 'ambar',
     name: 'Âmbar & Grafite',
     background: '#0d0c0a',
