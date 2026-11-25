@@ -4,7 +4,7 @@
 // é editar o valor abaixo — nenhum outro arquivo deve guardar esse estado.
 export const SECTION_FLAGS = {
   contact: false,
-  uses: false,
+  uses: true,
 } as const satisfies Record<string, boolean>;
 
 export type SectionKey = keyof typeof SECTION_FLAGS;
