@@ -17,9 +17,9 @@ import {
 } from '@fortawesome/free-brands-svg-icons';
 import {
   faBriefcase,
-  faCloudArrowUp,
   faCode,
   faDesktop,
+  faDog,
   faFileLines,
   faKeyboard,
   faLaptopCode,
@@ -179,16 +179,33 @@ const workPc: Spec[] = [
   },
 ];
 
-const toolGroups: {
-  title: string;
-  tools: { name: string; use: string; icon: IconDefinition }[];
-}[] = [
+// O Font Awesome não traz a Vercel; o logo é um triângulo, nas proporções 76×65.
+const vercelLogo = {
+  prefix: 'fab',
+  iconName: 'vercel',
+  icon: [76, 65, [], '', 'M38 0L76 65H0Z'],
+} as unknown as IconDefinition;
+
+const Brand = ({ children }: { children: ReactNode }) => (
+  <span translate="no">{children}</span>
+);
+
+type Tool = {
+  name: string;
+  /** Use quando o nome mistura marcas com palavras que devem ser traduzidas. */
+  label?: ReactNode;
+  use: string;
+  icon: IconDefinition;
+};
+
+const toolGroups: { title: string; tools: Tool[] }[] = [
   {
     title: 'Desenvolvimento',
     tools: [
       { name: 'Visual Studio Code', use: 'Editor de código', icon: faCode },
       { name: 'IntelliJ IDEA', use: 'Java e Kotlin', icon: faLaptopCode },
       { name: 'Warp', use: 'Terminal', icon: faTerminal },
+      { name: 'Bruno', use: 'Cliente de API', icon: faDog },
       {
         name: 'Claude Code',
         use: 'Assistente de IA para programar',
@@ -201,11 +218,21 @@ const toolGroups: {
       },
       {
         name: 'Ubuntu no WSL 2',
+        label: (
+          <>
+            <Brand>Ubuntu</Brand> no <Brand>WSL 2</Brand>
+          </>
+        ),
         use: 'Linux dentro do Windows',
         icon: faUbuntu,
       },
       {
         name: 'Git e GitHub',
+        label: (
+          <>
+            <Brand>Git</Brand> e <Brand>GitHub</Brand>
+          </>
+        ),
         use: 'Versionamento e pull requests',
         icon: faGitAlt,
       },
@@ -214,10 +241,19 @@ const toolGroups: {
   {
     title: 'Este site',
     tools: [
-      { name: 'Next.js e React', use: 'Base do site', icon: faReact },
+      {
+        name: 'Next.js e React',
+        label: (
+          <>
+            <Brand>Next.js</Brand> e <Brand>React</Brand>
+          </>
+        ),
+        use: 'Base do site',
+        icon: faReact,
+      },
       { name: 'TypeScript', use: 'Linguagem do projeto', icon: faTypescript },
       { name: 'Tailwind CSS', use: 'Estilos', icon: faTailwindCss },
-      { name: 'Vercel', use: 'Hospedagem e deploy', icon: faCloudArrowUp },
+      { name: 'Vercel', use: 'Hospedagem e deploy', icon: vercelLogo },
       { name: 'Cloudflare', use: 'DNS do domínio', icon: faCloudflare },
       {
         name: 'SonarCloud',
@@ -385,9 +421,9 @@ const Toolbox = () => (
         <h3 className="m-0 font-mono text-xs font-normal uppercase tracking-wider text-site-primary">
           {group.title}
         </h3>
-        <dl className="m-0 flex flex-col gap-3">
+        <ul className="m-0 flex list-none flex-col gap-3 p-0">
           {group.tools.map((tool) => (
-            <div key={tool.name} className="flex items-center gap-3">
+            <li key={tool.name} className="flex items-center gap-3">
               <span
                 aria-hidden="true"
                 className="flex size-9 shrink-0 items-center justify-center rounded-md border border-site-border-muted bg-site-card text-site-foreground"
@@ -395,19 +431,16 @@ const Toolbox = () => (
                 <FontAwesomeIcon icon={tool.icon} className="size-4" />
               </span>
               <div className="flex min-w-0 flex-col gap-0.5">
-                <dt
-                  className="font-medium leading-snug text-site-foreground"
-                  translate="no"
-                >
-                  {tool.name}
-                </dt>
-                <dd className="m-0 text-sm leading-snug text-site-body-muted">
+                <p className="m-0 font-medium leading-snug text-site-foreground">
+                  {tool.label ?? <span translate="no">{tool.name}</span>}
+                </p>
+                <p className="m-0 text-sm leading-snug text-site-body-muted">
                   {tool.use}
-                </dd>
+                </p>
               </div>
-            </div>
+            </li>
           ))}
-        </dl>
+        </ul>
       </div>
     ))}
   </div>

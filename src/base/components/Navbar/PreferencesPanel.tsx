@@ -250,7 +250,8 @@ const PALETTE_OPTIONS: {
   {
     value: 'ameixa',
     name: 'Lima & Ameixa',
-    background: '#0c0911',
+    // Mais clara que o fundo real, para não se confundir com a Índigo.
+    background: '#5b3d6e',
     accent: '#c3f06b',
   },
   {
