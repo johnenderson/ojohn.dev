@@ -248,6 +248,12 @@ const PALETTE_OPTIONS: {
     accent: '#c3f06b',
   },
   {
+    value: 'ameixa',
+    name: 'Lima & Ameixa',
+    background: '#0c0911',
+    accent: '#c3f06b',
+  },
+  {
     value: 'ambar',
     name: 'Âmbar & Grafite',
     background: '#0d0c0a',

@@ -76,7 +76,9 @@ const themeInitScript = `(function () {
     document.documentElement.style.colorScheme = resolved;
     var palette = localStorage.getItem('palette');
     document.documentElement.dataset.palette =
-      palette === 'ambar' || palette === 'teal' ? palette : 'lima';
+      palette === 'ameixa' || palette === 'ambar' || palette === 'teal'
+        ? palette
+        : 'lima';
   } catch (e) {
     document.documentElement.classList.add('dark');
   }

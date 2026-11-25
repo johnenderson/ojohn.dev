@@ -132,6 +132,62 @@ html.light[data-palette='ambar'] {
   --site-selection-foreground: #1b1712;
 }
 
+/* D — Lima & Ameixa: fundo e cartões inspirados no doce.sh; mantém o limão
+   do padrão no escuro e o verde de maior contraste no claro. */
+html[data-palette='ameixa'] {
+  --site-background: #0c0911;
+  --site-foreground: #fbf9fb;
+  --site-body: rgba(251, 249, 251, 0.74);
+  --site-body-muted: #a9a1ad;
+  --site-card: rgba(31, 24, 32, 0.88);
+  --site-card-hover: rgba(43, 34, 46, 0.96);
+  --site-popover: rgba(12, 9, 17, 0.96);
+  --site-navbar: rgba(12, 9, 17, 0.84);
+  --site-navbar-desktop: rgba(12, 9, 17, 0.45);
+  --site-navbar-scrolled: rgba(12, 9, 17, 0.94);
+  --site-primary: #c3f06b;
+  --site-primary-hover: #d6f797;
+  --site-primary-foreground: #111a05;
+  --site-primary-soft: rgba(195, 240, 107, 0.12);
+  --site-spotlight: rgba(195, 240, 107, 0.1);
+  --site-border: rgba(120, 101, 138, 0.5);
+  --site-border-muted: rgba(120, 101, 138, 0.36);
+  --site-border-subtle: rgba(120, 101, 138, 0.22);
+  --site-code: rgba(31, 24, 32, 0.82);
+  --site-code-inline: rgba(195, 240, 107, 0.12);
+  --code-surface: #161119;
+  --code-surface-header: #211a25;
+  --code-border: rgba(120, 101, 138, 0.24);
+  --code-muted: #a9a1ad;
+  --code-fg: #fbf9fb;
+  --site-selection: rgba(195, 240, 107, 0.3);
+  --site-selection-foreground: #fbf9fb;
+}
+html.light[data-palette='ameixa'] {
+  --site-background: #fefcfe;
+  --site-foreground: #17121b;
+  --site-body: rgba(23, 18, 27, 0.72);
+  --site-body-muted: #675e6c;
+  --site-card: #f8f3f7;
+  --site-card-hover: #fffbfe;
+  --site-popover: rgba(254, 252, 254, 0.96);
+  --site-navbar: rgba(254, 252, 254, 0.78);
+  --site-navbar-desktop: rgba(254, 252, 254, 0.45);
+  --site-navbar-scrolled: rgba(254, 252, 254, 0.95);
+  --site-primary: #4d7c0f;
+  --site-primary-hover: #3f6212;
+  --site-primary-foreground: #ffffff;
+  --site-primary-soft: rgba(77, 124, 15, 0.1);
+  --site-spotlight: rgba(77, 124, 15, 0.08);
+  --site-border: rgba(121, 105, 128, 0.36);
+  --site-border-muted: rgba(121, 105, 128, 0.25);
+  --site-border-subtle: rgba(121, 105, 128, 0.15);
+  --site-code: #f8f3f7;
+  --site-code-inline: rgba(77, 124, 15, 0.09);
+  --site-selection: rgba(77, 124, 15, 0.2);
+  --site-selection-foreground: #17121b;
+}
+
 /* C — Teal (original, com contraste corrigido no tema claro) */
 html[data-palette='teal'] {
   --site-background: #09080d;
