@@ -35,7 +35,7 @@ const pages = {
   uses: {
     eyebrow: 'Uso',
     title: 'Meu setup',
-    description: 'Maquinas, perifericos e ferramentas do meu dia a dia.',
+    description: 'Máquinas, periféricos e ferramentas do meu dia a dia.',
     badge: SITE_NAME,
   },
 } as const;
