@@ -1,21 +1,21 @@
-'use client';
-
-import { motion, useReducedMotion } from 'motion/react';
+import type { CSSProperties } from 'react';
 
 const HERO_NAME = 'John Enderson';
+const CHAR_DELAY_MS = 35;
+const FIRST_DELAY_MS = 100;
 
+const delayStyle = (position: number) =>
+  ({
+    '--hero-char-delay': `${FIRST_DELAY_MS + position * CHAR_DELAY_MS}ms`,
+  } as CSSProperties);
+
+/**
+ * Nome animado letra a letra. A marcação é a mesma no servidor e no navegador:
+ * quem decide se anima é o CSS (`.hero-char`), conforme a preferência de
+ * movimento. Escolher a marcação em JS quebrava a hidratação.
+ */
 const SplitName = () => {
-  const shouldReduceMotion = useReducedMotion();
   const words = HERO_NAME.split(' ');
-
-  if (shouldReduceMotion) {
-    return (
-      <>
-        {HERO_NAME}
-        <span className="text-site-primary">.</span>
-      </>
-    );
-  }
 
   return (
     <span aria-hidden="true" className="inline-flex flex-wrap gap-x-[0.28em]">
@@ -25,33 +25,21 @@ const SplitName = () => {
           className="inline-flex overflow-hidden"
         >
           {Array.from(word).map((char, charIndex) => (
-            <motion.span
+            <span
               key={`${char}-${charIndex}`}
-              className="inline-block"
-              initial={{ opacity: 0, y: '0.72em' }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{
-                delay: 0.1 + (wordIndex * 5 + charIndex) * 0.035,
-                duration: 0.62,
-                ease: [0.22, 1, 0.36, 1],
-              }}
+              className="hero-char inline-block"
+              style={delayStyle(wordIndex * 5 + charIndex)}
             >
               {char}
-            </motion.span>
+            </span>
           ))}
           {wordIndex === words.length - 1 && (
-            <motion.span
-              className="inline-block text-site-primary"
-              initial={{ opacity: 0, y: '0.72em' }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{
-                delay: 0.1 + HERO_NAME.length * 0.035,
-                duration: 0.62,
-                ease: [0.22, 1, 0.36, 1],
-              }}
+            <span
+              className="hero-char inline-block text-site-primary"
+              style={delayStyle(HERO_NAME.length)}
             >
               .
-            </motion.span>
+            </span>
           )}
         </span>
       ))}
