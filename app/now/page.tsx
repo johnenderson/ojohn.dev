@@ -22,11 +22,17 @@ import {
   GameCard,
   LanguageStack,
   LolLiveGame,
+  NowSummary,
+  type NowSummaryItem,
   RadarCard,
   RecentTrack,
   StarredRepos,
 } from '@/features/now/components';
-import { getGithubDev, getGithubStarred } from '@/lib/github';
+import {
+  getGithubDev,
+  getGithubStarred,
+  getGithubUsername,
+} from '@/lib/github';
 import { getLastfmRecentStats, getLastfmTopArtists } from '@/lib/lastfm';
 import { getLolLiveGame } from '@/lib/lol';
 import { SITE_NAME, SITE_URL } from '@/lib/site';
@@ -120,6 +126,22 @@ const getUniqueTracks = (tracks: LastfmTrack[]) => {
   });
 };
 
+const WEEKDAY_NAMES = [
+  'Domingo',
+  'Segunda',
+  'Terça',
+  'Quarta',
+  'Quinta',
+  'Sexta',
+  'Sábado',
+];
+
+const getBusiestWeekday = (rhythm: number[] | null | undefined) => {
+  if (!rhythm) return null;
+  const max = Math.max(...rhythm);
+  return max > 0 ? WEEKDAY_NAMES[rhythm.indexOf(max)] : null;
+};
+
 export default async function NowPage() {
   const [lastfm, artists, dev, steam, starred, lolLiveGame] = await Promise.all(
     [
@@ -151,6 +173,54 @@ export default async function NowPage() {
   const renderedAt = new Date().toISOString();
 
   const recentTracks = computeTrackData(lastfm);
+  const starsUrl = `https://github.com/${getGithubUsername()}?tab=stars`;
+
+  const currentTrack = recentTracks[0];
+  const busiestWeekday = getBusiestWeekday(dev?.rhythm);
+  const topGame = steam.games[0];
+
+  const summary: NowSummaryItem[] = [
+    {
+      label: 'Estudando',
+      value: 'EKS e System Design',
+      detail: 'Cursos do Matheus Fidelis',
+      href: '#radar',
+    },
+  ];
+  if (busiestWeekday) {
+    summary.push({
+      label: 'Pico no código',
+      value: busiestWeekday,
+      detail: 'Dia com mais contribuições no ano',
+      href: '#codigo',
+    });
+  }
+  if (currentTrack) {
+    summary.push({
+      label: currentTrack.nowPlaying ? 'Ouvindo agora' : 'Última faixa',
+      value: currentTrack.name,
+      detail: currentTrack.artist,
+      href: '#musica',
+    });
+  }
+  if (lolLiveGame) {
+    summary.push({
+      label: 'Em partida',
+      value: 'League of Legends',
+      detail: lolLiveGame.championId,
+      href: '#jogos',
+    });
+  } else if (topGame) {
+    summary.push({
+      label: 'Jogando',
+      value: topGame.name,
+      detail:
+        steam.source === 'recent'
+          ? 'Entre os recentes na Steam'
+          : 'Entre os mais jogados na Steam',
+      href: '#jogos',
+    });
+  }
 
   return (
     <PageWrapper>
@@ -158,9 +228,14 @@ export default async function NowPage() {
         <div className="content">
           <PageTitle title="Fazendo agora" subtitle={NOW_DESCRIPTION} />
 
+          <div className="mb-14">
+            <NowSummary items={summary} />
+          </div>
+
           <section
+            id="radar"
             aria-labelledby="radar-title"
-            className="border-b border-site-border-subtle pb-16"
+            className="scroll-mt-24 border-b border-site-border-subtle pb-16"
           >
             <SectionHeader
               icon={
@@ -193,16 +268,17 @@ export default async function NowPage() {
                 Também estou fazendo o curso de <strong>System Design</strong>{' '}
                 do <strong>Matheus Fidelis</strong> para organizar melhor
                 decisões, trade-offs e arquitetura antes do código começar a
-                gritar. Esse curso tem me ajudado muito a evoluir muito, mesmo
-                que eu ainda esteja engatinhando nos estudos.
+                gritar. Esse curso tem me ajudado muito a evoluir, mesmo que eu
+                ainda esteja engatinhando nos estudos.
               </RadarCard>
             </div>
           </section>
 
           {hasDevData ? (
             <section
+              id="codigo"
               aria-labelledby="code-title"
-              className="border-b border-site-border-subtle py-16"
+              className="scroll-mt-24 border-b border-site-border-subtle py-16"
             >
               <SectionHeader
                 icon={
@@ -219,20 +295,28 @@ export default async function NowPage() {
               />
 
               <div className="flex flex-col gap-4">
-                <div className="grid gap-4 lg:grid-cols-2">
+                {/* Ritmo de um lado; linguagens e atividade empilhadas do outro. */}
+                <div
+                  className={`grid gap-4 ${
+                    dev?.rhythm ? 'lg:grid-cols-2' : ''
+                  }`}
+                >
                   {dev?.rhythm ? <CodingRhythm rhythm={dev.rhythm} /> : null}
-                  <LanguageStack languages={dev?.languages ?? []} />
+                  <div className="flex min-w-0 flex-col gap-4">
+                    <LanguageStack languages={dev?.languages ?? []} />
+                    <ActivityFeed items={dev?.activity ?? []} />
+                  </div>
                 </div>
-                <ActivityFeed items={dev?.activity ?? []} />
-                {starred.length > 0 && <StarredRepos repos={starred} />}
+                <StarredRepos repos={starred} allHref={starsUrl} />
               </div>
             </section>
           ) : null}
 
           {!hasDevData && starred.length > 0 && (
             <section
+              id="codigo"
               aria-labelledby="starred-title"
-              className="border-b border-site-border-subtle py-16"
+              className="scroll-mt-24 border-b border-site-border-subtle py-16"
             >
               <SectionHeader
                 icon={
@@ -246,13 +330,14 @@ export default async function NowPage() {
                 title="Código"
                 updatedAt={renderedAt}
               />
-              <StarredRepos repos={starred} />
+              <StarredRepos repos={starred} allHref={starsUrl} />
             </section>
           )}
 
           <section
+            id="musica"
             aria-labelledby="listening-title"
-            className="border-b border-site-border-subtle py-16"
+            className="scroll-mt-24 border-b border-site-border-subtle py-16"
           >
             <SectionHeader
               icon={<HeadphonesIcon />}
@@ -337,7 +422,11 @@ export default async function NowPage() {
             </div>
           </section>
 
-          <section aria-labelledby="playing-title" className="pt-16">
+          <section
+            id="jogos"
+            aria-labelledby="playing-title"
+            className="scroll-mt-24 pt-16"
+          >
             <SectionHeader
               icon={
                 <FontAwesomeIcon

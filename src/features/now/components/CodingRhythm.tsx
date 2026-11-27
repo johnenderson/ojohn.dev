@@ -12,7 +12,7 @@ export const CodingRhythm = ({ rhythm }: CodingRhythmProps) => {
   const busiestLabel = rhythm[busiest] > 0 ? WEEKDAYS[busiest] : 'sem pico';
 
   return (
-    <div className="rounded-md border border-site-border-muted bg-site-card p-4 sm:p-5">
+    <div className="flex flex-col rounded-md border border-site-border-muted bg-site-card p-4 sm:p-5">
       <div className="flex items-start justify-between gap-4">
         <div>
           <h3 className="m-0 text-base font-semibold text-site-foreground">
@@ -41,7 +41,8 @@ export const CodingRhythm = ({ rhythm }: CodingRhythmProps) => {
         </span>
       </div>
 
-      <div className="flex items-end gap-1.5">
+      {/* O gráfico ocupa a altura que sobrar no cartão. */}
+      <div className="flex flex-1 gap-1.5">
         {rhythm.map((count, index) => {
           const height = Math.round((count / max) * 100);
           const isBusiest = index === busiest && count > 0;
@@ -51,9 +52,9 @@ export const CodingRhythm = ({ rhythm }: CodingRhythmProps) => {
               key={WEEKDAYS[index]}
               className="flex flex-1 flex-col items-center gap-2"
             >
-              <div className="flex h-24 w-full items-end">
+              <div className="relative min-h-24 w-full flex-1">
                 <div
-                  className={`w-full rounded-sm transition-[height,background-color] ${
+                  className={`absolute inset-x-0 bottom-0 rounded-sm transition-[height,background-color] ${
                     isBusiest ? 'bg-site-primary' : 'bg-site-card-hover'
                   }`}
                   style={{ height: `${Math.max(height, 6)}%` }}

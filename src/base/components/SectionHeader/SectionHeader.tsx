@@ -20,7 +20,7 @@ type SectionHeaderProps = {
   /** Link/ação alinhada à direita (ex.: "Ver todos"). */
   action?: ReactNode;
   className?: string;
-  /** ISO da última sincronização. Quando informado, mostra o selo "Atualizado há X". */
+  /** ISO da última sincronização. Quando informado, mostra "Atualizado há X". */
   updatedAt?: string | null;
 };
 
@@ -57,16 +57,13 @@ export const SectionHeader = ({
       </p>
     ) : null}
     {updatedAt ? (
-      <p className="m-0 inline-flex w-fit items-center gap-1.5 rounded-full border border-site-border-subtle px-2.5 py-1 text-xs font-medium text-site-body-muted">
+      <p className="m-0 inline-flex w-fit items-center gap-1.5 text-xs text-site-body-muted">
         <FontAwesomeIcon
           icon={faCalendarCheck}
           aria-hidden="true"
-          className="text-sm"
+          className="text-xs"
         />
-        Atualizado{' '}
-        <strong className="font-semibold text-site-foreground">
-          {formatRelativeTime(updatedAt)}
-        </strong>
+        Atualizado {formatRelativeTime(updatedAt)}
       </p>
     ) : null}
   </header>

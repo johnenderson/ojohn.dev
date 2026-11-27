@@ -56,7 +56,7 @@ export const ActivityFeed = ({ items }: ActivityFeedProps) => {
   if (items.length === 0) return null;
 
   return (
-    <div className="rounded-md border border-site-border-muted bg-site-card p-4 sm:p-5">
+    <div className="flex-1 rounded-md border border-site-border-muted bg-site-card p-4 sm:p-5">
       <h3 className="m-0 text-base font-semibold text-site-foreground">
         Em produção
       </h3>
