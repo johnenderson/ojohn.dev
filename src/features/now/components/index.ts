@@ -10,5 +10,6 @@ export { RadarCard } from './RadarCard';
 export { RecentTrack } from './RecentTrack';
 export { LolLiveGame } from './LolLiveGame';
 export { LolMatchHistory } from './LolMatchHistory';
+export { NowSummary, type NowSummaryItem } from './NowSummary';
 export { SectionIcon } from '@/base/components/SectionIcon';
 export { StarredRepos } from './StarredRepos';

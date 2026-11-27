@@ -4,12 +4,12 @@ import { faGithub } from '@fortawesome/free-brands-svg-icons';
 import { faStar } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
+import { SECTION_ACTION_CLASS } from '@/base/components/SectionHeader';
 import { formatRelativeTime } from '@/lib/formatRelativeTime';
 import type { GithubStarredRepo } from '@/lib/github';
 
 type StarredRepoRowProps = {
   repo: GithubStarredRepo;
-  priority?: boolean;
 };
 
 function StarredRepoRow({ repo }: Readonly<StarredRepoRowProps>) {
@@ -34,36 +34,14 @@ function StarredRepoRow({ repo }: Readonly<StarredRepoRowProps>) {
             {repo.fullName}
           </p>
           {repo.description && (
-            <p className="m-0 mt-0.5 line-clamp-1 text-[11px] leading-5 text-site-body-muted">
+            <p className="m-0 mt-0.5 line-clamp-2 text-xs leading-5 text-site-body-muted">
               {repo.description}
             </p>
           )}
-          {repo.topics.length > 0 && (
-            <div className="mt-1.5 flex flex-wrap gap-1">
-              {repo.topics.slice(0, 3).map((topic) => (
-                <span
-                  key={topic}
-                  className="rounded-full border border-site-border-subtle px-1.5 py-px text-[10px] font-medium leading-none text-site-body-muted"
-                >
-                  {topic}
-                </span>
-              ))}
-            </div>
-          )}
-        </div>
-
-        <div className="flex shrink-0 flex-col items-end gap-1 text-right min-w-max">
-          <span className="hidden rounded-full border border-site-border-subtle px-2 py-1 text-[10px] font-semibold leading-none text-site-body-muted sm:inline-flex">
-            {formatRelativeTime(repo.starredAt)}
-          </span>
-          <div className="flex items-center gap-1 whitespace-nowrap">
-            {repo.language && (
-              <span className="text-[11px] font-medium text-site-body-muted">
-                {repo.language}
-              </span>
-            )}
+          <p className="m-0 mt-1 flex flex-wrap items-center gap-x-3 text-xs text-site-body-muted">
+            {repo.language && <span>{repo.language}</span>}
             {repo.stars > 0 && (
-              <span className="inline-flex items-center gap-1 text-[11px] font-medium text-site-body-muted">
+              <span className="inline-flex items-center gap-1">
                 <FontAwesomeIcon
                   icon={faStar}
                   aria-hidden="true"
@@ -74,18 +52,23 @@ function StarredRepoRow({ repo }: Readonly<StarredRepoRowProps>) {
                   : repo.stars}
               </span>
             )}
-          </div>
+            <span>{formatRelativeTime(repo.starredAt)}</span>
+          </p>
         </div>
       </Link>
     </li>
   );
 }
 
+const VISIBLE_REPOS = 6;
+
 type StarredReposProps = {
   repos: GithubStarredRepo[];
+  /** Página com a lista completa de estrelas. */
+  allHref: string;
 };
 
-export function StarredRepos({ repos }: Readonly<StarredReposProps>) {
+export function StarredRepos({ repos, allHref }: Readonly<StarredReposProps>) {
   if (repos.length === 0) return null;
 
   return (
@@ -97,11 +80,22 @@ export function StarredRepos({ repos }: Readonly<StarredReposProps>) {
         Repositórios que marquei com estrela recentemente
       </p>
 
-      <ul className="m-0 flex list-none flex-col gap-1 p-0">
-        {repos.map((repo) => (
+      <ul className="m-0 grid list-none grid-cols-1 gap-x-4 gap-y-1 p-0 md:grid-cols-2">
+        {repos.slice(0, VISIBLE_REPOS).map((repo) => (
           <StarredRepoRow key={repo.fullName} repo={repo} />
         ))}
       </ul>
+
+      <div className="flex justify-end">
+        <Link
+          href={allHref}
+          target="_blank"
+          rel="noopener noreferrer"
+          className={SECTION_ACTION_CLASS}
+        >
+          Ver todas no GitHub →
+        </Link>
+      </div>
     </div>
   );
 }
