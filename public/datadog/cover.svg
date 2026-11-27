@@ -1,0 +1,84 @@
+<svg viewBox="0 0 1200 630" width="1200" height="630" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="cvtitle cvdesc" font-family="'Geist','Inter',system-ui,sans-serif">
+  <title id="cvtitle">Capa do artigo sobre investigação de query lenta</title>
+  <desc id="cvdesc">Diagrama: a rota GET /get-item leva a um plano de execução em que o Sort concentra 75% do custo estimado, e ao trace do APM em que a query ocupa cerca de 25% da requisição.</desc>
+
+  <defs>
+    <radialGradient id="bgGlow" cx="50%" cy="42%" r="70%">
+      <stop offset="0%" stop-color="#16202a"/>
+      <stop offset="55%" stop-color="#0e0c14"/>
+      <stop offset="100%" stop-color="#0b0a10"/>
+    </radialGradient>
+    <linearGradient id="cardFill" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#211d2b"/>
+      <stop offset="100%" stop-color="#16131d"/>
+    </linearGradient>
+    <linearGradient id="teal" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#6fe0d4"/>
+      <stop offset="100%" stop-color="#3fb9ac"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1200" height="630" fill="url(#bgGlow)"/>
+
+  <g fill="#b4adb7" font-size="26" font-weight="600" text-anchor="middle">
+    <text x="215" y="140">rota lenta</text>
+    <text x="600" y="140">plano de execução</text>
+    <text x="985" y="140">trace no APM</text>
+  </g>
+
+  <g fill="url(#cardFill)" stroke="#3a3442" stroke-width="2">
+    <rect x="65" y="180" width="300" height="270" rx="18"/>
+    <rect x="450" y="180" width="300" height="270" rx="18"/>
+    <rect x="835" y="180" width="300" height="270" rx="18"/>
+  </g>
+
+  <g fill="none" stroke="#5bd3c7" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" opacity="0.75">
+    <path d="M377 315h58M424 304l13 11-13 11"/>
+    <path d="M762 315h58M809 304l13 11-13 11"/>
+  </g>
+
+  <!-- rota: relógio e endpoint -->
+  <g fill="none" stroke="url(#teal)" stroke-width="7" stroke-linecap="round">
+    <circle cx="215" cy="277" r="52"/>
+    <path d="M215 246v33l23 15"/>
+  </g>
+  <text x="215" y="382" fill="#fffaf5" font-size="30" font-weight="700" text-anchor="middle" font-family="'Geist Mono','DejaVu Sans Mono',monospace">GET /get-item</text>
+  <text x="215" y="420" fill="#b4adb7" font-size="24" text-anchor="middle">≈ 1,06 s</text>
+
+  <!-- plano: árvore de operações, com o Sort em destaque -->
+  <g stroke="#7d7280" stroke-width="2.5" fill="none">
+    <path d="M600 268v24M600 346v20M530 386v-20h140v20"/>
+  </g>
+  <rect x="512" y="204" width="176" height="64" rx="12" fill="#241b1c" stroke="#f0a66d" stroke-width="3"/>
+  <text x="600" y="246" fill="#f0a66d" font-size="28" font-weight="700" text-anchor="middle">Sort 75%</text>
+  <g fill="#16131d" stroke="#5bd3c7" stroke-width="2">
+    <rect x="535" y="292" width="130" height="54" rx="10"/>
+    <rect x="472" y="386" width="116" height="44" rx="10"/>
+    <rect x="612" y="386" width="116" height="44" rx="10"/>
+  </g>
+  <g fill="#fffaf5" font-size="22" text-anchor="middle">
+    <text x="600" y="327">Append</text>
+    <text x="530" y="415" font-size="19">Seq Scan</text>
+    <text x="670" y="415" font-size="19">Seq Scan</text>
+  </g>
+
+  <!-- trace: spans da requisição, com a query em destaque -->
+  <rect x="866" y="222" width="238" height="30" rx="6" fill="url(#teal)"/>
+  <rect x="896" y="270" width="150" height="30" rx="6" fill="#5bd3c7" opacity="0.4"/>
+  <rect x="916" y="318" width="60" height="30" rx="6" fill="#f0a66d"/>
+  <rect x="990" y="366" width="86" height="30" rx="6" fill="#5bd3c7" opacity="0.25"/>
+  <text x="985" y="429" fill="#b4adb7" font-size="24" text-anchor="middle">query ≈ 25%</text>
+
+  <g font-size="22" font-weight="600" text-anchor="middle">
+    <g fill="#16131d" stroke="#3a3442" stroke-width="2">
+      <rect x="110" y="498" width="210" height="50" rx="25"/>
+      <rect x="495" y="498" width="210" height="50" rx="25"/>
+      <rect x="880" y="498" width="210" height="50" rx="25"/>
+    </g>
+    <g fill="#fffaf5">
+      <text x="215" y="531">Query Metrics</text>
+      <text x="600" y="531">Explain Plan</text>
+      <text x="985" y="531">DBM + APM</text>
+    </g>
+  </g>
+</svg>
