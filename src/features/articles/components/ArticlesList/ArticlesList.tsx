@@ -18,7 +18,7 @@ import {
 
 type Header = 'h1' | 'h2' | false;
 type ArticlesListProps = {
-  /** Destaca o primeiro artigo (capa grande). Só vale na lista não agrupada. */
+  /** Destaca o primeiro artigo (capa grande). */
   featureFirst?: boolean;
   filterTag?: string;
   grouped?: boolean;
@@ -41,9 +41,6 @@ const groupArticlesByYear = (articles: ArticleListItemType[]) =>
     };
   }, {});
 
-const formatArticleCount = (count: number) =>
-  count === 1 ? '1 artigo' : `${count} artigos`;
-
 export const ArticlesList: FC<ArticlesListProps> = ({
   featureFirst = false,
   filterTag,
@@ -55,10 +52,26 @@ export const ArticlesList: FC<ArticlesListProps> = ({
   const articles = getArticlesList().filter(
     (article) => !filterTag || article.tags.includes(filterTag),
   );
-  const articlesByYear = groupArticlesByYear(articles);
+  // Na lista agrupada, o destaque sai dos grupos para não aparecer duas vezes.
+  const highlighted = grouped && featureFirst ? articles[0] : undefined;
+  const articlesByYear = groupArticlesByYear(
+    highlighted ? articles.slice(1) : articles,
+  );
   const years = Object.keys(articlesByYear).sort(
     (a, b) => Number(b) - Number(a),
   );
+
+  const toItemProps = (article: ArticleListItemType) => ({
+    cover: article.cover,
+    datetime: article.date,
+    description: article.description,
+    icon: article.icon,
+    link: `/blog/${article.slug}`,
+    minutes: article.minutes,
+    showTags,
+    tags: article.tags,
+    title: article.title,
+  });
 
   let headerContent: React.ReactNode = null;
   if (header !== false) {
@@ -104,32 +117,25 @@ export const ArticlesList: FC<ArticlesListProps> = ({
 
       {grouped ? (
         <div className="flex flex-col gap-10">
+          {highlighted ? (
+            <ul className="m-0 grid list-none p-0">
+              <ArticleListItem {...toItemProps(highlighted)} variant="hero" />
+            </ul>
+          ) : null}
+
           {years.map((year) => (
             <section key={year} aria-labelledby={`articles-${year}`}>
-              <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
-                <h2
-                  id={`articles-${year}`}
-                  className="m-0 text-2xl font-bold leading-none text-site-foreground"
-                >
-                  {year}
-                </h2>
-                <span className="text-sm font-medium text-site-body-muted">
-                  {formatArticleCount(articlesByYear[year].length)}
-                </span>
-              </div>
+              <h2
+                id={`articles-${year}`}
+                className="m-0 mb-4 flex items-center gap-4 font-mono text-sm font-medium tracking-wider text-site-body-muted after:h-px after:flex-1 after:bg-site-border-muted"
+              >
+                {year}
+              </h2>
               <ul className="m-0 grid list-none gap-3 p-0">
                 {articlesByYear[year].map((article) => (
                   <ArticleListItem
                     key={article.slug}
-                    cover={article.cover}
-                    datetime={article.date}
-                    description={article.description}
-                    icon={article.icon}
-                    link={`/blog/${article.slug}`}
-                    minutes={article.minutes}
-                    showTags={showTags}
-                    tags={article.tags}
-                    title={article.title}
+                    {...toItemProps(article)}
                     variant={itemVariant}
                   />
                 ))}
@@ -142,15 +148,7 @@ export const ArticlesList: FC<ArticlesListProps> = ({
           {articles.map((article, index) => (
             <ArticleListItem
               key={article.slug}
-              cover={article.cover}
-              datetime={article.date}
-              description={article.description}
-              icon={article.icon}
-              link={`/blog/${article.slug}`}
-              minutes={article.minutes}
-              showTags={showTags}
-              tags={article.tags}
-              title={article.title}
+              {...toItemProps(article)}
               variant={featureFirst && index === 0 ? 'feature' : itemVariant}
             />
           ))}

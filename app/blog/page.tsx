@@ -4,6 +4,7 @@ import { PageWrapper } from '../components/PageWrapper';
 import type { Metadata } from 'next';
 
 import { PageTitle } from '@/base/components/PageTitle';
+import { SECTION_ACTION_CLASS } from '@/base/components/SectionHeader';
 import { ArticlesList } from '@/features/articles/components/ArticlesList';
 import { getArticlesList } from '@/features/articles/lib/articles';
 import { SITE_NAME, SITE_URL } from '@/lib/site';
@@ -36,6 +37,28 @@ export const metadata: Metadata = {
 };
 
 const MIN_ARTICLES_PER_TAG = 2;
+
+const formatArticleCount = (count: number) =>
+  count === 1 ? '1 artigo' : `${count} artigos`;
+
+/** Quantidade de artigos exibidos e o atalho para assinar o feed. */
+const ListSummary = ({ activeTag }: { activeTag?: string }) => {
+  const count = getArticlesList().filter(
+    (article) => !activeTag || article.tags.includes(activeTag),
+  ).length;
+
+  return (
+    <div className="flex flex-wrap items-center justify-between gap-x-4 border-b border-site-border-muted pb-2">
+      <p className="m-0 text-sm font-medium text-site-body-muted">
+        {formatArticleCount(count)}
+        {activeTag ? ` com a tag "${activeTag}"` : ''}
+      </p>
+      <a href="/rss.xml" className={SECTION_ACTION_CLASS}>
+        Assinar via RSS →
+      </a>
+    </div>
+  );
+};
 
 const getAllTags = () => {
   const counts = new Map<string, number>();
@@ -103,7 +126,9 @@ export default async function Page({ searchParams }: BlogPageProps) {
             subtitle="Guias, tutoriais e notas pessoais."
           />
           <TagFilter activeTag={tag} />
+          <ListSummary activeTag={tag} />
           <ArticlesList
+            featureFirst
             filterTag={tag}
             grouped
             header={false}

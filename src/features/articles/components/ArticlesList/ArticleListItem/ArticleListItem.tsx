@@ -16,7 +16,7 @@ type PostPropType = {
   showTags?: boolean;
   tags: string[];
   title: string;
-  variant?: 'default' | 'compact' | 'feature';
+  variant?: 'default' | 'compact' | 'feature' | 'hero';
 };
 
 /** Capa em destaque: empilhada no mobile, ao lado do texto a partir de md. */
@@ -28,6 +28,18 @@ const FeatureCover = ({ cover, title }: { cover: string; title: string }) => (
     height={360}
     sizes="(min-width: 768px) 320px, 100vw"
     className="aspect-video w-full shrink-0 rounded-md border border-site-border-subtle object-cover transition-transform duration-300 group-hover:scale-[1.02] md:w-80"
+  />
+);
+
+/** Capa da lista do blog: maior que a dos cards da home. */
+const ListCover = ({ cover, title }: { cover: string; title: string }) => (
+  <Image
+    src={cover}
+    alt={`Capa do artigo ${title}`}
+    width={448}
+    height={252}
+    sizes="224px"
+    className="hidden aspect-video w-56 shrink-0 self-center rounded-md border border-site-border-subtle object-cover transition-transform duration-300 group-hover:scale-[1.03] sm:block"
   />
 );
 
@@ -91,6 +103,64 @@ export const ArticleListItem: FC<PostPropType> = ({
   const isCompact = variant === 'compact';
   const formattedDate = formatArticleDate(datetime);
 
+  // Destaque do blog. A home usa 'feature', que continua como está.
+  if (variant === 'hero') {
+    return (
+      <li>
+        <Card
+          href={link}
+          interactive
+          className="article-card-glass group p-4 focus-visible:outline-none sm:p-5"
+        >
+          <div
+            className={`article-card-content grid gap-5 ${
+              cover
+                ? 'lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)] lg:items-center lg:gap-8'
+                : ''
+            }`}
+          >
+            {cover ? (
+              <Image
+                src={cover}
+                alt={`Capa do artigo ${title}`}
+                width={1200}
+                height={630}
+                sizes="(min-width: 1024px) 560px, 100vw"
+                loading="eager"
+                fetchPriority="high"
+                className="aspect-[1200/630] h-auto w-full rounded-md border border-site-border-subtle object-cover"
+              />
+            ) : null}
+
+            <div className="min-w-0">
+              <p className="m-0 mb-3 font-mono text-xs uppercase tracking-wider text-site-primary">
+                Mais recente
+              </p>
+              <div className="flex items-start gap-3">
+                {icon ? <ArticleIcon icon={icon} size="sm" /> : null}
+                <h2 className="m-0 text-balance text-2xl font-bold leading-tight text-site-foreground transition-colors group-hover:text-site-primary group-focus-visible:text-site-primary">
+                  {title}
+                </h2>
+              </div>
+
+              <p className="mb-0 mt-3 text-pretty text-base leading-relaxed text-site-body">
+                {description}
+              </p>
+
+              <MetaLine
+                datetime={datetime}
+                formattedDate={formattedDate}
+                minutes={minutes}
+              />
+
+              {showTags && tags.length > 0 && <TagList tags={tags} />}
+            </div>
+          </div>
+        </Card>
+      </li>
+    );
+  }
+
   if (variant === 'feature') {
     return (
       <li>
@@ -140,7 +210,7 @@ export const ArticleListItem: FC<PostPropType> = ({
             {icon ? <ArticleIcon icon={icon} size="card" /> : null}
 
             <div className="min-w-0 flex-1">
-              <h3 className="m-0 text-lg font-bold leading-snug text-site-foreground transition-colors group-hover:text-site-primary group-focus-visible:text-site-primary">
+              <h3 className="m-0 text-balance text-xl font-bold leading-snug text-site-foreground transition-colors group-hover:text-site-primary group-focus-visible:text-site-primary">
                 {title}
               </h3>
 
@@ -150,14 +220,14 @@ export const ArticleListItem: FC<PostPropType> = ({
                 minutes={minutes}
               />
 
-              <p className="mb-0 mt-1.5 line-clamp-2 text-xs leading-5 text-site-body-muted">
+              <p className="mb-0 mt-2 line-clamp-2 text-[15px] leading-6 text-site-body">
                 {description}
               </p>
 
               {showTags && tags.length > 0 && <TagList tags={tags} />}
             </div>
 
-            {cover ? <CardCover cover={cover} title={title} /> : null}
+            {cover ? <ListCover cover={cover} title={title} /> : null}
           </div>
         </Card>
       </li>
