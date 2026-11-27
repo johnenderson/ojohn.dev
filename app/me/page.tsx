@@ -21,10 +21,7 @@ import {
   hoverRotation,
 } from '@/base/card-animation';
 import { PageTitle } from '@/base/components/PageTitle';
-import {
-  SECTION_ACTION_CLASS,
-  SectionHeader,
-} from '@/base/components/SectionHeader';
+import { SectionHeader } from '@/base/components/SectionHeader';
 import { SECTION_FLAGS } from '@/lib/section-flags';
 import { SITE_NAME, SITE_URL } from '@/lib/site';
 
@@ -109,6 +106,9 @@ const MONO_LABEL =
 
 const CHIP =
   'flex items-center gap-2 rounded-full border border-site-border-muted bg-site-card px-3 py-1.5 text-sm text-site-foreground';
+
+const EXPLORE_LINK =
+  'inline-flex min-h-11 items-center gap-2 rounded-md lg:flex lg:justify-between border border-site-border-muted px-4 text-sm font-medium text-site-foreground no-underline transition-colors hover:border-site-primary hover:text-site-primary-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-site-primary';
 
 const icon = (definition: IconDefinition) => (
   <FontAwesomeIcon icon={definition} aria-hidden="true" className="size-4" />
@@ -350,9 +350,11 @@ export default function Page() {
               </div>
             </section>
 
+            {/* No desktop: título e links numa coluna, texto na outra. A ordem
+                no DOM (título, texto, links) é a que vale no celular. */}
             <section
               aria-labelledby="site-title"
-              className="w-full rounded-md border border-site-border-muted bg-site-card p-5 sm:p-8"
+              className="grid w-full rounded-md border border-site-border-muted bg-site-card p-5 sm:p-8 lg:grid-cols-[16rem_minmax(0,1fr)] lg:grid-rows-[auto_1fr] lg:gap-x-12"
             >
               <SectionHeader
                 icon={icon(faPenNib)}
@@ -360,44 +362,47 @@ export default function Page() {
                 title="Sobre este site"
               />
 
-              <Prose>
-                <p className="m-0">
-                  A ideia de criar este espaço surgiu a partir da inspiração de{' '}
-                  <strong className="font-semibold text-site-foreground">
-                    Doce Fernandes
-                  </strong>
-                  , do <InlineLink href="https://doce.sh">doce.sh</InlineLink>.
-                  Ele já me inspirou em diferentes momentos, especialmente
-                  quando fazia transmissões na Twitch sobre programação,
-                  resolução de desafios no LeetCode e outros assuntos
-                  relacionados à tecnologia.
-                </p>
+              <div className="lg:col-start-2 lg:row-span-2 lg:row-start-1">
+                <Prose>
+                  <p className="m-0">
+                    A ideia de criar este espaço surgiu a partir da inspiração
+                    de{' '}
+                    <strong className="font-semibold text-site-foreground">
+                      Doce Fernandes
+                    </strong>
+                    , do <InlineLink href="https://doce.sh">doce.sh</InlineLink>
+                    . Ele já me inspirou em diferentes momentos, especialmente
+                    quando fazia transmissões na Twitch sobre programação,
+                    resolução de desafios no LeetCode e outros assuntos
+                    relacionados à tecnologia.
+                  </p>
 
-                <p className="m-0">
-                  Este site também nasceu como uma forma de me incentivar a
-                  escrever mais — tanto sobre mim quanto sobre as coisas que
-                  venho aprendendo ao longo da minha trajetória.
-                </p>
+                  <p className="m-0">
+                    Este site também nasceu como uma forma de me incentivar a
+                    escrever mais — tanto sobre mim quanto sobre as coisas que
+                    venho aprendendo ao longo da minha trajetória.
+                  </p>
 
-                <p className="m-0">
-                  Quero compartilhar conteúdos que possam ser úteis para pessoas
-                  que estão procurando ideias para programar, construir um
-                  portfólio, desenvolver projetos ou conhecer melhor
-                  determinados assuntos relacionados à tecnologia.
-                </p>
+                  <p className="m-0">
+                    Quero compartilhar conteúdos que possam ser úteis para
+                    pessoas que estão procurando ideias para programar,
+                    construir um portfólio, desenvolver projetos ou conhecer
+                    melhor determinados assuntos relacionados à tecnologia.
+                  </p>
 
-                <p className="m-0">
-                  Não tenho a pretensão de saber tudo. A ideia é documentar
-                  aprendizados, experiências, erros e descobertas que talvez
-                  também possam ajudar outras pessoas.
-                </p>
-              </Prose>
+                  <p className="m-0">
+                    Não tenho a pretensão de saber tudo. A ideia é documentar
+                    aprendizados, experiências, erros e descobertas que talvez
+                    também possam ajudar outras pessoas.
+                  </p>
+                </Prose>
+              </div>
 
-              <ul className="m-0 mt-6 flex list-none flex-wrap gap-x-6 p-0">
+              <ul className="m-0 mt-6 flex list-none flex-wrap gap-2 self-start p-0 lg:col-start-1 lg:row-start-2 lg:mt-0 lg:flex-col lg:items-stretch">
                 {exploreLinks.map((link) => (
                   <li key={link.href}>
-                    <Link href={link.href} className={SECTION_ACTION_CLASS}>
-                      {link.label} →
+                    <Link href={link.href} className={EXPLORE_LINK}>
+                      {link.label} <span aria-hidden="true">→</span>
                     </Link>
                   </li>
                 ))}
