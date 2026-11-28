@@ -451,7 +451,8 @@ export default async function NowPage() {
             )}
 
             {steam.games.length > 0 ? (
-              <div className="grid grid-cols-3 gap-3 sm:grid-cols-5 lg:gap-6">
+              // Mobile: 3 colunas → mostra 9 (3 linhas cheias); sm+: 5 colunas → 10
+              <div className="grid grid-cols-3 gap-3 sm:grid-cols-5 lg:gap-6 max-sm:[&>*:nth-child(n+10)]:hidden">
                 {steam.games.map((game) => (
                   <GameCard key={game.appid} game={game} />
                 ))}

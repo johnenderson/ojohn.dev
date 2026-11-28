@@ -20,14 +20,14 @@ const debugLog = (...args: unknown[]) => {
 const CACHE_TTL_RECENT = 60 * 60 * 24; // 24h
 // Top all-time: ranking de horas totais não muda do dia pra noite
 const CACHE_TTL_ALLTIME = 60 * 60 * 24 * 7; // 7 dias
-// v5: capas resolvidas via IStoreBrowseService (assets com hash)
-const CACHE_KEY_RECENT = 'steam:recently-played:v5';
-const CACHE_KEY_ALLTIME = 'steam:alltime:v5';
+// v6: lista ampliada para 10 jogos (invalida o cache antigo, que guardava só 5)
+const CACHE_KEY_RECENT = 'steam:recently-played:v6';
+const CACHE_KEY_ALLTIME = 'steam:alltime:v6';
 
 /** Quantos cards a grade exibe — sempre completamos até esse número. */
-const TARGET_COUNT = 5;
+const TARGET_COUNT = 10;
 /** Pool de all-time mantido em cache, com folga para o backfill após dedupe. */
-const ALLTIME_POOL = 12;
+const ALLTIME_POOL = 20;
 
 /**
  * Apps que não são jogos de verdade e devem ser omitidos da lista.
